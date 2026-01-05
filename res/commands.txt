@@ -1,0 +1,122 @@
+create calendar --name personal --timezone America/New_York
+create calendar --name work --timezone America/Los_Angeles
+create calendar --name sideProject --timezone Europe/London
+use calendar --name personal
+create event "Meeting A" from 2025-11-06T10:00 to 2025-11-06T11:00
+create event "AllDay" on 2025-11-07
+create event "Scrum" from 2025-11-10T09:00 to 2025-11-10T09:30 repeats MWF for 4 times
+create event "Yoga" on 2025-11-09 repeats TU for 3 times
+create event "Project Deadline" from 2025-11-12T17:00 to 2025-11-12T17:30
+create event "Team Lunch" on 2025-11-13
+create event "Daily Standup" from 2025-11-14T09:00 to 2025-11-14T09:15 repeats MTWRF until 2025-11-21
+create event "Evening Review" from 2025-11-08T18:00 to 2025-11-08T18:30
+create event "Monthly Planning" from 2025-11-20T14:00 to 2025-11-20T16:00
+edit calendar --name personal --property name myPersonal
+use calendar --name myPersonal
+edit calendar --name myPersonal --property timezone America/Chicago
+edit event subject "Meeting A" from 2025-11-06T09:00 to 2025-11-06T10:00 with "Client Meeting"
+edit event location "AllDay" from 2025-11-07T07:00 to 2025-11-07T16:00 with "Office"
+edit event status "Scrum" from 2025-11-10T08:00 to 2025-11-10T08:30 with "Private"
+edit events description "Scrum" from 2025-11-12T08:00 with "Sprint Planning"
+edit series start "Daily Standup" from 2025-11-14T08:00 with 2025-11-14T08:15
+edit series subject "Daily Standup" from 2025-11-14T08:15 with "Morning Standup"
+use calendar --name work
+create event "Work Sync" from 2025-11-06T09:00 to 2025-11-06T10:00
+create event "Team Meeting" from 2025-11-07T14:00 to 2025-11-07T15:00
+create event "Code Review" from 2025-11-08T11:00 to 2025-11-08T12:00
+create event "Deployment" on 2025-11-09
+create event "Interview" from 2025-11-10T13:00 to 2025-11-10T14:00 repeats TU for 2 times
+create event "Weekly Sync" from 2025-11-11T10:00 to 2025-11-11T10:30 repeats MWF for 3 times
+create event "Lunch & Learn" on 2025-11-12 repeats W for 2 times
+edit calendar --name work --property timezone America/New_York
+edit event location "Work Sync" from 2025-11-06T12:00 to 2025-11-06T13:00 with "Zoom"
+edit events description "Weekly Sync" from 2025-11-12T13:00 with "Sprint Catchup"
+edit series subject "Lunch & Learn" from 2025-11-12T11:00 with "Learning Session"
+use calendar --name sideProject
+create event "Brainstorm" from 2025-11-06T08:00 to 2025-11-06T09:30
+create event "Prototype Review" from 2025-11-07T10:00 to 2025-11-07T11:30
+create event "Design Session" from 2025-11-08T14:00 to 2025-11-08T16:00 repeats TU for 3 times
+create event "Client Call" from 2025-11-09T12:00 to 2025-11-09T12:30
+edit calendar --name sideProject --property name SideProj
+use calendar --name SideProj
+edit calendar --name SideProj --property timezone Europe/Berlin
+edit event location "Design Session" from 2025-11-09T15:00 to 2025-11-09T17:00 with "Remote"
+edit series description "Design Session" from 2025-11-09T15:00 with "UI/UX Sprint"
+use calendar --name myPersonal
+print events on 2025-11-06
+print events on 2025-11-07
+print events on 2025-11-08
+print events on 2025-11-10
+print events from 2025-11-06T00:00 to 2025-11-21T23:59
+show status on 2025-11-06T10:30
+show status on 2025-11-08T12:00
+use calendar --name work
+print events on 2025-11-06
+print events on 2025-11-07
+print events on 2025-11-08
+print events from 2025-11-06T00:00 to 2025-11-12T23:59
+show status on 2025-11-06T09:30
+show status on 2025-11-09T12:00
+use calendar --name SideProj
+print events on 2025-11-06
+print events on 2025-11-07
+print events on 2025-11-08
+print events from 2025-11-06T00:00 to 2025-11-10T23:59
+show status on 2025-11-08T15:00
+show status on 2025-11-09T12:15
+use calendar --name myPersonal
+export cal calendar_export_myPersonal.csv
+export cal calendar_export_myPersonal.ical
+use calendar --name work
+export cal calendar_export_work.csv
+export cal calendar_export_work.ical
+use calendar --name SideProj
+export cal calendar_export_SideProj.csv
+export cal calendar_export_SideProj.ical
+create calendar --name Work --timezone America/New_York
+create calendar --name Personal --timezone America/Los_Angeles
+use calendar --name Work
+create event "Thursday Meeting" from 2025-01-09T09:00 to 2025-01-09T10:00
+create event "Thursday Lunch" from 2025-01-09T12:00 to 2025-01-09T13:00
+create event "Monday Standup" from 2025-01-13T08:30 to 2025-01-13T09:00 repeats M for 10 times
+create event "Client Call" from 2025-01-16T14:00 to 2025-01-16T15:00
+print events from 2025-01-01T00:00 to 2025-04-30T23:59
+copy event "Thursday Meeting" on 2025-01-09T09:00 --target Personal to 2025-02-06T10:00
+use calendar --name Personal
+print events on 2025-02-06
+use calendar --name Work
+copy events on 2025-01-09 --target Personal to 2025-02-13
+use calendar --name Personal
+print events on 2025-02-13
+use calendar --name Work
+copy events between 2025-01-09 and 2025-01-16 --target Personal to 2025-03-01
+use calendar --name Personal
+print events from 2025-03-01T00:00 to 2025-03-15T23:59
+use calendar --name Work
+copy events between 2025-01-27 and 2025-02-24 --target Personal to 2025-04-01
+use calendar --name Personal
+print events from 2025-04-01T00:00 to 2025-04-30T23:59
+use calendar --name Work
+copy events between 2025-01-09 and 2025-01-16 --target Work to 2025-05-01
+print events from 2025-05-01T00:00 to 2025-05-15T23:59
+copy event "Thursday Meeting" on 2025-01-09T09:00 --target Personal to 2025-02-06T10:00
+copy events on 2025-01-09 --target Personal to 2025-02-13
+copy event "Fake Event" on 2025-01-09T10:00 --target Personal to 2025-06-01T10:00
+copy event "Thursday Meeting" on 2025-01-09T09:00 --target FakeCalendar to 2025-06-01T10:00
+copy events between 2025-12-01 and 2025-12-31 --target Personal to 2025-06-01
+use calendar --name Work
+export cal Work_Final.csv
+export cal Work_Final.ical
+use calendar --name Personal
+export cal Personal_Final.csv
+export cal Personal_Final.ical
+use calendar --name myPersonal
+export cal myPersonal_Final.csv
+export cal myPersonal_Final.ical
+use calendar --name work
+export cal work_Final.csv
+export cal work_Final.ical
+use calendar --name SideProj
+export cal SideProj_Final.csv
+export cal SideProj_Final.ical
+exit
