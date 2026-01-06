@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>QueryEventParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.parser</a> &gt; <span class="el_source">QueryEventParser.java</span></div><h1>QueryEventParser.java</h1><pre class="source lang-java linenums">package calendar.parser;
+
+import calendar.command.QueryEventCommand;
+import calendar.dto.QueryEventDto;
+import calendar.interfacetypes.Icommand;
+import calendar.interfacetypes.Iparser;
+import calendar.model.CalendarModel;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * Parser implementation for handling event query commands.
+ * This class uses regex patterns to parse user input for querying calendar events
+ * with three different query types: printing events on a specific date, printing events
+ * within a date-time range, or checking availability status at a specific instant.
+ * The parser validates command syntax and extracts temporal parameters into a QueryEventDto
+ * which is then wrapped in a QueryEventCommand for execution.
+ */
+public class QueryEventParser implements Iparser {
+
+  private final Map&lt;QueryEventDto.QueryType, Pattern&gt; patterns;
+
+  /**
+   * Constructs a QueryEventParser and initializes the query patterns.
+   * Defines regex patterns for printing events on a specific date,
+   * printing events within a range, and showing status at a specific time.
+   */
+<span class="fc" id="L30">  public QueryEventParser() {</span>
+<span class="fc" id="L31">    this.patterns = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc" id="L32">    String dateStr = &quot;(?&lt;date&gt;\\d{4}-\\d{2}-\\d{2})&quot;;</span>
+<span class="fc" id="L33">    String dateTimeStr = &quot;(?&lt;datetime&gt;\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2})&quot;;</span>
+<span class="fc" id="L34">    String dateTimeStart = &quot;(?&lt;start&gt;\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2})&quot;;</span>
+<span class="fc" id="L35">    String dateTimeEnd = &quot;(?&lt;end&gt;\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2})&quot;;</span>
+
+<span class="fc" id="L37">    patterns.put(QueryEventDto.QueryType.PRINT_ON_DATE,</span>
+<span class="fc" id="L38">            Pattern.compile(String.format(&quot;^print events on %s$&quot;, dateStr),</span>
+                    Pattern.CASE_INSENSITIVE));
+<span class="fc" id="L40">    patterns.put(QueryEventDto.QueryType.PRINT_IN_RANGE,</span>
+<span class="fc" id="L41">            Pattern.compile(String.format(&quot;^print events from %s to %s$&quot;,</span>
+                            dateTimeStart, dateTimeEnd),
+                    Pattern.CASE_INSENSITIVE));
+<span class="fc" id="L44">    patterns.put(QueryEventDto.QueryType.SHOW_STATUS_AT,</span>
+<span class="fc" id="L45">            Pattern.compile(String.format(&quot;^show status on %s$&quot;, dateTimeStr),</span>
+                    Pattern.CASE_INSENSITIVE));
+<span class="fc" id="L47">  }</span>
+
+  /**
+   * Determines whether this parser can handle the given command string.
+   * Returns true if the command starts with &quot;print events&quot; or &quot;show status&quot;,
+   * indicating it is a query command that this parser should process.
+   *
+   * @param commandString the raw user input command
+   * @return true if the command is a query command, false otherwise
+   */
+  public boolean canHandle(String commandString) {
+<span class="fc bfc" id="L58" title="All 2 branches covered.">    if (commandString == null) {</span>
+<span class="fc" id="L59">      return false;</span>
+    }
+<span class="fc" id="L61">    String trimmedLower = commandString.trim().toLowerCase();</span>
+<span class="fc bfc" id="L62" title="All 4 branches covered.">    return trimmedLower.startsWith(&quot;print events&quot;) || trimmedLower.startsWith(&quot;show status&quot;);</span>
+  }
+
+  /**
+   * Parses the query command string and creates a QueryEventCommand.
+   * Iterates through the regex patterns to find a match, extracts the temporal
+   * parameters (date, date-time range, or instant) into a QueryEventDto, and wraps
+   * it in a QueryEventCommand ready for execution. The patterns are checked in order
+   * to ensure correct matching.
+   *
+   * @param userInput the raw user command string to parse
+   * @param service   the calendar model service acting as the receiver
+   * @return a QueryEventCommand containing the parsed query parameters
+   * @throws Exception if the command format is invalid or doesn't match any known pattern
+   */
+  @Override
+  public Icommand parse(String userInput, CalendarModel service) throws Exception {
+<span class="fc" id="L79">    String trimmedInput = userInput.trim();</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">    for (Map.Entry&lt;QueryEventDto.QueryType, Pattern&gt; entry : patterns.entrySet()) {</span>
+<span class="fc" id="L81">      Matcher matcher = entry.getValue().matcher(trimmedInput);</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">      if (matcher.matches()) {</span>
+<span class="fc" id="L83">        QueryEventDto obj = new QueryEventDto(entry.getKey(), matcher);</span>
+<span class="fc" id="L84">        return new QueryEventCommand(service, obj);</span>
+      }
+<span class="fc" id="L86">    }</span>
+<span class="fc" id="L87">    throw new Exception(&quot;Invalid query command format: &quot; + userInput);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

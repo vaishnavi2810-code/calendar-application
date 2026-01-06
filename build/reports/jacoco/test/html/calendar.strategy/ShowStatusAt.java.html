@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ShowStatusAt.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.strategy</a> &gt; <span class="el_source">ShowStatusAt.java</span></div><h1>ShowStatusAt.java</h1><pre class="source lang-java linenums">package calendar.strategy;
+
+import static calendar.constants.CreateCalendarConstants.DATETIME_FORMATTER;
+
+import calendar.dto.QueryEventDto;
+import calendar.interfacetypes.Iquery;
+import calendar.model.Event;
+import calendar.util.EventFinder;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * Strategy implementation for checking availability status at a specific instant in time.
+ * This class queries the calendar to find all events that are active at the specified
+ * date-time instant. The result set is used to determine if the user is busy (events found)
+ * or available (no events found) at that moment.
+ */
+<span class="fc" id="L22">public class ShowStatusAt implements Iquery {</span>
+
+  /**
+   * Finds all events that are active at the specified instant in time.
+   * Returns events whose time span includes the query instant - that is, events where
+   * the instant falls between (or at) their start and end times. An empty set indicates
+   * availability, while a non-empty set indicates the user is busy at that time.
+   *
+   * @param dto the query data transfer object containing the instant to check
+   * @param allEvents the complete set of calendar events to search through
+   * @return a set of events active at the specified instant, or an empty set if none are active
+   * @throws Exception if the query parameters are invalid or if an error occurs during the search
+   */
+  @Override
+  public Set&lt;Event&gt; find(QueryEventDto dto, Set&lt;Event&gt; allEvents,
+                         ZoneId timezone) throws Exception {
+<span class="fc" id="L38">    String dtStr = dto.getAtInstant();</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">    if (dtStr == null) {</span>
+<span class="fc" id="L40">      throw new Exception(&quot;Invalid query: missing date-time.&quot;);</span>
+    }
+<span class="fc" id="L42">    ZonedDateTime atInstant = ZonedDateTime.of(</span>
+<span class="fc" id="L43">            LocalDateTime.parse(dtStr, DATETIME_FORMATTER),</span>
+            timezone
+    );
+<span class="fc" id="L46">    List&lt;Event&gt; activeAt = EventFinder.findActiveAt(atInstant, allEvents);</span>
+<span class="fc" id="L47">    return new HashSet&lt;&gt;(activeAt);</span>
+  }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="model.export.IcalExporterTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.002">
+  <properties/>
+  <testcase name="testMapStatusNull" classname="model.export.IcalExporterTest" time="0.0"/>
+  <testcase name="testMapStatusDefault" classname="model.export.IcalExporterTest" time="0.001"/>
+  <testcase name="testExportHandlesNullStrings" classname="model.export.IcalExporterTest" time="0.0"/>
+  <testcase name="testExportEscapesSpecialCharacters" classname="model.export.IcalExporterTest" time="0.001"/>
+  <testcase name="testMapStatusValidTypes" classname="model.export.IcalExporterTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

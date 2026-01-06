@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CopySingleEvent.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.strategy</a> &gt; <span class="el_source">CopySingleEvent.java</span></div><h1>CopySingleEvent.java</h1><pre class="source lang-java linenums">package calendar.strategy;
+
+import static calendar.util.EditEvent.validateNoDuplicate;
+
+import calendar.dto.CopyEventDto;
+import calendar.interfacetypes.Icopy;
+import calendar.model.Calendar;
+import calendar.model.Event;
+import calendar.model.EventBuilder;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+/**
+ * Strategy for copying a single event from one calendar to another by name and datetime.
+ * Maintains weekday consistency by adjusting the target date to match the source event's weekday.
+ * For example, if the source event is on a Monday, the copied event will also be on a Monday.
+ * Handles timezone conversion between source and target calendars.
+ */
+<span class="fc" id="L24">public class CopySingleEvent implements Icopy {</span>
+
+  /**
+  * Copies a single event from source calendar to target calendar.
+  * The target date is automatically adjusted to match the source event's weekday.
+  * If the source event is part of a recurring series, a new series ID is generated.
+  * Validates that the copied event does not create duplicates in the target calendar.
+  *
+  * @param dto contains event name, source start datetime, and target start datetime
+  * @param sourceCalendar the calendar containing the event to copy
+  * @param targetCalendar the calendar to copy the event into
+  * @return updated set of events for the target calendar including the copied event
+  * @throws Exception if the source event is not found, would create duplicates,
+  *                   or if a recurring event would span multiple days
+  */
+  @Override
+  public Set&lt;Event&gt; copy(CopyEventDto dto, Calendar sourceCalendar, Calendar targetCalendar)
+      throws Exception {
+<span class="fc" id="L42">    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd'T'HH:mm&quot;);</span>
+<span class="fc" id="L43">    LocalDateTime sourceLocalDateTime =</span>
+<span class="fc" id="L44">        LocalDateTime.parse(dto.getSourceStartDateTime(), formatter);</span>
+<span class="fc" id="L45">    ZonedDateTime sourceStartDateTime =</span>
+<span class="fc" id="L46">        ZonedDateTime.of(sourceLocalDateTime, sourceCalendar.getTimezone());</span>
+<span class="fc" id="L47">    Event sourceEvent = sourceCalendar.getEvents().stream()</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        .filter(e -&gt; e.getSubject().equals(dto.getEventName())</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">            &amp;&amp; e.getStartDateTime().equals(sourceStartDateTime))</span>
+<span class="fc" id="L50">        .findFirst()</span>
+<span class="fc" id="L51">        .orElseThrow(() -&gt; new Exception(&quot;Event '&quot; + dto.getEventName()</span>
+<span class="fc" id="L52">            + &quot;' starting at &quot; + dto.getSourceStartDateTime() + &quot; not found.&quot;));</span>
+<span class="fc" id="L53">    Duration eventDuration = Duration.between(</span>
+<span class="fc" id="L54">        sourceEvent.getStartDateTime(),</span>
+<span class="fc" id="L55">        sourceEvent.getEndDateTime());</span>
+<span class="fc" id="L56">    LocalDateTime targetLocalDateTime = LocalDateTime</span>
+<span class="fc" id="L57">        .parse(dto.getTargetStartDateTime(), formatter);</span>
+<span class="fc" id="L58">    ZonedDateTime newStart = ZonedDateTime.of(targetLocalDateTime, targetCalendar.getTimezone());</span>
+<span class="fc" id="L59">    ZonedDateTime newEnd = newStart.plus(eventDuration);</span>
+<span class="pc bpc" id="L60" title="1 of 4 branches missed.">    if (sourceEvent.getSeriesId() != null &amp;&amp; !sourceEvent.getSeriesId().isEmpty()</span>
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">        &amp;&amp; !newStart.toLocalDate().equals(newEnd.toLocalDate())) {</span>
+<span class="nc" id="L62">      throw new Exception(&quot;Error: Start Date and End Date &quot;</span>
+          + &quot;should not differ for a recurring event.&quot;);
+    }
+<span class="fc" id="L65">    String newSeriesId = null;</span>
+<span class="pc bpc" id="L66" title="1 of 4 branches missed.">    if (sourceEvent.getSeriesId() != null &amp;&amp; !sourceEvent.getSeriesId().isEmpty()) {</span>
+<span class="fc" id="L67">      newSeriesId = UUID.randomUUID().toString();</span>
+    }
+<span class="fc" id="L69">    Event newEvent = new EventBuilder()</span>
+<span class="fc" id="L70">        .setSubject(sourceEvent.getSubject())</span>
+<span class="fc" id="L71">        .setStartDateTime(newStart)</span>
+<span class="fc" id="L72">        .setEndDateTime(newEnd)</span>
+<span class="fc" id="L73">        .setLocation(sourceEvent.getLocation())</span>
+<span class="fc" id="L74">        .setDescription(sourceEvent.getDescription())</span>
+<span class="fc" id="L75">        .setStatus(sourceEvent.getStatus())</span>
+<span class="fc" id="L76">        .setSeriesId(newSeriesId)</span>
+<span class="fc" id="L77">        .build();</span>
+<span class="fc" id="L78">    Set&lt;Event&gt; newEvents = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L79">    Set&lt;Event&gt; eventsToRemove = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L80">    validateNoDuplicate(newEvent, targetCalendar.getEvents(), newEvents, eventsToRemove);</span>
+<span class="fc" id="L81">    Set&lt;Event&gt; updatedEvents = new HashSet&lt;&gt;(targetCalendar.getEvents());</span>
+<span class="fc" id="L82">    updatedEvents.add(newEvent);</span>
+<span class="fc" id="L83">    return updatedEvents;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

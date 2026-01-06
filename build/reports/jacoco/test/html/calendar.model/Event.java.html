@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Event.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.model</a> &gt; <span class="el_source">Event.java</span></div><h1>Event.java</h1><pre class="source lang-java linenums">package calendar.model;
+
+import java.time.ZonedDateTime;
+import java.util.Objects;
+
+/**
+ * Represents a calendar event with a subject, time range, and optional properties.
+ * Events are immutable once created. Two events are considered equal if they have
+ * the same subject, start time, and end time, regardless of other properties.
+ * Events can be standalone or part of a recurring series identified by seriesId.
+ */
+public class Event {
+  private final String subject;
+  private final ZonedDateTime startDateTime;
+  private final ZonedDateTime endDateTime;
+  private final String seriesId;
+  private final String description;
+  private final String location;
+  private final String status;
+
+  /**
+   * Constructs a new Event with the specified properties.
+   * All fields are immutable after construction.
+   *
+   * @param subject the event title or name
+   * @param startDateTime the event start date and time with timezone
+   * @param endDateTime the event end date and time with timezone
+   * @param seriesId the unique identifier for recurring series, or empty for standalone events
+   * @param description additional details or notes about the event
+   * @param location the physical or virtual location of the event
+   * @param status the current status of the event (e.g., &quot;confirmed&quot;, &quot;pending&quot;)
+   */
+  public Event(String subject, ZonedDateTime startDateTime, ZonedDateTime endDateTime,
+<span class="fc" id="L34">               String seriesId, String description, String location, String status) {</span>
+<span class="fc" id="L35">    this.subject = subject;</span>
+<span class="fc" id="L36">    this.startDateTime = startDateTime;</span>
+<span class="fc" id="L37">    this.endDateTime = endDateTime;</span>
+<span class="fc" id="L38">    this.seriesId = seriesId;</span>
+<span class="fc" id="L39">    this.description = description;</span>
+<span class="fc" id="L40">    this.location = location;</span>
+<span class="fc" id="L41">    this.status = status;</span>
+<span class="fc" id="L42">  }</span>
+
+  public String getSubject() {
+<span class="fc" id="L45">    return subject;</span>
+  }
+
+  public ZonedDateTime getStartDateTime() {
+<span class="fc" id="L49">    return startDateTime;</span>
+  }
+
+  public ZonedDateTime getEndDateTime() {
+<span class="fc" id="L53">    return endDateTime;</span>
+  }
+
+  public String getSeriesId() {
+<span class="fc" id="L57">    return seriesId;</span>
+  }
+
+  public String getDescription() {
+<span class="fc" id="L61">    return description;</span>
+  }
+
+  public String getLocation() {
+<span class="fc" id="L65">    return location;</span>
+  }
+
+  public String getStatus() {
+<span class="fc" id="L69">    return status;</span>
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+<span class="fc bfc" id="L74" title="All 2 branches covered.">    if (this == obj) {</span>
+<span class="fc" id="L75">      return true;</span>
+    }
+<span class="fc bfc" id="L77" title="All 4 branches covered.">    if (obj == null || getClass() != obj.getClass()) {</span>
+<span class="fc" id="L78">      return false;</span>
+    }
+<span class="fc" id="L80">    Event other = (Event) obj;</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">    return Objects.equals(this.subject, other.subject)</span>
+            &amp;&amp;
+<span class="fc bfc" id="L83" title="All 2 branches covered.">           Objects.equals(this.startDateTime, other.startDateTime)</span>
+            &amp;&amp;
+<span class="fc bfc" id="L85" title="All 2 branches covered.">           Objects.equals(this.endDateTime, other.endDateTime);</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="fc" id="L90">    return Objects.hash(subject, startDateTime, endDateTime);</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="fc" id="L95">    return &quot;Event{&quot;</span>
+            +
+           &quot;subject='&quot; + subject + '\''
+            +
+           &quot;startDateTime=&quot; + startDateTime
+            +
+           &quot;endDateTime=&quot; + endDateTime
+            +
+           &quot;seriesId='&quot; + seriesId + '\''
+            +
+           &quot;, description='&quot; + description + '\''
+            +
+           &quot;, location='&quot; + location + '\''
+            +
+           &quot;, status='&quot; + status + '\''
+            +
+           '}';
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

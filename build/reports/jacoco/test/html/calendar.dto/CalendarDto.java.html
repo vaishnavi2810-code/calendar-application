@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CalendarDto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.dto</a> &gt; <span class="el_source">CalendarDto.java</span></div><h1>CalendarDto.java</h1><pre class="source lang-java linenums">package calendar.dto;
+
+import java.util.regex.Matcher;
+
+/**
+ * A DTO for carrying data for calendar management commands.
+ * It's flexible and can hold data for creating, editing, using,
+ * and copying calendars and events.
+ */
+public class CalendarDto {
+
+  /**
+   * Enum for all calendar-level (non-event-level) commands.
+   */
+<span class="fc" id="L15">  public enum CalendarCommandType {</span>
+<span class="fc" id="L16">    CREATE_CALENDAR,</span>
+<span class="fc" id="L17">    EDIT_CALENDAR,</span>
+<span class="fc" id="L18">    USE_CALENDAR,</span>
+  }
+
+  private final CalendarCommandType type;
+  private final String calendarName;
+  private final String timeZone;
+  private final String propertyName;
+  private final String propertyValue;
+  private final String targetCalendarName;
+  private final String sourceEventName;
+  private final String sourceStartTime;
+  private final String targetStartTime;
+  private final String sourceDate;
+  private final String sourceStartDate;
+  private final String sourceEndDate;
+  private final String targetDate;
+
+  /**
+   * Creates a CalendarDto by extracting relevant fields from the matcher
+   * based on the command type.
+   *
+   * @param type The type of calendar command being processed.
+   * @param matcher The regex matcher containing the parsed command data.
+   */
+<span class="fc" id="L42">  public CalendarDto(CalendarCommandType type, Matcher matcher) {</span>
+<span class="fc" id="L43">    this.type = type;</span>
+
+
+<span class="fc" id="L46">    this.calendarName = getGroup(matcher, &quot;name&quot;);</span>
+<span class="fc" id="L47">    this.timeZone = getGroup(matcher, &quot;timezone&quot;);</span>
+<span class="fc" id="L48">    this.propertyName = getGroup(matcher, &quot;property&quot;);</span>
+<span class="fc" id="L49">    this.propertyValue = getGroup(matcher, &quot;value&quot;);</span>
+
+<span class="fc" id="L51">    this.targetCalendarName = getGroup(matcher, &quot;target&quot;);</span>
+<span class="fc" id="L52">    this.sourceEventName = getGroup(matcher, &quot;eventName&quot;);</span>
+<span class="fc" id="L53">    this.sourceStartTime = getGroup(matcher, &quot;sourceTime&quot;);</span>
+<span class="fc" id="L54">    this.targetStartTime = getGroup(matcher, &quot;targetTime&quot;);</span>
+<span class="fc" id="L55">    this.sourceDate = getGroup(matcher, &quot;sourceDate&quot;);</span>
+<span class="fc" id="L56">    this.sourceStartDate = getGroup(matcher, &quot;sourceStartDate&quot;);</span>
+<span class="fc" id="L57">    this.sourceEndDate = getGroup(matcher, &quot;sourceEndDate&quot;);</span>
+<span class="fc" id="L58">    this.targetDate = getGroup(matcher, &quot;targetDate&quot;);</span>
+<span class="fc" id="L59">  }</span>
+
+  /**
+   * Creates a CalendarDto directly from parameters without using a Matcher.
+   * Used for GUI mode where data comes from form fields rather than text parsing.
+   *
+   * @param type The type of calendar command being processed.
+   * @param calendarName The name of the calendar.
+   * @param timeZone The timezone of the calendar.
+   * @param propertyName The property name for edit operations.
+   * @param propertyValue The property value for edit operations.
+   */
+  private CalendarDto(CalendarCommandType type, String calendarName,
+<span class="fc" id="L72">                      String timeZone, String propertyName, String propertyValue) {</span>
+<span class="fc" id="L73">    this.type = type;</span>
+<span class="fc" id="L74">    this.calendarName = calendarName;</span>
+<span class="fc" id="L75">    this.timeZone = timeZone;</span>
+<span class="fc" id="L76">    this.propertyName = propertyName;</span>
+<span class="fc" id="L77">    this.propertyValue = propertyValue;</span>
+<span class="fc" id="L78">    this.targetCalendarName = null;</span>
+<span class="fc" id="L79">    this.sourceEventName = null;</span>
+<span class="fc" id="L80">    this.sourceStartTime = null;</span>
+<span class="fc" id="L81">    this.targetStartTime = null;</span>
+<span class="fc" id="L82">    this.sourceDate = null;</span>
+<span class="fc" id="L83">    this.sourceStartDate = null;</span>
+<span class="fc" id="L84">    this.sourceEndDate = null;</span>
+<span class="fc" id="L85">    this.targetDate = null;</span>
+<span class="fc" id="L86">  }</span>
+
+  /**
+   * Safely extracts a named group from the matcher.
+   * Replicates the &quot;un-quoting&quot; logic from your other DTOs.
+   */
+  private String getGroup(Matcher matcher, String groupName) {
+    try {
+<span class="fc" id="L94">      String val = matcher.group(groupName);</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">      if (val == null) {</span>
+<span class="nc" id="L96">        return null;</span>
+      }
+<span class="pc bpc" id="L98" title="2 of 4 branches missed.">      if ((groupName.equals(&quot;eventName&quot;) || groupName.equals(&quot;propertyValue&quot;))</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">              &amp;&amp; val.length() &gt;= 2</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">              &amp;&amp; val.startsWith(&quot;\&quot;&quot;)</span>
+<span class="nc bnc" id="L101" title="All 2 branches missed.">              &amp;&amp; val.endsWith(&quot;\&quot;&quot;)) {</span>
+<span class="nc" id="L102">        return val.substring(1, val.length() - 1);</span>
+      }
+<span class="fc" id="L104">      return val;</span>
+<span class="fc" id="L105">    } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L106">      return null;</span>
+    }
+  }
+
+  /**
+   * Creates a DTO for creating a new calendar.
+   *
+   * @param name The name of the calendar to create.
+   * @param timezone The timezone ID for the calendar.
+   * @return A CalendarDto configured for calendar creation.
+   */
+  public static CalendarDto createCalendar(String name, String timezone) {
+<span class="fc" id="L118">    return new CalendarDto(CalendarCommandType.CREATE_CALENDAR, name, timezone, null, null);</span>
+  }
+
+  /**
+   * Creates a DTO for switching to a different calendar.
+   *
+   * @param name The name of the calendar to switch to.
+   * @return A CalendarDto configured for calendar switching.
+   */
+  public static CalendarDto useCalendar(String name) {
+<span class="fc" id="L128">    return new CalendarDto(CalendarCommandType.USE_CALENDAR, name, null, null, null);</span>
+  }
+
+  /**
+   * Creates a DTO for editing a calendar property.
+   *
+   * @param name The name of the calendar to edit.
+   * @param property The property to modify.
+   * @param value The new value for the property.
+   * @return A CalendarDto configured for calendar editing.
+   */
+  public static CalendarDto editCalendar(String name, String property, String value) {
+<span class="fc" id="L140">    return new CalendarDto(CalendarCommandType.EDIT_CALENDAR, name, null, property, value);</span>
+  }
+
+  public CalendarCommandType getType() {
+<span class="fc" id="L144">    return type;</span>
+  }
+
+  public String getCalendarName() {
+<span class="fc" id="L148">    return calendarName;</span>
+  }
+
+  public String getTimeZone() {
+<span class="fc" id="L152">    return timeZone;</span>
+  }
+
+  public String getPropertyName() {
+<span class="fc" id="L156">    return propertyName;</span>
+  }
+
+  public String getPropertyValue() {
+<span class="fc" id="L160">    return propertyValue;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

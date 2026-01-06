@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="model.create.CreateAllDayRecurringnTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.0">
+  <properties/>
+  <testcase name="testCreateAllDayRecurringForCollision" classname="model.create.CreateAllDayRecurringnTest" time="0.0"/>
+  <testcase name="testCreateAllDayRecurringForSuccess" classname="model.create.CreateAllDayRecurringnTest" time="0.0"/>
+  <testcase name="testCreateAllDayRecurringForOneTime" classname="model.create.CreateAllDayRecurringnTest" time="0.0"/>
+  <system-out><![CDATA[✓ TEST PASSED: Created 3 recurring all-day events.
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="parser.QueryEventParserTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.001">
+  <properties/>
+  <testcase name="testParsePrintEventsOnDate" classname="parser.QueryEventParserTest" time="0.0"/>
+  <testcase name="testCanHandleValidQueryCommands" classname="parser.QueryEventParserTest" time="0.0"/>
+  <testcase name="testParseShowStatus" classname="parser.QueryEventParserTest" time="0.0"/>
+  <testcase name="testParseInvalidCommandThrowsException" classname="parser.QueryEventParserTest" time="0.001"/>
+  <testcase name="testParsePrintEventsInRange" classname="parser.QueryEventParserTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

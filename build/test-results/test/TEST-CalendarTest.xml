@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="CalendarTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:33" hostname="Vaishnavis-MacBook-Pro.local" time="0.115">
+  <properties/>
+  <testcase name="testMainHeadlessModeSuccess" classname="CalendarTest" time="0.108"/>
+  <testcase name="testMainHeadlessModeMixedCase" classname="CalendarTest" time="0.001"/>
+  <testcase name="testMainWrongFirstArgument" classname="CalendarTest" time="0.0"/>
+  <testcase name="testMainHeadlessModeMissingFilename" classname="CalendarTest" time="0.0"/>
+  <testcase name="testInteractiveModeStartsSuccessfully" classname="CalendarTest" time="0.004"/>
+  <testcase name="testMainOneArgument" classname="CalendarTest" time="0.0"/>
+  <testcase name="testMainInteractiveModeExtraArgs" classname="CalendarTest" time="0.0"/>
+  <testcase name="testMainInvalidMode" classname="CalendarTest" time="0.001"/>
+  <testcase name="testMainHeadlessModeExtraArgs" classname="CalendarTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

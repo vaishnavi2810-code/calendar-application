@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CalendarModel.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.model</a> &gt; <span class="el_source">CalendarModel.java</span></div><h1>CalendarModel.java</h1><pre class="source lang-java linenums">package calendar.model;
+
+import calendar.dto.CopyEventDto;
+import calendar.dto.CreateEventDto;
+import calendar.dto.EditEventDto;
+import calendar.dto.ExportEventDto;
+import calendar.dto.QueryEventDto;
+import calendar.factory.CopyStrategyFactory;
+import calendar.factory.CreateStrategyFactory;
+import calendar.factory.EditStrategyFactory;
+import calendar.factory.ExporterFactory;
+import calendar.factory.QueryStrategyFactory;
+import calendar.interfacetypes.Icalendarcollection;
+import calendar.interfacetypes.Icopy;
+import calendar.interfacetypes.Icreate;
+import calendar.interfacetypes.Iedit;
+import calendar.interfacetypes.Iexport;
+import calendar.interfacetypes.Iquery;
+import java.time.DateTimeException;
+import java.time.DayOfWeek;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Model class that provides operations for managing calendars and events.
+ */
+public class CalendarModel {
+
+  private final Icalendarcollection repository;
+  private String activeCalendarName;
+
+  /**
+   * Constructs a CalendarModel with the specified repository.
+   *
+   * @param repository the repository to use for storing and retrieving calendars
+   */
+<span class="fc" id="L39">  public CalendarModel(Icalendarcollection repository) {</span>
+<span class="fc" id="L40">    this.repository = repository;</span>
+<span class="fc" id="L41">  }</span>
+
+  /**
+   * Sets the active calendar by name.
+   *
+   * @param name the name of the calendar to set as active
+   * @throws Exception if the calendar does not exist
+   */
+  public void setActiveCalendar(String name) throws Exception {
+<span class="fc bfc" id="L50" title="All 2 branches covered.">    if (!repository.existsByName(name)) {</span>
+<span class="fc" id="L51">      throw new Exception(&quot;Error: Calendar '&quot; + name + &quot;' not found.&quot;);</span>
+    }
+<span class="fc" id="L53">    this.activeCalendarName = name;</span>
+<span class="fc" id="L54">  }</span>
+
+  /**
+   * Retrieves the name of the currently active calendar.
+   *
+   * @return the name of the active calendar
+   * @throws Exception if an error occurs while retrieving the active calendar
+   */
+  public String getActiveCalendar() throws Exception {
+<span class="fc" id="L63">    return activeCalendarName;</span>
+  }
+
+  /**
+   * Creates an event in the active calendar.
+   *
+   * @param dto the event data transfer object containing event details
+   * @throws Exception if the active calendar is not found or creation fails
+   */
+  public void createEvent(CreateEventDto dto) throws Exception {
+<span class="fc" id="L73">    Calendar activeModel = repository.findByName(activeCalendarName);</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">    if (activeModel == null) {</span>
+<span class="fc" id="L75">      throw new Exception(&quot;Calendar not found.&quot;);</span>
+    }
+<span class="fc" id="L77">    Set&lt;Event&gt; mergedEvents = new HashSet&lt;&gt;(activeModel.getEvents());</span>
+<span class="fc" id="L78">    ZoneId timezone = activeModel.getTimezone();</span>
+<span class="fc" id="L79">    Icreate strategy = CreateStrategyFactory.getStrategy(dto.getType());</span>
+<span class="fc" id="L80">    Set&lt;Event&gt; newEvents = strategy.create(dto, mergedEvents, timezone);</span>
+<span class="fc" id="L81">    mergedEvents.addAll(newEvents);</span>
+<span class="fc" id="L82">    Calendar updatedModel = new CalendarModelBuilder()</span>
+<span class="fc" id="L83">            .setName(activeModel.getName())</span>
+<span class="fc" id="L84">            .setTimeZone(activeModel.getTimezone())</span>
+<span class="fc" id="L85">            .setEvents(mergedEvents)</span>
+<span class="fc" id="L86">            .build();</span>
+<span class="fc" id="L87">    repository.save(updatedModel);</span>
+<span class="fc" id="L88">  }</span>
+
+  /**
+   * Edits an existing event in the active calendar.
+   *
+   * @param dto the edit data transfer object containing modifications
+   * @throws Exception if the active calendar is not found or edit fails
+   */
+  public void editEvent(EditEventDto dto) throws Exception {
+<span class="fc" id="L97">    Calendar activeModel = repository.findByName(activeCalendarName);</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">    if (activeModel == null) {</span>
+<span class="fc" id="L99">      throw new Exception(&quot;Calendar not found.&quot;);</span>
+    }
+<span class="fc" id="L101">    Set&lt;Event&gt; eventsCopy = new HashSet&lt;&gt;(activeModel.getEvents());</span>
+<span class="fc" id="L102">    ZoneId timezone = activeModel.getTimezone();</span>
+<span class="fc" id="L103">    Iedit strategy = EditStrategyFactory.getStrategy(dto.getEditType());</span>
+<span class="fc" id="L104">    strategy.edit(dto, eventsCopy, timezone);</span>
+<span class="fc" id="L105">    Calendar updatedModel = new CalendarModelBuilder()</span>
+<span class="fc" id="L106">            .setName(activeModel.getName())</span>
+<span class="fc" id="L107">            .setTimeZone(activeModel.getTimezone())</span>
+<span class="fc" id="L108">            .setEvents(eventsCopy)</span>
+<span class="fc" id="L109">            .build();</span>
+<span class="fc" id="L110">    repository.save(updatedModel);</span>
+<span class="fc" id="L111">  }</span>
+
+  /**
+   * Queries events from the active calendar using a specific strategy.
+   *
+   * @param dto the query data transfer object containing query criteria
+   * @return a set of events matching the query
+   * @throws Exception if the active calendar is not found
+   */
+  public Set&lt;Event&gt; queryEvent(QueryEventDto dto) throws Exception {
+<span class="fc" id="L121">    Calendar activeModel = repository.findByName(activeCalendarName);</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">    if (activeModel == null) {</span>
+<span class="fc" id="L123">      throw new Exception(&quot;Calendar not found.&quot;);</span>
+    }
+<span class="fc" id="L125">    Set&lt;Event&gt; existingEvents = activeModel.getEvents();</span>
+<span class="fc" id="L126">    ZoneId timezone = activeModel.getTimezone();</span>
+<span class="fc" id="L127">    Iquery strategy = QueryStrategyFactory.getStrategy(dto.getType());</span>
+<span class="fc" id="L128">    return strategy.find(dto, existingEvents, timezone);</span>
+  }
+
+  /**
+   * Exports events from the active calendar to a specified format.
+   *
+   * @param dto the export data transfer object containing export details
+   * @return the path or result of the export operation
+   * @throws Exception if the active calendar is not found
+   */
+  public String exportEvent(ExportEventDto dto) throws Exception {
+<span class="fc" id="L139">    Calendar activeModel = repository.findByName(activeCalendarName);</span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">    if (activeModel == null) {</span>
+<span class="fc" id="L141">      throw new Exception(&quot;Calendar not found.&quot;);</span>
+    }
+<span class="fc" id="L143">    Set&lt;Event&gt; existingEvents = activeModel.getEvents();</span>
+<span class="fc" id="L144">    Iexport exporter = ExporterFactory.getExporter(dto);</span>
+<span class="fc" id="L145">    return exporter.export(existingEvents, dto.getFileName());</span>
+  }
+
+  /**
+   * Creates a new calendar with the specified name and timezone.
+   *
+   * @param name    the name of the new calendar
+   * @param zoneStr the timezone string for the calendar
+   * @throws Exception if the calendar already exists or the timezone is invalid
+   */
+  public void createNewCalendar(String name, String zoneStr) throws Exception {
+<span class="fc bfc" id="L156" title="All 2 branches covered.">    if (repository.existsByName(name)) {</span>
+<span class="fc" id="L157">      throw new Exception(&quot;Error: A calendar with the name '&quot; + name + &quot;' already exists.&quot;);</span>
+    }
+
+    ZoneId zone;
+    try {
+<span class="fc" id="L162">      zone = ZoneId.of(zoneStr);</span>
+<span class="fc" id="L163">    } catch (DateTimeException e) {</span>
+<span class="fc" id="L164">      throw new Exception(&quot;Error: Invalid Time Zone '&quot; + zoneStr + &quot;'.&quot;);</span>
+<span class="fc" id="L165">    }</span>
+
+<span class="fc" id="L167">    Calendar newModel = new CalendarModelBuilder()</span>
+<span class="fc" id="L168">            .setName(name)</span>
+<span class="fc" id="L169">            .setTimeZone(zone)</span>
+<span class="fc" id="L170">            .setEvents(new HashSet&lt;&gt;())</span>
+<span class="fc" id="L171">            .build();</span>
+<span class="fc" id="L172">    repository.save(newModel);</span>
+<span class="fc" id="L173">  }</span>
+
+  /**
+   * Updates the timezone of an existing calendar.
+   *
+   * @param calendarName the name of the calendar to update
+   * @param zoneStr      the new timezone string
+   * @throws Exception if the calendar is not found, the timezone is invalid, or conversion fails
+   */
+  public void updateCalendarTimezone(String calendarName, String zoneStr) throws Exception {
+<span class="fc" id="L183">    Calendar originalModel = repository.findByName(calendarName);</span>
+<span class="fc bfc" id="L184" title="All 2 branches covered.">    if (originalModel == null) {</span>
+<span class="fc" id="L185">      throw new Exception(&quot;Calendar not found.&quot;);</span>
+    }
+    ZoneId newZone;
+    try {
+<span class="fc" id="L189">      newZone = ZoneId.of(zoneStr);</span>
+<span class="fc" id="L190">    } catch (DateTimeException e) {</span>
+<span class="fc" id="L191">      throw new Exception(&quot;Error: Invalid Time Zone '&quot; + zoneStr + &quot;'.&quot;);</span>
+<span class="fc" id="L192">    }</span>
+<span class="fc bfc" id="L193" title="All 2 branches covered.">    if (originalModel.getTimezone().equals(newZone)) {</span>
+<span class="fc" id="L194">      return;</span>
+    }
+<span class="fc" id="L196">    Set&lt;Event&gt; newEventSet = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L197" title="All 2 branches covered.">    for (Event oldEvent : originalModel.getEvents()) {</span>
+<span class="fc" id="L198">      ZonedDateTime newStart = oldEvent.getStartDateTime().withZoneSameInstant(newZone);</span>
+<span class="fc" id="L199">      ZonedDateTime newEnd = oldEvent.getEndDateTime().withZoneSameInstant(newZone);</span>
+<span class="fc bfc" id="L200" title="All 2 branches covered.">      if (!newStart.toLocalDate().equals(newEnd.toLocalDate())) {</span>
+<span class="fc" id="L201">        throw new Exception(&quot;Error: Start Date and End Date should &quot;</span>
+                +
+                &quot;not differ for a recurring event.&quot;);
+      }
+
+<span class="fc" id="L206">      DayOfWeek oldDay = oldEvent.getStartDateTime().getDayOfWeek();</span>
+<span class="fc" id="L207">      DayOfWeek newDay = newStart.getDayOfWeek();</span>
+<span class="fc bfc" id="L208" title="All 2 branches covered.">      if (!oldDay.equals(newDay)) {</span>
+<span class="fc" id="L209">        throw new Exception(&quot;Error: Timezone change would cause event '&quot;</span>
+<span class="fc" id="L210">                + oldEvent.getSubject() + &quot;' to shift from &quot; + oldDay</span>
+                + &quot; to &quot; + newDay + &quot;.&quot;);
+      }
+<span class="fc" id="L213">      Event newEvent = new EventBuilder()</span>
+<span class="fc" id="L214">              .setSubject(oldEvent.getSubject())</span>
+<span class="fc" id="L215">              .setStartDateTime(newStart)</span>
+<span class="fc" id="L216">              .setEndDateTime(newEnd)</span>
+<span class="fc" id="L217">              .setLocation(oldEvent.getLocation())</span>
+<span class="fc" id="L218">              .setDescription(oldEvent.getDescription())</span>
+<span class="fc" id="L219">              .setStatus(oldEvent.getStatus())</span>
+<span class="fc" id="L220">              .setSeriesId(oldEvent.getSeriesId())</span>
+<span class="fc" id="L221">              .build();</span>
+<span class="fc" id="L222">      newEventSet.add(newEvent);</span>
+<span class="fc" id="L223">    }</span>
+<span class="fc" id="L224">    Calendar updatedModel = new CalendarModelBuilder()</span>
+<span class="fc" id="L225">            .setName(originalModel.getName())</span>
+<span class="fc" id="L226">            .setTimeZone(newZone)</span>
+<span class="fc" id="L227">            .setEvents(newEventSet)</span>
+<span class="fc" id="L228">            .build();</span>
+<span class="fc" id="L229">    repository.save(updatedModel);</span>
+<span class="fc" id="L230">  }</span>
+
+  /**
+   * Updates the name of an existing calendar.
+   *
+   * @param currentName the current name of the calendar
+   * @param newName     the new name to assign
+   * @throws Exception if the calendar is not found or the new name already exists
+   */
+  public void updateCalendarName(String currentName, String newName) throws Exception {
+<span class="fc" id="L240">    Calendar originalModel = repository.findByName(currentName);</span>
+<span class="fc bfc" id="L241" title="All 2 branches covered.">    if (originalModel == null) {</span>
+<span class="fc" id="L242">      throw new Exception(&quot;Calendar not found.&quot;);</span>
+    }
+<span class="fc bfc" id="L244" title="All 2 branches covered.">    if (repository.existsByName(newName)) {</span>
+<span class="fc" id="L245">      throw new Exception(&quot;New name already exists.&quot;);</span>
+    }
+<span class="fc" id="L247">    Calendar updatedModel = new CalendarModelBuilder()</span>
+<span class="fc" id="L248">            .setName(newName)</span>
+<span class="fc" id="L249">            .setTimeZone(originalModel.getTimezone())</span>
+<span class="fc" id="L250">            .setEvents(originalModel.getEvents())</span>
+<span class="fc" id="L251">            .build();</span>
+<span class="fc" id="L252">    repository.deleteByName(currentName);</span>
+<span class="fc" id="L253">    repository.save(updatedModel);</span>
+<span class="fc" id="L254">  }</span>
+
+  /**
+   * Checks if a calendar exists by name.
+   *
+   * @param name the name of the calendar to check
+   * @return true if the calendar exists, false otherwise
+   * @throws Exception if a repository error occurs
+   */
+  public boolean checkCalendarModel(String name) throws Exception {
+<span class="fc" id="L264">    return repository.existsByName(name);</span>
+  }
+
+  /**
+   * Retrieves a calendar model by name.
+   *
+   * @param name the name of the calendar
+   * @return the calendar model
+   * @throws Exception if the calendar is not found
+   */
+  public Calendar calendarModel(String name) throws Exception {
+<span class="fc" id="L275">    return repository.findByName(name);</span>
+  }
+
+  /**
+   * Copies events from the active calendar to a target calendar based on the copy type.
+   *
+   * @param dto the copy data transfer object containing copy details
+   * @throws Exception if the active calendar is not found or copy fails
+   */
+  public void copyEvent(CopyEventDto dto) throws Exception {
+<span class="fc" id="L285">    Calendar activeModel = repository.findByName(activeCalendarName);</span>
+<span class="fc bfc" id="L286" title="All 2 branches covered.">    if (activeModel == null) {</span>
+<span class="fc" id="L287">      throw new Exception(&quot;No calendar is currently selected.&quot;);</span>
+    }
+
+<span class="fc" id="L290">    Calendar targetCalendar = repository.findByName(dto.getTargetCalendarName());</span>
+<span class="fc bfc" id="L291" title="All 2 branches covered.">    if (targetCalendar == null) {</span>
+<span class="fc" id="L292">      throw new Exception(&quot;Target calendar '&quot; + dto.getTargetCalendarName() + &quot;' not found.&quot;);</span>
+    }
+
+<span class="fc" id="L295">    Icopy strategy = CopyStrategyFactory.getStrategy(dto.getCopyType());</span>
+<span class="fc" id="L296">    Set&lt;Event&gt; updatedTargetEvents = strategy.copy(dto, activeModel, targetCalendar);</span>
+
+<span class="fc" id="L298">    Calendar updatedTargetCalendar = new CalendarModelBuilder()</span>
+<span class="fc" id="L299">            .setName(targetCalendar.getName())</span>
+<span class="fc" id="L300">            .setTimeZone(targetCalendar.getTimezone())</span>
+<span class="fc" id="L301">            .setEvents(updatedTargetEvents)</span>
+<span class="fc" id="L302">            .build();</span>
+
+<span class="fc" id="L304">    repository.save(updatedTargetCalendar);</span>
+<span class="fc" id="L305">  }</span>
+
+  /**
+   * Retrieves the names of all available calendars.
+   *
+   * @return a set containing the names of all calendars
+   */
+  public Set&lt;String&gt; getAllCalendarNames() {
+<span class="fc" id="L313">    return repository.getAllCalendarNames();</span>
+  }
+
+  /**
+   * Retrieves the timezone string for the specified calendar.
+   *
+   * @param calendarName the name of the calendar
+   * @return the string representation of the calendar's timezone
+   * @throws Exception if the calendar is not found
+   */
+  public String getCalendarTimezone(String calendarName) throws Exception {
+<span class="fc" id="L324">    Calendar obj = this.calendarModel(calendarName);</span>
+<span class="fc bfc" id="L325" title="All 2 branches covered.">    if (obj == null) {</span>
+<span class="fc" id="L326">      throw new Exception(&quot;Calendar not found.&quot;);</span>
+    } else {
+<span class="fc" id="L328">      return obj.getTimezone().toString();</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

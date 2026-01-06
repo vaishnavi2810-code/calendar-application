@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IcalExporter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.strategy</a> &gt; <span class="el_source">IcalExporter.java</span></div><h1>IcalExporter.java</h1><pre class="source lang-java linenums">package calendar.strategy;
+
+import calendar.interfacetypes.Iexport;
+import calendar.model.Event;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+
+/**
+ * Export strategy implementation for creating iCalendar (.ics) files.
+ * This class converts a collection of calendar events into the iCalendar
+ * format, conforming to the RFC 5545 specification.
+ */
+<span class="fc" id="L19">public class IcalExporter implements Iexport {</span>
+<span class="fc" id="L20">  private static final DateTimeFormatter ICAL_DATE_FORMAT =</span>
+<span class="fc" id="L21">            DateTimeFormatter.ofPattern(&quot;yyyyMMdd'T'HHmmss'Z'&quot;);</span>
+
+  private static final String PRODID = &quot;-//ExampleApp//MyCalendar 1.0//EN&quot;;
+
+  /**
+  * Exports a collection of events to a file in iCalendar (.ics) format.
+  * Creates a file with the required iCalendar header and footer, and
+  * one VEVENT entry for each event in the collection.
+  *
+  * @param events the collection of events to be exported
+  * @param fileName the name of the file to create (e.g., &quot;my_calendar.ical&quot;)
+  * @return the absolute path of the created iCal file
+  * @throws IOException if the file cannot be created or written to
+  */
+  @Override
+  public String export(Collection&lt;Event&gt; events, String fileName) throws IOException {
+<span class="fc" id="L37">    StringBuilder icalBuilder = new StringBuilder();</span>
+
+<span class="fc" id="L39">    icalBuilder.append(&quot;BEGIN:VCALENDAR\n&quot;);</span>
+<span class="fc" id="L40">    icalBuilder.append(&quot;VERSION:2.0\n&quot;);</span>
+<span class="fc" id="L41">    icalBuilder.append(&quot;PRODID:&quot;).append(PRODID).append(&quot;\n&quot;);</span>
+<span class="fc" id="L42">    icalBuilder.append(&quot;CALSCALE:GREGORIAN\n&quot;);</span>
+
+<span class="fc bfc" id="L44" title="All 2 branches covered.">    for (Event event : events) {</span>
+<span class="fc" id="L45">      icalBuilder.append(&quot;BEGIN:VEVENT\n&quot;);</span>
+<span class="fc" id="L46">      ZonedDateTime start = event.getStartDateTime();</span>
+<span class="fc" id="L47">      ZonedDateTime end = event.getEndDateTime();</span>
+<span class="fc" id="L48">      String dtStart = start.withZoneSameInstant(ZoneOffset.UTC).format(ICAL_DATE_FORMAT);</span>
+<span class="fc" id="L49">      String dtEnd = end.withZoneSameInstant(ZoneOffset.UTC).format(ICAL_DATE_FORMAT);</span>
+<span class="fc" id="L50">      String dtStamp = ZonedDateTime.now(ZoneOffset.UTC).format(ICAL_DATE_FORMAT);</span>
+<span class="fc" id="L51">      icalBuilder.append(&quot;DTSTAMP:&quot;).append(dtStamp).append(&quot;\n&quot;);</span>
+<span class="fc" id="L52">      icalBuilder.append(&quot;DTSTART:&quot;).append(dtStart).append(&quot;\n&quot;);</span>
+<span class="fc" id="L53">      icalBuilder.append(&quot;DTEND:&quot;).append(dtEnd).append(&quot;\n&quot;);</span>
+<span class="fc" id="L54">      icalBuilder.append(&quot;SUMMARY:&quot;).append(escapeIcalString(event.getSubject())).append(&quot;\n&quot;);</span>
+<span class="fc" id="L55">      icalBuilder.append(&quot;LOCATION:&quot;).append(escapeIcalString(event.getLocation())).append(&quot;\n&quot;);</span>
+<span class="fc" id="L56">      icalBuilder.append(&quot;DESCRIPTION:&quot;)</span>
+<span class="fc" id="L57">              .append(escapeIcalString(event.getDescription()))</span>
+<span class="fc" id="L58">              .append(&quot;\n&quot;);</span>
+<span class="fc" id="L59">      icalBuilder.append(&quot;STATUS:&quot;).append(mapStatus(event.getStatus())).append(&quot;\n&quot;);</span>
+<span class="fc" id="L60">      icalBuilder.append(&quot;END:VEVENT\n&quot;);</span>
+<span class="fc" id="L61">    }</span>
+<span class="fc" id="L62">    icalBuilder.append(&quot;END:VCALENDAR\n&quot;);</span>
+<span class="fc" id="L63">    Path filePath = Paths.get(fileName);</span>
+<span class="fc" id="L64">    Files.writeString(filePath, icalBuilder.toString());</span>
+<span class="fc" id="L65">    return filePath.toAbsolutePath().toString();</span>
+  }
+
+  /**
+  * Escapes special characters in a string for iCalendar text fields.
+  * According to iCal spec, newlines must be escaped as &quot;\n&quot;,
+  * and commas, semicolons, and backslashes must be escaped with a backslash.
+  *
+  * @param field The string to escape.
+  * @return The escaped string, or an empty string if input is null.
+ */
+  private String escapeIcalString(String field) {
+<span class="fc bfc" id="L77" title="All 4 branches covered.">    if (field == null || field.isEmpty()) {</span>
+<span class="fc" id="L78">      return &quot;&quot;;</span>
+    }
+<span class="fc" id="L80">    return field.replace(&quot;\\&quot;, &quot;\\\\&quot;)</span>
+<span class="fc" id="L81">                .replace(&quot;;&quot;, &quot;\\;&quot;)</span>
+<span class="fc" id="L82">                .replace(&quot;,&quot;, &quot;\\,&quot;)</span>
+<span class="fc" id="L83">                .replace(&quot;\n&quot;, &quot;\\n&quot;);</span>
+  }
+
+  /**
+  * Maps an event status string to a valid iCalendar STATUS value.
+  * The iCal standard values are &quot;TENTATIVE&quot;, &quot;CONFIRMED&quot;, &quot;CANCELLED&quot;.
+  *
+  * @param eventStatus The status string from the Event object.
+  * @return A valid iCalendar status (defaults to &quot;CONFIRMED&quot;).
+  */
+  private String mapStatus(String eventStatus) {
+<span class="fc bfc" id="L94" title="All 2 branches covered.">    if (eventStatus == null) {</span>
+<span class="fc" id="L95">      return &quot;CONFIRMED&quot;;</span>
+    }
+<span class="fc" id="L97">    String upperStatus = eventStatus.toUpperCase();</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">    switch (upperStatus) {</span>
+      case &quot;TENTATIVE&quot;:
+      case &quot;CANCELLED&quot;:
+<span class="fc" id="L101">        return upperStatus;</span>
+      case &quot;CONFIRMED&quot;:
+      default:
+<span class="fc" id="L104">        return &quot;CONFIRMED&quot;;</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

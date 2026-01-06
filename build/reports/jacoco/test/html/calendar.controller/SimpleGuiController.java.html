@@ -1,0 +1,641 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SimpleGuiController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.controller</a> &gt; <span class="el_source">SimpleGuiController.java</span></div><h1>SimpleGuiController.java</h1><pre class="source lang-java linenums">package calendar.controller;
+
+import static calendar.util.EventFinder.findBySubjectAndStart;
+
+import calendar.command.CalendarCommand;
+import calendar.command.CreateEventCommand;
+import calendar.command.EditEventCommand;
+import calendar.command.QueryEventCommand;
+import calendar.dto.CalendarDto;
+import calendar.dto.CreateEventDto;
+import calendar.dto.EditEventDto;
+import calendar.dto.QueryEventDto;
+import calendar.dto.QueryResultDto;
+import calendar.interfacetypes.IcreateEventDialogData;
+import calendar.interfacetypes.IeditEventDialogData;
+import calendar.interfacetypes.IguiViewCalendar;
+import calendar.interfacetypes.IresultDto;
+import calendar.model.Calendar;
+import calendar.model.CalendarModel;
+import calendar.model.Event;
+import calendar.service.GuiDtoBuilderService;
+import calendar.view.BulkEditEventDialog;
+import calendar.view.CreateCalendarDialog;
+import calendar.view.CreateEventDialog;
+import calendar.view.EditCalendarDialog;
+import calendar.view.EditEventDialog;
+import calendar.view.SearchEditEventDialog;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+
+/**
+ * Simple controller for calendar operations only.
+ * Step 1: Start small, build incrementally.
+ */
+public class SimpleGuiController {
+
+  private final CalendarModel service;
+  private final IguiViewCalendar view;
+  private final GuiDtoBuilderService guiBuilder;
+  private YearMonth currentMonth;
+  private LocalDate selectedDate;
+
+  /**
+   * Constructs the controller and initializes the application state.
+   * Sets up the default calendar, wires listeners, and loads initial data.
+   *
+   * @param service the model service handling business logic
+   * @param view    the GUI view component
+   */
+<span class="fc" id="L61">  public SimpleGuiController(CalendarModel service, IguiViewCalendar view) {</span>
+<span class="fc" id="L62">    this.service = service;</span>
+<span class="fc" id="L63">    this.view = view;</span>
+<span class="fc" id="L64">    this.guiBuilder = new GuiDtoBuilderService();</span>
+<span class="fc" id="L65">    this.currentMonth = YearMonth.now();</span>
+<span class="fc" id="L66">    this.selectedDate = LocalDate.now();</span>
+<span class="fc" id="L67">    initializeDefaultCalendar();</span>
+<span class="fc" id="L68">    wireUpEventListeners();</span>
+<span class="fc" id="L69">    updateViewAndLoadData();</span>
+<span class="fc" id="L70">    refreshCalendarList();</span>
+<span class="fc" id="L71">  }</span>
+
+  /**
+   * Wires up all GUI event listeners to their respective controller actions.
+   * Handles navigation, selection, and button clicks.
+   */
+  private void wireUpEventListeners() {
+<span class="fc" id="L78">    view.getCalendarDropdown().addActionListener(e -&gt; {</span>
+<span class="fc" id="L79">      String selected = (String) view.getCalendarDropdown().getSelectedItem();</span>
+<span class="pc bpc" id="L80" title="2 of 4 branches missed.">      if (selected != null &amp;&amp; !selected.equals(&quot;(No calendars)&quot;)) {</span>
+<span class="fc" id="L81">        switchCalendar(selected);</span>
+      }
+<span class="fc" id="L83">    });</span>
+<span class="fc" id="L84">    view.addNavigationListeners(</span>
+            e -&gt; {
+<span class="nc" id="L86">              currentMonth = currentMonth.minusMonths(1);</span>
+<span class="nc" id="L87">              updateViewAndLoadData();</span>
+<span class="nc" id="L88">            },</span>
+            e -&gt; {
+<span class="nc" id="L90">              currentMonth = currentMonth.plusMonths(1);</span>
+<span class="nc" id="L91">              updateViewAndLoadData();</span>
+<span class="nc" id="L92">            },</span>
+            e -&gt; {
+<span class="nc" id="L94">              currentMonth = YearMonth.now();</span>
+<span class="nc" id="L95">              selectedDate = LocalDate.now();</span>
+<span class="nc" id="L96">              updateViewAndLoadData();</span>
+<span class="nc" id="L97">            }</span>
+    );
+<span class="fc" id="L99">    view.setDateSelectionListener(date -&gt; {</span>
+<span class="fc" id="L100">      this.selectedDate = date;</span>
+<span class="fc" id="L101">      view.updateCalendarView(currentMonth, selectedDate);</span>
+<span class="fc" id="L102">      loadEventsForDate(date);</span>
+<span class="fc" id="L103">    });</span>
+<span class="pc" id="L104">    view.getCreateCalendarButton().addActionListener(e -&gt; showCreateCalendarDialog());</span>
+<span class="pc" id="L105">    view.getEditCalendarButton().addActionListener(e -&gt; showEditCalendarDialog());</span>
+<span class="pc" id="L106">    view.getCreateEventButton().addActionListener(e -&gt; showCreateEventDialog());</span>
+<span class="pc" id="L107">    view.getEditEventButton().addActionListener(e -&gt; showEditEventDialog());</span>
+<span class="pc" id="L108">    view.getEditEventsBySearchButton().addActionListener(e -&gt; showEditEventsBySearchDialog());</span>
+<span class="fc" id="L109">  }</span>
+
+  /**
+   * Displays the dialog for creating a new event.
+   * If confirmed, triggers the event creation logic.
+   */
+  private void showCreateEventDialog() {
+<span class="nc" id="L116">    LocalDate selectedDate = view.getSelectedDate();</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">    if (selectedDate == null) {</span>
+<span class="nc" id="L118">      selectedDate = LocalDate.now();</span>
+    }
+<span class="nc" id="L120">    CreateEventDialog dialog = new CreateEventDialog(view.getFrame(), selectedDate);</span>
+<span class="nc" id="L121">    dialog.setVisible(true);</span>
+
+<span class="nc bnc" id="L123" title="All 2 branches missed.">    if (dialog.isConfirmed()) {</span>
+<span class="nc" id="L124">      handleCreateEvent(dialog);</span>
+    }
+<span class="nc" id="L126">  }</span>
+
+  /**
+   * Shows dialog to search and edit events by subject and start datetime.
+   * Handles the flow of searching, validating results, and performing bulk updates.
+   */
+  private void showEditEventsBySearchDialog() {
+    try {
+<span class="nc" id="L134">      String calendarName = service.getActiveCalendar();</span>
+<span class="nc" id="L135">      String calendarZoneId = service.getCalendarTimezone(calendarName);</span>
+<span class="nc" id="L136">      ZoneId calendarZone = ZoneId.of(calendarZoneId);</span>
+<span class="nc" id="L137">      SearchEditEventDialog searchDialog = new SearchEditEventDialog(view.getFrame());</span>
+<span class="nc" id="L138">      searchDialog.setVisible(true);</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">      if (!searchDialog.isConfirmed()) {</span>
+<span class="nc" id="L140">        return;</span>
+      }
+<span class="nc" id="L142">      String subject = searchDialog.getSubject();</span>
+<span class="nc" id="L143">      ZonedDateTime startDateTime = searchDialog.getStartDateTime(calendarZone);</span>
+<span class="nc" id="L144">      Calendar calendarModel = service.calendarModel(calendarName);</span>
+<span class="nc" id="L145">      Set&lt;Event&gt; allEvents = calendarModel.getEvents();</span>
+<span class="nc" id="L146">      List&lt;Event&gt; matchingEvents = findBySubjectAndStart(subject, startDateTime, allEvents);</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">      if (matchingEvents.isEmpty()) {</span>
+<span class="nc" id="L148">        view.showError(&quot;No events found with subject '&quot; + subject</span>
+                + &quot;' starting at &quot; + startDateTime);
+<span class="nc" id="L150">        return;</span>
+      }
+<span class="nc" id="L152">      matchingEvents.sort((e1, e2) -&gt; e1.getStartDateTime().compareTo(e2.getStartDateTime()));</span>
+<span class="nc" id="L153">      view.showSuccess(&quot;Found &quot; + matchingEvents.size() + &quot; matching event(s).&quot;);</span>
+<span class="nc" id="L154">      BulkEditEventDialog bulkDialog = new BulkEditEventDialog(</span>
+<span class="nc" id="L155">              view.getFrame(),</span>
+              matchingEvents, calendarZone);
+<span class="nc" id="L157">      bulkDialog.setVisible(true);</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">      if (bulkDialog.isConfirmed()) {</span>
+<span class="nc bnc" id="L159" title="All 2 branches missed.">        if (!matchingEvents.isEmpty()) {</span>
+<span class="nc" id="L160">          Event templateEvent = matchingEvents.get(0);</span>
+<span class="nc" id="L161">          updateEventWithChanges(</span>
+                  templateEvent,
+<span class="nc" id="L163">                  bulkDialog.getSubject(),</span>
+<span class="nc" id="L164">                  bulkDialog.getStartDate(),</span>
+<span class="nc" id="L165">                  bulkDialog.getStartTime(),</span>
+<span class="nc" id="L166">                  bulkDialog.getEndDate(),</span>
+<span class="nc" id="L167">                  bulkDialog.getEndTime(),</span>
+<span class="nc" id="L168">                  bulkDialog.getEventLocation(),</span>
+<span class="nc" id="L169">                  bulkDialog.getDescription(),</span>
+                  &quot;all&quot;
+          );
+        }
+<span class="nc" id="L173">        view.showSuccess(&quot;All matching events updated successfully!&quot;);</span>
+<span class="nc" id="L174">        loadEventsForDate(view.getSelectedDate());</span>
+      }
+<span class="nc" id="L176">    } catch (Exception e) {</span>
+<span class="nc" id="L177">      view.showError(&quot;Failed to search/edit events: &quot; + e.getMessage());</span>
+<span class="nc" id="L178">      e.printStackTrace();</span>
+<span class="nc" id="L179">    }</span>
+<span class="nc" id="L180">  }</span>
+
+  /**
+   * Processes the data from the create event dialog and executes the creation command.
+   * Validates input such as empty subjects or invalid time ranges.
+   *
+   * @param dialog the data interface containing user input from the dialog
+   */
+  public void handleCreateEvent(IcreateEventDialogData dialog) {
+<span class="fc" id="L189">    String subject = dialog.getSubject();</span>
+<span class="fc bfc" id="L190" title="All 2 branches covered.">    if (subject.isEmpty()) {</span>
+<span class="fc" id="L191">      view.showError(&quot;Event name cannot be empty!&quot;);</span>
+<span class="fc" id="L192">      return;</span>
+    }
+    try {
+      CreateEventDto dto;
+<span class="fc bfc" id="L196" title="All 2 branches covered.">      if (dialog.isAllDay()) {</span>
+<span class="fc" id="L197">        LocalDate date = dialog.getSelectedDate();</span>
+<span class="fc bfc" id="L198" title="All 2 branches covered.">        if (!dialog.isRecurring()) {</span>
+<span class="fc" id="L199">          dto = guiBuilder.buildAllDaySingleEventDto(subject, date);</span>
+        } else {
+<span class="fc" id="L201">          Set&lt;DayOfWeek&gt; weekdays = dialog.getSelectedWeekdays();</span>
+<span class="fc bfc" id="L202" title="All 2 branches covered.">          if (weekdays.isEmpty()) {</span>
+<span class="fc" id="L203">            view.showError(&quot;Please select at least one weekday for recurring events!&quot;);</span>
+<span class="fc" id="L204">            return;</span>
+          }
+<span class="fc bfc" id="L206" title="All 2 branches covered.">          if (dialog.isRepeatForTimes()) {</span>
+<span class="fc" id="L207">            int times = dialog.getRepeatTimes();</span>
+<span class="fc" id="L208">            dto = guiBuilder.buildAllDayRecurringForDto(subject, date, weekdays, times);</span>
+<span class="fc" id="L209">          } else {</span>
+<span class="fc" id="L210">            LocalDate until = dialog.getRepeatUntilDate();</span>
+<span class="fc" id="L211">            dto = guiBuilder.buildAllDayRecurringUntilDto(subject, date, weekdays, until);</span>
+          }
+        }
+<span class="fc" id="L214">      } else {</span>
+<span class="fc" id="L215">        LocalTime startTime = dialog.getStartTime();</span>
+<span class="fc" id="L216">        LocalTime endTime = dialog.getEndTime();</span>
+<span class="fc" id="L217">        LocalDate startDate = dialog.getSelectedDate();</span>
+<span class="fc" id="L218">        LocalDate endDate = dialog.getEndDate();</span>
+
+<span class="fc" id="L220">        LocalDateTime start = LocalDateTime.of(startDate, startTime);</span>
+<span class="fc" id="L221">        LocalDateTime end = LocalDateTime.of(endDate, endTime);</span>
+
+<span class="pc bpc" id="L223" title="1 of 4 branches missed.">        if (end.isBefore(start) || end.equals(start)) {</span>
+<span class="fc" id="L224">          view.showError(&quot;End time must be after start time!&quot;);</span>
+<span class="fc" id="L225">          return;</span>
+        }
+<span class="fc bfc" id="L227" title="All 2 branches covered.">        if (!dialog.isRecurring()) {</span>
+<span class="fc" id="L228">          dto = guiBuilder.buildTimedSingleEventDto(subject, start, end);</span>
+        } else {
+<span class="fc" id="L230">          Set&lt;DayOfWeek&gt; weekdays = dialog.getSelectedWeekdays();</span>
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">          if (weekdays.isEmpty()) {</span>
+<span class="nc" id="L232">            view.showError(&quot;Please select at least one weekday for recurring events!&quot;);</span>
+<span class="nc" id="L233">            return;</span>
+          }
+<span class="pc bpc" id="L235" title="1 of 2 branches missed.">          if (dialog.isRepeatForTimes()) {</span>
+<span class="fc" id="L236">            int times = dialog.getRepeatTimes();</span>
+<span class="fc" id="L237">            dto = guiBuilder.buildTimedRecurringForDto(subject, start, end, weekdays, times);</span>
+<span class="fc" id="L238">          } else {</span>
+<span class="nc" id="L239">            LocalDate until = dialog.getRepeatUntilDate();</span>
+<span class="nc" id="L240">            dto = guiBuilder.buildTimedRecurringUntilDto(subject, start, end, weekdays, until);</span>
+          }
+        }
+      }
+<span class="fc" id="L244">      CreateEventCommand cmd = new CreateEventCommand(dto, service);</span>
+<span class="fc" id="L245">      cmd.execute();</span>
+<span class="fc" id="L246">      view.setStatus(&quot;Event '&quot; + subject + &quot;' created!&quot;);</span>
+<span class="fc" id="L247">      view.showSuccess(&quot;Event created successfully!&quot;);</span>
+<span class="nc" id="L248">    } catch (Exception e) {</span>
+<span class="nc" id="L249">      view.showError(&quot;Failed to create event: &quot; + e.getMessage());</span>
+<span class="fc" id="L250">    }</span>
+<span class="fc" id="L251">  }</span>
+
+  /**
+   * Shows dialog to edit the active calendar.
+   * Allows modification of the calendar name and timezone.
+   */
+  private void showEditCalendarDialog() {
+    try {
+<span class="nc" id="L259">      String activeCalendar = service.getActiveCalendar();</span>
+<span class="nc bnc" id="L260" title="All 2 branches missed.">      if (activeCalendar == null) {</span>
+<span class="nc" id="L261">        view.showError(&quot;No calendar selected!&quot;);</span>
+<span class="nc" id="L262">        return;</span>
+      }
+<span class="nc" id="L264">      String currentTimezone = service.getCalendarTimezone(activeCalendar);</span>
+<span class="nc" id="L265">      EditCalendarDialog dialog = new EditCalendarDialog(view.getFrame(),</span>
+              activeCalendar, currentTimezone);
+<span class="nc" id="L267">      dialog.setVisible(true);</span>
+<span class="nc bnc" id="L268" title="All 2 branches missed.">      if (dialog.isConfirmed()) {</span>
+<span class="nc" id="L269">        String newName = dialog.getNewName();</span>
+<span class="nc" id="L270">        String newTimezone = dialog.getNewTimezone();</span>
+
+<span class="nc bnc" id="L272" title="All 2 branches missed.">        if (newName.isEmpty()) {</span>
+<span class="nc" id="L273">          view.showError(&quot;Calendar name cannot be empty!&quot;);</span>
+<span class="nc" id="L274">          return;</span>
+        }
+
+<span class="nc bnc" id="L277" title="All 2 branches missed.">        boolean nameChanged = !newName.equals(activeCalendar);</span>
+<span class="nc bnc" id="L278" title="All 2 branches missed.">        boolean timezoneChanged = !newTimezone.equals(currentTimezone);</span>
+
+<span class="nc bnc" id="L280" title="All 4 branches missed.">        if (!nameChanged &amp;&amp; !timezoneChanged) {</span>
+<span class="nc" id="L281">          return;</span>
+        }
+<span class="nc bnc" id="L283" title="All 2 branches missed.">        if (timezoneChanged) {</span>
+<span class="nc" id="L284">          editCalendarTimezone(activeCalendar, newTimezone);</span>
+        }
+<span class="nc bnc" id="L286" title="All 2 branches missed.">        if (nameChanged) {</span>
+<span class="nc" id="L287">          editCalendarName(activeCalendar, newName);</span>
+        } else {
+<span class="nc" id="L289">          refreshCalendarList();</span>
+        }
+      }
+<span class="nc" id="L292">    } catch (Exception e) {</span>
+<span class="nc" id="L293">      view.showError(&quot;Failed to edit calendar: &quot; + e.getMessage());</span>
+<span class="nc" id="L294">    }</span>
+<span class="nc" id="L295">  }</span>
+
+  /**
+   * Edits the calendar name.
+   *
+   * @param currentName the current name of the calendar
+   * @param newName     the new name to assign
+   */
+  public void editCalendarName(String currentName, String newName) {
+    try {
+<span class="fc" id="L305">      CalendarDto dto = guiBuilder.buildEditCalendarDto(currentName, &quot;name&quot;, newName);</span>
+<span class="fc" id="L306">      CalendarCommand cmd = new CalendarCommand(dto, service);</span>
+<span class="fc" id="L307">      cmd.execute();</span>
+<span class="fc" id="L308">      refreshCalendarList();</span>
+<span class="fc" id="L309">      view.setStatus(&quot;Calendar renamed to '&quot; + newName + &quot;'&quot;);</span>
+<span class="fc" id="L310">      view.showSuccess(&quot;Calendar renamed successfully!&quot;);</span>
+<span class="fc" id="L311">      switchCalendar(newName);</span>
+<span class="fc" id="L312">    } catch (Exception e) {</span>
+<span class="fc" id="L313">      view.showError(&quot;Failed to rename calendar: &quot; + e.getMessage());</span>
+<span class="fc" id="L314">    }</span>
+<span class="fc" id="L315">  }</span>
+
+  /**
+   * Edits the calendar timezone.
+   *
+   * @param calendarName the name of the calendar to update
+   * @param newTimezone  the new timezone string
+   */
+  public void editCalendarTimezone(String calendarName, String newTimezone) {
+    try {
+<span class="fc" id="L325">      CalendarDto dto = guiBuilder.buildEditCalendarDto(calendarName, &quot;timezone&quot;, newTimezone);</span>
+<span class="fc" id="L326">      CalendarCommand cmd = new CalendarCommand(dto, service);</span>
+<span class="fc" id="L327">      cmd.execute();</span>
+<span class="fc" id="L328">      refreshCalendarList();</span>
+<span class="fc" id="L329">      view.setStatus(&quot;Calendar timezone updated!&quot;);</span>
+<span class="fc" id="L330">      view.showSuccess(&quot;Calendar timezone updated successfully!&quot;);</span>
+<span class="fc" id="L331">    } catch (Exception e) {</span>
+<span class="fc" id="L332">      view.showError(&quot;Failed to update timezone: &quot; + e.getMessage());</span>
+<span class="fc" id="L333">    }</span>
+<span class="fc" id="L334">  }</span>
+
+
+  /**
+   * Creates a default calendar if none exists in the system.
+   * Uses the system's default timezone.
+   */
+  private void initializeDefaultCalendar() {
+    try {
+<span class="fc" id="L343">      Set&lt;String&gt; calendars = service.getAllCalendarNames();</span>
+<span class="pc bpc" id="L344" title="2 of 4 branches missed.">      if (calendars == null || calendars.isEmpty()) {</span>
+<span class="fc" id="L345">        String timezone = ZoneId.systemDefault().getId();</span>
+<span class="fc" id="L346">        createCalendar(&quot;Default&quot;, timezone);</span>
+<span class="fc" id="L347">        view.setStatus(&quot;Default calendar created!&quot;);</span>
+      }
+<span class="nc" id="L349">    } catch (Exception e) {</span>
+<span class="nc" id="L350">      view.setStatus(&quot;Ready&quot;);</span>
+<span class="fc" id="L351">    }</span>
+<span class="fc" id="L352">  }</span>
+
+  /**
+   * Shows dialog to create a new calendar.
+   */
+  private void showCreateCalendarDialog() {
+<span class="nc" id="L358">    CreateCalendarDialog dialog = new CreateCalendarDialog(view.getFrame());</span>
+<span class="nc" id="L359">    dialog.setVisible(true);</span>
+<span class="nc bnc" id="L360" title="All 2 branches missed.">    if (dialog.isConfirmed()) {</span>
+<span class="nc" id="L361">      String name = dialog.getCalendarName();</span>
+<span class="nc" id="L362">      String timezone = dialog.getTimezone();</span>
+<span class="nc bnc" id="L363" title="All 2 branches missed.">      if (name.isEmpty()) {</span>
+<span class="nc" id="L364">        view.showError(&quot;Calendar name cannot be empty!&quot;);</span>
+<span class="nc" id="L365">        return;</span>
+      }
+<span class="nc" id="L367">      createCalendar(name, timezone);</span>
+    }
+<span class="nc" id="L369">  }</span>
+
+  /**
+   * Creates a new calendar with the specified name and timezone.
+   *
+   * @param name     the name of the new calendar
+   * @param timezone the timezone for the new calendar
+   */
+  public void createCalendar(String name, String timezone) {
+    try {
+<span class="fc" id="L379">      CalendarDto dto = guiBuilder.buildCreateCalendarDto(name, timezone);</span>
+<span class="fc" id="L380">      CalendarCommand cmd = new CalendarCommand(dto, service);</span>
+<span class="fc" id="L381">      cmd.execute();</span>
+<span class="fc" id="L382">      refreshCalendarList();</span>
+<span class="fc" id="L383">      view.setStatus(&quot;Calendar '&quot; + name + &quot;' created!&quot;);</span>
+<span class="fc" id="L384">      view.showSuccess(&quot;Calendar '&quot; + name + &quot;' created successfully!&quot;);</span>
+<span class="fc" id="L385">      switchCalendar(name);</span>
+<span class="fc" id="L386">    } catch (Exception e) {</span>
+<span class="fc" id="L387">      view.showError(&quot;Failed to create calendar: &quot; + e.getMessage());</span>
+<span class="fc" id="L388">    }</span>
+<span class="fc" id="L389">  }</span>
+
+  /**
+   * Switches the active calendar to the specified one.
+   *
+   * @param name the name of the calendar to activate
+   */
+  public void switchCalendar(String name) {
+    try {
+<span class="fc" id="L398">      CalendarDto dto = guiBuilder.buildUseCalendarDto(name);</span>
+<span class="fc" id="L399">      CalendarCommand cmd = new CalendarCommand(dto, service);</span>
+<span class="fc" id="L400">      cmd.execute();</span>
+<span class="fc" id="L401">      view.setStatus(&quot;Active calendar: &quot; + name);</span>
+<span class="fc" id="L402">    } catch (Exception e) {</span>
+<span class="fc" id="L403">      view.showError(&quot;Failed to switch calendar: &quot; + e.getMessage());</span>
+<span class="fc" id="L404">    }</span>
+<span class="fc" id="L405">  }</span>
+
+  /**
+   * Refreshes the calendar list in the view dropdown.
+   * Retrieves all available calendar names from the service.
+   */
+  public void refreshCalendarList() {
+    try {
+<span class="fc" id="L413">      Set&lt;String&gt; calendarNames = service.getAllCalendarNames();</span>
+<span class="fc" id="L414">      String activeCalendar = service.getActiveCalendar();</span>
+<span class="fc" id="L415">      view.updateCalendarList(new ArrayList&lt;&gt;(calendarNames), activeCalendar);</span>
+<span class="nc" id="L416">    } catch (Exception e) {</span>
+<span class="nc" id="L417">      view.showError(&quot;Failed to load calendars: &quot; + e.getMessage());</span>
+<span class="fc" id="L418">    }</span>
+<span class="fc" id="L419">  }</span>
+
+  /**
+   * Helper method to update the calendar grid and load data.
+   */
+  private void updateViewAndLoadData() {
+<span class="fc" id="L425">    view.updateCalendarView(currentMonth, selectedDate);</span>
+<span class="fc" id="L426">  }</span>
+
+  /**
+   * Loads and displays events for a specific date in the view.
+   *
+   * @param date the date for which to load events
+   */
+  public void loadEventsForDate(LocalDate date) {
+    try {
+<span class="fc" id="L435">      String activeCalendar = service.getActiveCalendar();</span>
+<span class="pc bpc" id="L436" title="1 of 2 branches missed.">      if (activeCalendar == null) {</span>
+<span class="nc" id="L437">        view.showError(&quot;No calendar selected! Please select or create a calendar.&quot;);</span>
+<span class="nc" id="L438">        return;</span>
+      }
+<span class="fc" id="L440">      QueryEventDto dto = guiBuilder.buildQueryForDate(date);</span>
+<span class="fc" id="L441">      QueryEventCommand cmd = new QueryEventCommand(service, dto);</span>
+<span class="fc" id="L442">      IresultDto result = cmd.execute();</span>
+<span class="pc bpc" id="L443" title="1 of 2 branches missed.">      if (result instanceof QueryResultDto) {</span>
+<span class="fc" id="L444">        QueryResultDto queryResult = (QueryResultDto) result;</span>
+<span class="fc" id="L445">        view.displayEventsForQueryResult(date, queryResult);</span>
+<span class="fc" id="L446">      } else {</span>
+<span class="nc" id="L447">        view.showError(&quot;Unexpected result type from query&quot;);</span>
+      }
+<span class="nc" id="L449">    } catch (Exception e) {</span>
+<span class="nc" id="L450">      e.printStackTrace();</span>
+<span class="nc bnc" id="L451" title="All 2 branches missed.">      String errorMsg = (e.getMessage() != null) ? e.getMessage() : e.getClass().getName();</span>
+<span class="nc" id="L452">      view.showError(&quot;Failed to load events: &quot; + errorMsg);</span>
+<span class="fc" id="L453">    }</span>
+<span class="fc" id="L454">  }</span>
+
+  /**
+   * Shows dialog to edit an event on the selected date.
+   * If multiple events exist, prompts the user to select one.
+   */
+  private void showEditEventDialog() {
+<span class="nc" id="L461">    LocalDate selectedDate = view.getSelectedDate();</span>
+<span class="nc bnc" id="L462" title="All 2 branches missed.">    if (selectedDate == null) {</span>
+<span class="nc" id="L463">      view.showError(&quot;Please select a date first&quot;);</span>
+<span class="nc" id="L464">      return;</span>
+    }
+    try {
+<span class="nc" id="L467">      QueryEventDto queryDto = guiBuilder.buildQueryForDate(selectedDate);</span>
+<span class="nc" id="L468">      QueryEventCommand queryCmd = new QueryEventCommand(service, queryDto);</span>
+<span class="nc" id="L469">      IresultDto result = queryCmd.execute();</span>
+<span class="nc bnc" id="L470" title="All 2 branches missed.">      if (!(result instanceof QueryResultDto)) {</span>
+<span class="nc" id="L471">        view.showError(&quot;Failed to load events&quot;);</span>
+<span class="nc" id="L472">        return;</span>
+      }
+<span class="nc" id="L474">      QueryResultDto queryResult = (QueryResultDto) result;</span>
+<span class="nc bnc" id="L475" title="All 4 branches missed.">      if (queryResult.getEvents() == null || queryResult.getEvents().isEmpty()) {</span>
+<span class="nc" id="L476">        view.showError(&quot;No events on this date to edit&quot;);</span>
+<span class="nc" id="L477">        return;</span>
+      }
+<span class="nc" id="L479">      Event selectedEvent = selectEventFromList(queryResult.getEvents());</span>
+<span class="nc bnc" id="L480" title="All 2 branches missed.">      if (selectedEvent == null) {</span>
+<span class="nc" id="L481">        return;</span>
+      }
+<span class="nc" id="L483">      EditEventDialog dialog = new EditEventDialog(view.getFrame(), selectedEvent);</span>
+<span class="nc" id="L484">      dialog.setVisible(true);</span>
+<span class="nc bnc" id="L485" title="All 2 branches missed.">      if (dialog.isConfirmed()) {</span>
+<span class="nc" id="L486">        handleEditEvent(dialog);</span>
+      }
+<span class="nc" id="L488">    } catch (Exception e) {</span>
+<span class="nc" id="L489">      view.showError(&quot;Failed to edit event: &quot; + e.getMessage());</span>
+<span class="nc" id="L490">      e.printStackTrace();</span>
+<span class="nc" id="L491">    }</span>
+<span class="nc" id="L492">  }</span>
+
+  /**
+   * Shows a selection dialog for choosing which event to edit from a list.
+   *
+   * @param events the set of events to choose from
+   * @return the selected Event object, or null if cancelled
+   */
+  private Event selectEventFromList(Set&lt;Event&gt; events) {
+<span class="nc" id="L501">    Event[] eventArray = events.toArray(new Event[0]);</span>
+<span class="nc" id="L502">    String[] eventNames = new String[eventArray.length];</span>
+<span class="nc" id="L503">    java.time.format.DateTimeFormatter formatter =</span>
+<span class="nc" id="L504">            java.time.format.DateTimeFormatter.ofPattern(&quot;HH:mm&quot;);</span>
+<span class="nc bnc" id="L505" title="All 2 branches missed.">    for (int i = 0; i &lt; eventArray.length; i++) {</span>
+<span class="nc" id="L506">      Event e = eventArray[i];</span>
+<span class="nc" id="L507">      String time = e.getStartDateTime().format(formatter) + &quot; - &quot;</span>
+<span class="nc" id="L508">              + e.getEndDateTime().format(formatter);</span>
+<span class="nc" id="L509">      eventNames[i] = time + &quot; - &quot; + e.getSubject();</span>
+    }
+<span class="nc" id="L511">    String selected = (String) javax.swing.JOptionPane.showInputDialog(</span>
+<span class="nc" id="L512">            view.getFrame(),</span>
+            &quot;Select event to edit:&quot;,
+            &quot;Select Event&quot;,
+            javax.swing.JOptionPane.QUESTION_MESSAGE,
+            null,
+            eventNames,
+            eventNames[0]
+    );
+<span class="nc bnc" id="L520" title="All 2 branches missed.">    if (selected == null) {</span>
+<span class="nc" id="L521">      return null;</span>
+    }
+<span class="nc bnc" id="L523" title="All 2 branches missed.">    for (int i = 0; i &lt; eventNames.length; i++) {</span>
+<span class="nc bnc" id="L524" title="All 2 branches missed.">      if (eventNames[i].equals(selected)) {</span>
+<span class="nc" id="L525">        return eventArray[i];</span>
+      }
+    }
+<span class="nc" id="L528">    return null;</span>
+  }
+
+  /**
+   * Applies the changes to a given event.
+   * Determines the scope of the edit (single, series, future) and executes the update.
+   *
+   * @param originalEvent  the event being modified
+   * @param newSubject     the updated subject
+   * @param newStartDate   the updated start date
+   * @param newStartTime   the updated start time
+   * @param newEndDate     the updated end date
+   * @param newEndTime     the updated end time
+   * @param newLocation    the updated location
+   * @param newDescription the updated description
+   * @param editScope      the scope of the edit (&quot;single&quot;, &quot;series&quot;, etc.)
+   */
+  private void updateEventWithChanges(Event originalEvent,
+                                      String newSubject,
+                                      LocalDate newStartDate,
+                                      LocalTime newStartTime,
+                                      LocalDate newEndDate,
+                                      LocalTime newEndTime,
+                                      String newLocation,
+                                      String newDescription,
+                                      String editScope) {
+
+    try {
+<span class="fc bfc" id="L556" title="All 2 branches covered.">      if (!newEndTime.isAfter(newStartTime)) {</span>
+<span class="fc" id="L557">        view.showError(&quot;End time must be after start time!&quot;);</span>
+<span class="fc" id="L558">        return;</span>
+      }
+<span class="fc" id="L560">      LocalDateTime newStart = LocalDateTime.of(newStartDate, newStartTime);</span>
+<span class="fc" id="L561">      LocalDateTime newEnd = LocalDateTime.of(newEndDate, newEndTime);</span>
+<span class="fc" id="L562">      Map&lt;String, String&gt; changes = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L563">      java.time.format.DateTimeFormatter formatter = java.time</span>
+              .format
+              .DateTimeFormatter
+<span class="fc" id="L566">              .ofPattern(&quot;yyyy-MM-dd'T'HH:mm&quot;);</span>
+<span class="fc bfc" id="L567" title="All 2 branches covered.">      if (!originalEvent.getSubject().equals(newSubject)) {</span>
+<span class="fc" id="L568">        changes.put(&quot;subject&quot;, newSubject);</span>
+      }
+<span class="fc bfc" id="L570" title="All 2 branches covered.">      if (!originalEvent.getStartDateTime().toLocalDateTime().equals(newStart)) {</span>
+<span class="fc" id="L571">        changes.put(&quot;start&quot;, newStart.format(formatter));</span>
+      }
+<span class="fc bfc" id="L573" title="All 2 branches covered.">      if (!originalEvent.getEndDateTime().toLocalDateTime().equals(newEnd)) {</span>
+<span class="fc" id="L574">        changes.put(&quot;end&quot;, newEnd.format(formatter));</span>
+      }
+<span class="pc bpc" id="L576" title="1 of 2 branches missed.">      String oldLocation = originalEvent.getLocation() != null ? originalEvent.getLocation() : &quot;&quot;;</span>
+<span class="pc bpc" id="L577" title="1 of 2 branches missed.">      if (!oldLocation.equals(newLocation)) {</span>
+<span class="nc" id="L578">        changes.put(&quot;location&quot;, newLocation);</span>
+      }
+<span class="pc bpc" id="L580" title="1 of 2 branches missed.">      String oldDescription = originalEvent.getDescription() != null</span>
+<span class="pc" id="L581">              ? originalEvent.getDescription() : &quot;&quot;;</span>
+<span class="pc bpc" id="L582" title="1 of 2 branches missed.">      if (!oldDescription.equals(newDescription)) {</span>
+<span class="nc" id="L583">        changes.put(&quot;description&quot;, newDescription);</span>
+      }
+<span class="pc bpc" id="L585" title="1 of 2 branches missed.">      if (changes.isEmpty()) {</span>
+<span class="nc" id="L586">        return;</span>
+      }
+      EditEventDto dto;
+<span class="fc bfc" id="L589" title="All 2 branches covered.">      if (editScope.equals(&quot;single&quot;)) {</span>
+<span class="fc" id="L590">        dto = guiBuilder.buildEditSingleEventDto(</span>
+<span class="fc" id="L591">                originalEvent.getSubject(),</span>
+<span class="fc" id="L592">                originalEvent.getStartDateTime().toLocalDateTime(),</span>
+<span class="fc" id="L593">                originalEvent.getEndDateTime().toLocalDateTime(),</span>
+                changes
+        );
+<span class="pc bpc" id="L596" title="1 of 2 branches missed.">      } else if (editScope.equals(&quot;series&quot;)) {</span>
+<span class="nc" id="L597">        dto = guiBuilder.buildEditSeriesDto(</span>
+<span class="nc" id="L598">                originalEvent.getSubject(),</span>
+<span class="nc" id="L599">                originalEvent.getStartDateTime().toLocalDateTime(),</span>
+                changes
+        );
+      } else {
+<span class="fc" id="L603">        dto = guiBuilder.buildEditForwardDto(</span>
+<span class="fc" id="L604">                originalEvent.getSubject(),</span>
+<span class="fc" id="L605">                originalEvent.getStartDateTime().toLocalDateTime(),</span>
+                changes
+        );
+      }
+<span class="fc" id="L609">      EditEventCommand cmd = new EditEventCommand(dto, service);</span>
+<span class="fc" id="L610">      cmd.execute();</span>
+<span class="nc" id="L611">    } catch (Exception e) {</span>
+<span class="nc" id="L612">      view.showError(&quot;Failed to update event: &quot; + e.getMessage());</span>
+<span class="nc" id="L613">      e.printStackTrace();</span>
+<span class="fc" id="L614">    }</span>
+<span class="fc" id="L615">  }</span>
+
+
+  /**
+   * Handles the edit event action after the dialog is confirmed.
+   * Extracts data from the dialog and triggers the update logic.
+   *
+   * @param dialog the data interface containing edits from the dialog
+   */
+  public void handleEditEvent(IeditEventDialogData dialog) {
+<span class="fc" id="L625">    Event originalEvent = dialog.getOriginalEvent();</span>
+<span class="fc" id="L626">    updateEventWithChanges(</span>
+            originalEvent,
+<span class="fc" id="L628">            dialog.getSubject(),</span>
+<span class="fc" id="L629">            dialog.getStartDate(),</span>
+<span class="fc" id="L630">            dialog.getStartTime(),</span>
+<span class="fc" id="L631">            dialog.getEndDate(),</span>
+<span class="fc" id="L632">            dialog.getEndTime(),</span>
+<span class="fc" id="L633">            dialog.getEventLocation(),</span>
+<span class="fc" id="L634">            dialog.getDescription(),</span>
+<span class="fc" id="L635">            dialog.getEditScope()</span>
+    );
+<span class="fc" id="L637">    view.showSuccess(&quot;Event updated successfully!&quot;);</span>
+<span class="fc" id="L638">    loadEventsForDate(view.getSelectedDate());</span>
+<span class="fc" id="L639">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

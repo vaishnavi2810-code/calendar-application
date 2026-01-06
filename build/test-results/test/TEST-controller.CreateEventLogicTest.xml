@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="controller.CreateEventLogicTest" tests="13" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:33" hostname="Vaishnavis-MacBook-Pro.local" time="0.397">
+  <properties/>
+  <testcase name="testControllerInitialization" classname="controller.CreateEventLogicTest" time="0.364"/>
+  <testcase name="testButtonListenersWiring" classname="controller.CreateEventLogicTest" time="0.003"/>
+  <testcase name="testDropdownListenerTriggersSwitchCalendar" classname="controller.CreateEventLogicTest" time="0.004"/>
+  <testcase name="testHandleCreateEventValidationEmptySubject" classname="controller.CreateEventLogicTest" time="0.003"/>
+  <testcase name="testHandleCreateEventAllDayRecurringBranchCoverage" classname="controller.CreateEventLogicTest" time="0.004"/>
+  <testcase name="testHandleCreateEventAllDayRecurringBranchCoverage2" classname="controller.CreateEventLogicTest" time="0.004"/>
+  <testcase name="testDateSelectionListenerTriggersLoadEvents" classname="controller.CreateEventLogicTest" time="0.002"/>
+  <testcase name="testHandleCreateEventAllDayRecurringUntilBranchCoverage" classname="controller.CreateEventLogicTest" time="0.003"/>
+  <testcase name="testHandleCreateEventRecurringNoWeekdays" classname="controller.CreateEventLogicTest" time="0.001"/>
+  <testcase name="testHandleCreateEventTimedRecurringBranchCoverage" classname="controller.CreateEventLogicTest" time="0.003"/>
+  <testcase name="testHandleCreateEventAllDaySingle" classname="controller.CreateEventLogicTest" time="0.003"/>
+  <testcase name="testHandleCreateEventValidationEndBeforeStart" classname="controller.CreateEventLogicTest" time="0.001"/>
+  <testcase name="testHandleCreateEventTimedSingle" classname="controller.CreateEventLogicTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

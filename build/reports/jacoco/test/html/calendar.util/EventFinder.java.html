@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EventFinder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.util</a> &gt; <span class="el_source">EventFinder.java</span></div><h1>EventFinder.java</h1><pre class="source lang-java linenums">package calendar.util;
+
+import calendar.model.Event;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+/**
+ * Utility class providing static methods for finding and filtering calendar events.
+ * This class contains methods for searching events by various criteria including subject,
+ * start time, series membership, date ranges, and specific time instants. All methods
+ * are static and the class cannot be instantiated.
+ */
+public class EventFinder {
+  private EventFinder() {
+  }
+
+  /**
+   * Finds all events matching the specified subject and exact start time.
+   * Performs exact matching on both the subject string and the start date-time.
+   * This method is useful for identifying specific event occurrences when multiple
+   * events may share the same subject but occur at different times.
+   *
+   * @param subject the exact subject string to match
+   * @param start the exact start date-time to match
+   * @param events the set of events to search through
+   * @return a list of events matching both subject and start time, or an empty list if none match
+   */
+  public static List&lt;Event&gt; findBySubjectAndStart(String subject, ZonedDateTime start,
+                                            Set&lt;Event&gt; events) {
+<span class="fc" id="L34">    return events.stream()</span>
+<span class="fc bfc" id="L35" title="All 2 branches covered.">        .filter(e -&gt; e.getSubject().equals(subject)</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">            &amp;&amp; e.getStartDateTime().equals(start))</span>
+<span class="fc" id="L37">        .collect(Collectors.toList());</span>
+  }
+
+  /**
+   * Finds all events belonging to a specific recurring event series.
+   * Returns all events that share the specified series ID, which identifies
+   * occurrences of the same recurring event pattern.
+   *
+   * @param seriesId the series identifier to match
+   * @param events the set of events to search through
+   * @return a list of all events in the series, or an empty list if the series ID is
+   *         null/empty or no events match
+   */
+  public static List&lt;Event&gt; findBySeries(String seriesId, Set&lt;Event&gt; events) {
+<span class="fc bfc" id="L51" title="All 4 branches covered.">    if (seriesId == null || seriesId.isEmpty()) {</span>
+<span class="fc" id="L52">      return List.of();</span>
+    }
+<span class="fc" id="L54">    return events.stream()</span>
+<span class="fc" id="L55">        .filter(e -&gt; seriesId.equals(e.getSeriesId()))</span>
+<span class="fc" id="L56">        .collect(Collectors.toList());</span>
+  }
+
+  /**
+   * Finds events in a series starting from a specific time (inclusive).
+   * Returns all events in the specified series that start at or after the given time.
+   * This method is useful for edit operations that affect &quot;this and future occurrences.&quot;
+   *
+   * @param seriesId the series identifier to match
+   * @param fromTime the earliest start time to include (inclusive)
+   * @param events the set of events to search through
+   * @return a list of series events starting at or after the specified time, or an empty list
+   *         if the series ID is null/empty or no events match
+   */
+  public static List&lt;Event&gt; findSeriesFrom(String seriesId, ZonedDateTime fromTime,
+                                           Set&lt;Event&gt; events) {
+<span class="fc bfc" id="L72" title="All 4 branches covered.">    if (seriesId == null || seriesId.isEmpty()) {</span>
+<span class="fc" id="L73">      return List.of();</span>
+    }
+<span class="fc" id="L75">    return events.stream()</span>
+<span class="fc" id="L76">        .filter(e -&gt; seriesId.equals(e.getSeriesId()))</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        .filter(e -&gt; !e.getStartDateTime().isBefore(fromTime))</span>
+<span class="fc" id="L78">        .collect(Collectors.toList());</span>
+  }
+
+  /**
+   * Finds all events occurring on a specific date.
+   * Returns events that have any overlap with the specified date, regardless of when
+   * they start or end. Events spanning multiple days are included if the query date
+   * falls within their duration. The date is interpreted in the specified timezone.
+   *
+   * @param date the date to search for events
+   * @param timezone the timezone to use for date boundary calculations
+   * @param events the set of events to search through
+   * @return a list of events occurring on the specified date, or an empty list if none match
+   */
+  public static List&lt;Event&gt; findOnDate(LocalDate date, ZoneId timezone,
+                                       Set&lt;Event&gt; events) {
+<span class="fc" id="L94">    ZonedDateTime dayStart = date.atStartOfDay(timezone);</span>
+<span class="fc" id="L95">    ZonedDateTime dayEnd = date.plusDays(1).atStartOfDay(timezone);</span>
+<span class="fc" id="L96">    return events.stream()</span>
+<span class="fc" id="L97">        .filter(e -&gt; eventOverlapsWithRange(e, dayStart, dayEnd))</span>
+<span class="fc" id="L98">        .collect(Collectors.toList());</span>
+  }
+
+  /**
+   * Finds all events occurring within a specified date-time range.
+   * Returns events that have any overlap with the time period between start and end.
+   * An event overlaps if it starts before the range ends and ends after the range starts.
+   *
+   * @param start the start of the range (inclusive)
+   * @param end the end of the range (exclusive)
+   * @param events the set of events to search through
+   * @return a list of events overlapping with the specified range, or an empty list if none match
+   */
+  public static List&lt;Event&gt; findInRange(ZonedDateTime start, ZonedDateTime end,
+                                        Set&lt;Event&gt; events) {
+<span class="fc" id="L113">    return events.stream()</span>
+<span class="fc" id="L114">        .filter(e -&gt; eventOverlapsWithRange(e, start, end))</span>
+<span class="fc" id="L115">        .collect(Collectors.toList());</span>
+  }
+
+  /**
+   * Finds all events that are active at a specific instant in time.
+   * An event is considered active if the instant falls within its duration
+   * (at or after the start time and before the end time). This method is used
+   * for availability checks.
+   *
+   * @param instant the specific moment in time to check
+   * @param events the set of events to search through
+   * @return a list of events active at the specified instant, or an empty list if none are active
+   */
+  public static List&lt;Event&gt; findActiveAt(ZonedDateTime instant, Set&lt;Event&gt; events) {
+<span class="fc" id="L129">    return events.stream()</span>
+<span class="fc" id="L130">        .filter(e -&gt; eventIsActiveAt(e, instant))</span>
+<span class="fc" id="L131">        .collect(Collectors.toList());</span>
+  }
+
+  private static boolean eventOverlapsWithRange(Event event, ZonedDateTime rangeStart,
+                                                ZonedDateTime rangeEnd) {
+<span class="fc bfc" id="L136" title="All 2 branches covered.">    return event.getStartDateTime().isBefore(rangeEnd)</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">        &amp;&amp; event.getEndDateTime().isAfter(rangeStart);</span>
+  }
+
+  private static boolean eventIsActiveAt(Event event, ZonedDateTime instant) {
+<span class="fc bfc" id="L141" title="All 2 branches covered.">    return !instant.isBefore(event.getStartDateTime())</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">        &amp;&amp; instant.isBefore(event.getEndDateTime());</span>
+  }
+
+  /**
+   * Finds all events with a specific subject that start on or after a given time.
+   * Events are filtered by exact subject match and start time comparison.
+   *
+   * @param subject the subject to search for (exact match)
+   * @param start the earliest start time to include
+   * @param events the set of events to search through
+   * @return a list of events matching the subject that start on or after the given time
+   */
+  public static List&lt;Event&gt; findBySubjectFromStart(String subject, ZonedDateTime start,
+                                                   Set&lt;Event&gt; events) {
+<span class="fc" id="L156">    return events.stream()</span>
+<span class="pc bpc" id="L157" title="1 of 2 branches missed.">            .filter(e -&gt; e.getSubject().equals(subject)</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">                    &amp;&amp; !e.getStartDateTime().isBefore(start))</span>
+<span class="fc" id="L159">            .collect(Collectors.toList());</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

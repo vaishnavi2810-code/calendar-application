@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreateEventSingle.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.strategy</a> &gt; <span class="el_source">CreateEventSingle.java</span></div><h1>CreateEventSingle.java</h1><pre class="source lang-java linenums">package calendar.strategy;
+
+import static calendar.constants.CreateCalendarConstants.DATETIME_FORMATTER;
+
+import calendar.dto.CreateEventDto;
+import calendar.interfacetypes.Icreate;
+import calendar.model.Event;
+import calendar.model.EventBuilder;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Strategy implementation for creating a single timed event.
+ * This class generates a one-time event with specific start and end times on a given date.
+ * The event is created in the configured timezone and validated to ensure the end time
+ * is after the start time and that no conflicts exist with existing events.
+ */
+<span class="fc" id="L21">public class CreateEventSingle implements Icreate {</span>
+
+  /**
+   * Creates a single timed event based on the specified parameters.
+   * Parses the start and end date-time strings, validates that the end time is after
+   * the start time, and creates the event in the configured timezone. The event does not
+   * have a series ID since it is a standalone occurrence.
+   *
+   * @param data the data transfer object containing event creation parameters including
+   *             subject, start date-time, and end date-time
+   * @param list the existing set of events to check for conflicts before creating the new event
+   * @return a set containing the single newly created event
+   * @throws Exception if the end time is before the start time, if the event conflicts
+   *                   with an existing event, or if the date-time strings cannot be parsed
+   */
+  @Override
+  public Set&lt;Event&gt; create(CreateEventDto data, Set&lt;Event&gt; list, ZoneId timezone) throws Exception {
+<span class="fc" id="L38">    LocalDateTime floatingStart = LocalDateTime.parse(data.getStartDateTime(), DATETIME_FORMATTER);</span>
+<span class="fc" id="L39">    LocalDateTime floatingEnd = LocalDateTime.parse(data.getEndDateTime(), DATETIME_FORMATTER);</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">    if (floatingEnd.isBefore(floatingStart)) {</span>
+<span class="fc" id="L41">      throw new Exception(&quot;Error: Event end time cannot be before its start time.&quot;);</span>
+    }
+<span class="fc" id="L43">    HashSet&lt;Event&gt; result = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L44">    ZonedDateTime eventStart = ZonedDateTime.of(floatingStart, timezone);</span>
+<span class="fc" id="L45">    ZonedDateTime eventEnd = ZonedDateTime.of(floatingEnd, timezone);</span>
+<span class="fc" id="L46">    Event event = new EventBuilder()</span>
+<span class="fc" id="L47">        .setEndDateTime(eventEnd)</span>
+<span class="fc" id="L48">        .setStartDateTime(eventStart)</span>
+<span class="fc" id="L49">        .setSubject(data.getSubject())</span>
+<span class="fc" id="L50">        .build();</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">    if (list.contains(event)) {</span>
+<span class="fc" id="L52">      throw new Exception(&quot;Event already exists&quot;);</span>
+    }
+<span class="fc" id="L54">    result.add(event);</span>
+<span class="fc" id="L55">    return result;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

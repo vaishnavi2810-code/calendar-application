@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GoogleCsvExporter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.strategy</a> &gt; <span class="el_source">GoogleCsvExporter.java</span></div><h1>GoogleCsvExporter.java</h1><pre class="source lang-java linenums">package calendar.strategy;
+
+import static calendar.constants.ExportConstants.CSV_HEADER;
+import static calendar.constants.ExportConstants.GOOGLE_DATE_FORMAT;
+import static calendar.constants.ExportConstants.GOOGLE_TIME_FORMAT;
+
+import calendar.interfacetypes.Iexport;
+import calendar.model.Event;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.ZonedDateTime;
+import java.util.Collection;
+
+/**
+ * Export strategy implementation for creating Google Calendar-compatible CSV files.
+ * This class converts a collection of calendar events into a CSV format with columns
+ * for subject, start date, start time, end date, end time, description, location, and status.
+ * The dates and times are formatted according to Google Calendar's expected format.
+ */
+<span class="fc" id="L22">public class GoogleCsvExporter implements Iexport {</span>
+
+  /**
+   * Exports a collection of events to a CSV file in Google Calendar format.
+   * Creates a CSV file with a header row and one row per event, containing the event's
+   * subject, start/end dates and times, description, location, and status. The subject
+   * field is properly quoted if it contains commas, quotes, or newlines. All date and
+   * time values are formatted according to Google Calendar's requirements.
+   *
+   * @param events the collection of events to be exported
+   * @param fileName the name of the file to create, including the .csv extension
+   * @return the absolute path of the created CSV file
+   * @throws IOException if the file cannot be created or written to
+   */
+  public String export(Collection&lt;Event&gt; events, String fileName) throws IOException {
+
+<span class="fc" id="L38">    StringBuilder csvBuilder = new StringBuilder();</span>
+<span class="fc" id="L39">    csvBuilder.append(CSV_HEADER);</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">    for (Event event : events) {</span>
+<span class="fc" id="L41">      ZonedDateTime start = event.getStartDateTime();</span>
+<span class="fc" id="L42">      ZonedDateTime end = event.getEndDateTime();</span>
+<span class="fc" id="L43">      String eventLocation = event.getLocation();</span>
+<span class="fc" id="L44">      String eventDescription = event.getDescription();</span>
+<span class="fc" id="L45">      String status = event.getStatus();</span>
+<span class="fc" id="L46">      String startDateStr = start.format(GOOGLE_DATE_FORMAT);</span>
+<span class="fc" id="L47">      String startTimeStr = start.format(GOOGLE_TIME_FORMAT);</span>
+<span class="fc" id="L48">      String endDateStr = end.format(GOOGLE_DATE_FORMAT);</span>
+<span class="fc" id="L49">      String endTimeStr = end.format(GOOGLE_TIME_FORMAT);</span>
+<span class="fc" id="L50">      csvBuilder.append(quoteCsvField(event.getSubject())).append(&quot;,&quot;);</span>
+<span class="fc" id="L51">      csvBuilder.append(startDateStr).append(&quot;,&quot;);</span>
+<span class="fc" id="L52">      csvBuilder.append(startTimeStr).append(&quot;,&quot;);</span>
+<span class="fc" id="L53">      csvBuilder.append(endDateStr).append(&quot;,&quot;);</span>
+<span class="fc" id="L54">      csvBuilder.append(endTimeStr).append(&quot;,&quot;);</span>
+<span class="fc" id="L55">      csvBuilder.append(eventDescription).append(&quot;,&quot;);</span>
+<span class="fc" id="L56">      csvBuilder.append(eventLocation).append(&quot;,&quot;);</span>
+<span class="fc" id="L57">      csvBuilder.append(status).append(&quot;\n&quot;);</span>
+
+<span class="fc" id="L59">    }</span>
+<span class="fc" id="L60">    Path filePath = Paths.get(fileName);</span>
+<span class="fc" id="L61">    Files.writeString(filePath, csvBuilder.toString());</span>
+<span class="fc" id="L62">    return filePath.toAbsolutePath().toString();</span>
+  }
+
+  /**
+   * Properly formats a field value for CSV by escaping special characters.
+   * If the field contains commas, double quotes, or newlines, wraps it in double quotes
+   * and escapes any existing double quotes by doubling them (CSV standard). Returns
+   * an empty string if the field is null or empty.
+   *
+   * @param field the field value to format
+   * @return the properly escaped and quoted field value, or empty string if null/empty
+   */
+  public String quoteCsvField(String field) {
+<span class="pc bpc" id="L75" title="2 of 4 branches missed.">    if (field == null || field.isEmpty()) {</span>
+<span class="nc" id="L76">      return &quot;&quot;;</span>
+    }
+<span class="pc bpc" id="L78" title="1 of 6 branches missed.">    if (field.contains(&quot;,&quot;) || field.contains(&quot;\&quot;&quot;) || field.contains(&quot;\n&quot;)) {</span>
+<span class="fc" id="L79">      field = field.replace(&quot;\&quot;&quot;, &quot;\&quot;\&quot;&quot;);</span>
+<span class="fc" id="L80">      return &quot;\&quot;&quot; + field + &quot;\&quot;&quot;;</span>
+    }
+<span class="fc" id="L82">    return field;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

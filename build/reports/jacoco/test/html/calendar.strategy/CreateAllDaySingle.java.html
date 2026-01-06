@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreateAllDaySingle.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.strategy</a> &gt; <span class="el_source">CreateAllDaySingle.java</span></div><h1>CreateAllDaySingle.java</h1><pre class="source lang-java linenums">package calendar.strategy;
+
+import calendar.dto.CreateEventDto;
+import calendar.interfacetypes.Icreate;
+import calendar.model.Event;
+import calendar.model.EventBuilder;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Strategy implementation for creating a single all-day event.
+ * This class generates a one-time all-day event with default hours of 8:00 AM to 5:00 PM
+ * on the specified date. The event is created in the configured timezone and checked
+ * for conflicts with existing events.
+ */
+<span class="fc" id="L20">public class CreateAllDaySingle implements Icreate {</span>
+
+  /**
+   * Creates a single all-day event based on the specified parameters.
+   * The event is created with default times of 8:00 AM to 5:00 PM in the configured timezone.
+   * The event does not have a series ID since it is a standalone occurrence.
+   *
+   * @param data the data transfer object containing event creation parameters including
+   *             subject and date
+   * @param list the existing set of events to check for conflicts before creating the new event
+   * @return a set containing the single newly created event
+   * @throws Exception if the event conflicts with an existing event or if the date cannot be parsed
+   */
+  @Override
+  public Set&lt;Event&gt; create(CreateEventDto data, Set&lt;Event&gt; list, ZoneId timezone) throws Exception {
+<span class="fc" id="L35">    LocalDate date = LocalDate.parse(data.getOnDate());</span>
+<span class="fc" id="L36">    HashSet&lt;Event&gt; result = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L37">    LocalTime startTime = LocalTime.of(8, 0);</span>
+<span class="fc" id="L38">    LocalTime endTime = LocalTime.of(17, 0);</span>
+<span class="fc" id="L39">    ZonedDateTime zonedStart = ZonedDateTime.of(date, startTime, timezone);</span>
+<span class="fc" id="L40">    ZonedDateTime zonedEnd = ZonedDateTime.of(date, endTime, timezone);</span>
+<span class="fc" id="L41">    EventBuilder builder = new EventBuilder()</span>
+<span class="fc" id="L42">        .setSubject(data.getSubject())</span>
+<span class="fc" id="L43">        .setStartDateTime(zonedStart)</span>
+<span class="fc" id="L44">        .setEndDateTime(zonedEnd);</span>
+<span class="fc" id="L45">    Event event = builder.build();</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">    if (list.contains(event)) {</span>
+<span class="fc" id="L47">      throw new Exception(&quot;Event already exists&quot;);</span>
+    }
+<span class="fc" id="L49">    result.add(event);</span>
+<span class="fc" id="L50">    return result;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

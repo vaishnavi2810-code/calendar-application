@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreateTimedRecurringUntil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.strategy</a> &gt; <span class="el_source">CreateTimedRecurringUntil.java</span></div><h1>CreateTimedRecurringUntil.java</h1><pre class="source lang-java linenums">package calendar.strategy;
+
+import static calendar.constants.CreateCalendarConstants.DATETIME_FORMATTER;
+import static calendar.constants.CreateCalendarConstants.parseWeekdays;
+
+import calendar.dto.CreateEventDto;
+import calendar.interfacetypes.Icreate;
+import calendar.model.Event;
+import calendar.model.EventBuilder;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+/**
+ * Strategy implementation for creating recurring timed events until a specified end date.
+ * This class generates a series of events that occur at the same time on specified weekdays,
+ * continuing until the specified end date is reached. All events in the series share a common
+ * series ID for identification purposes. The start and end times must be on the same date.
+ */
+<span class="fc" id="L26">public class CreateTimedRecurringUntil implements Icreate {</span>
+
+  /**
+   * Creates a set of recurring timed events based on the specified parameters.
+   * Starting from the given date, iterates through subsequent days and creates events
+   * on matching weekdays until the specified end date (inclusive). Each event occurs at
+   * the same time of day and is assigned the same series ID to indicate they belong to
+   * the same recurring series. Validates that the end time is after the start time,
+   * that both times occur on the same date, and that the until date is not before the start date.
+   *
+   * @param data the data transfer object containing event creation parameters including
+   *             subject, start date-time, end date-time, weekdays pattern, and until date
+   * @param list the existing set of events to check for conflicts before creating new events
+   * @return a set containing all newly created event occurrences up to and including the until date
+   * @throws Exception if the end time is before the start time, if start and end are not
+   *                   on the same date, if the until date is before the start date,
+   *                   if any event in the series conflicts with an existing event,
+   *                   or if the dates cannot be parsed
+   */
+  @Override
+  public Set&lt;Event&gt; create(CreateEventDto data, Set&lt;Event&gt; list, ZoneId timezone) throws Exception {
+<span class="fc" id="L47">    LocalDateTime floatingStart = LocalDateTime.parse(data.getStartDateTime(), DATETIME_FORMATTER);</span>
+<span class="fc" id="L48">    LocalDateTime floatingEnd = LocalDateTime.parse(data.getEndDateTime(), DATETIME_FORMATTER);</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">    if (floatingEnd.isBefore(floatingStart)) {</span>
+<span class="fc" id="L50">      throw new Exception(&quot;Error: Event end time cannot be before its start time.&quot;);</span>
+    }
+<span class="fc" id="L52">    LocalDate date = floatingStart.toLocalDate();</span>
+<span class="fc" id="L53">    LocalTime startTime = floatingStart.toLocalTime();</span>
+<span class="fc" id="L54">    LocalTime endTime = floatingEnd.toLocalTime();</span>
+<span class="fc" id="L55">    String seriesId = UUID.randomUUID().toString();</span>
+<span class="fc" id="L56">    LocalDate untillDate = LocalDate.parse(data.getUntilDate());</span>
+<span class="fc" id="L57">    HashSet&lt;Event&gt; result = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">    if (!floatingStart.toLocalDate().equals(floatingEnd.toLocalDate())) {</span>
+<span class="fc" id="L59">      throw new Exception(&quot;Error: Recurring events must start and end on the same day.&quot;);</span>
+    }
+<span class="fc bfc" id="L61" title="All 2 branches covered.">    if (untillDate.isBefore(date)) {</span>
+<span class="fc" id="L62">      throw new Exception(&quot;Error: 'until' date cannot be before the event's start date.&quot;);</span>
+    }
+<span class="fc" id="L64">    Set&lt;DayOfWeek&gt; wantedDays = parseWeekdays(data.getWeekdays());</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">    while (!date.isAfter(untillDate)) {</span>
+<span class="fc bfc" id="L66" title="All 2 branches covered.">      if (wantedDays.contains(date.getDayOfWeek())) {</span>
+<span class="fc" id="L67">        ZonedDateTime startDateTime = ZonedDateTime.of(date, startTime, timezone);</span>
+<span class="fc" id="L68">        ZonedDateTime endDateTime = ZonedDateTime.of(date, endTime, timezone);</span>
+<span class="fc" id="L69">        EventBuilder eventBuilder = new EventBuilder()</span>
+<span class="fc" id="L70">            .setSubject(data.getSubject())</span>
+<span class="fc" id="L71">            .setEndDateTime(endDateTime)</span>
+<span class="fc" id="L72">            .setStartDateTime(startDateTime)</span>
+<span class="fc" id="L73">            .setSeriesId(seriesId);</span>
+<span class="fc" id="L74">        Event event = eventBuilder.build();</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        if (list.contains(event)) {</span>
+<span class="fc" id="L76">          throw new Exception(&quot;Event already exists&quot;);</span>
+        }
+<span class="fc" id="L78">        result.add(event);</span>
+      }
+<span class="fc" id="L80">      date = date.plusDays(1);</span>
+    }
+<span class="fc" id="L82">    return result;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

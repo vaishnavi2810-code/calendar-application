@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="service.GuiDtoBuilderServiceTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.002">
+  <properties/>
+  <testcase name="testBuildQueryForStatus" classname="service.GuiDtoBuilderServiceTest" time="0.001"/>
+  <testcase name="testFormatWeekdaysOrdering" classname="service.GuiDtoBuilderServiceTest" time="0.0"/>
+  <testcase name="testBuildTimedRecurringUntilDto" classname="service.GuiDtoBuilderServiceTest" time="0.0"/>
+  <testcase name="testBuildTimedRecurringForDto" classname="service.GuiDtoBuilderServiceTest" time="0.0"/>
+  <testcase name="testBuildCreateCalendarDtoWithEmptyName" classname="service.GuiDtoBuilderServiceTest" time="0.001"/>
+  <testcase name="testBuildCreateCalendarDtoWithNullName" classname="service.GuiDtoBuilderServiceTest" time="0.0"/>
+  <testcase name="testBuildAllDayRecurringUntilDto" classname="service.GuiDtoBuilderServiceTest" time="0.0"/>
+  <testcase name="testBuildTimedSingleEventDto" classname="service.GuiDtoBuilderServiceTest" time="0.0"/>
+  <testcase name="testBuildAllDayRecurringForDto" classname="service.GuiDtoBuilderServiceTest" time="0.0"/>
+  <testcase name="testBuildQueryForDate" classname="service.GuiDtoBuilderServiceTest" time="0.0"/>
+  <testcase name="testBuildCreateCalendarDto" classname="service.GuiDtoBuilderServiceTest" time="0.0"/>
+  <testcase name="testBuildQueryForRange" classname="service.GuiDtoBuilderServiceTest" time="0.0"/>
+  <testcase name="testBuildUseCalendarDto" classname="service.GuiDtoBuilderServiceTest" time="0.0"/>
+  <testcase name="testBuildEditCalendarDto" classname="service.GuiDtoBuilderServiceTest" time="0.0"/>
+  <testcase name="testBuildAllDaySingleEventDto" classname="service.GuiDtoBuilderServiceTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

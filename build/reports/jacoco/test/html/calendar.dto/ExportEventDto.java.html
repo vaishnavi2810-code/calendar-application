@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExportEventDto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.dto</a> &gt; <span class="el_source">ExportEventDto.java</span></div><h1>ExportEventDto.java</h1><pre class="source lang-java linenums">package calendar.dto;
+
+/**
+ * Data Transfer Object for exporting calendar events to a file.
+ * Encapsulates the target file name and provides utility methods to extract
+ * file type information from the file name extension.
+ */
+public class ExportEventDto {
+  private final String fileName;
+
+  /**
+   * Creates an ExportEventDto with the specified file name.
+   *
+   * @param fileName the name of the target export file including extension
+   */
+<span class="fc" id="L16">  public ExportEventDto(String fileName) {</span>
+<span class="fc" id="L17">    this.fileName = fileName;</span>
+<span class="fc" id="L18">  }</span>
+
+  public String getFileName() {
+<span class="fc" id="L21">    return fileName;</span>
+  }
+
+  /**
+   * Extracts and returns the file type from the file name by parsing the extension.
+   * The extension is converted to lowercase. If no extension is found (no dot in the
+   * file name or dot is at the beginning), returns an empty string.
+   *
+   * @return the file extension in lowercase, or an empty string if no extension exists
+   */
+  public String getFileType() {
+<span class="fc" id="L32">    int dotIndex = fileName.lastIndexOf('.');</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">    return (dotIndex &gt; 0) ? fileName.substring(dotIndex + 1).toLowerCase() : &quot;&quot;;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="model.edit.MultiPropertyEditTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.003">
+  <properties/>
+  <testcase name="testEditSeriesBothTimesWithAdditionalProperty" classname="model.edit.MultiPropertyEditTest" time="0.001"/>
+  <testcase name="testEditSeriesMultipleNonTimeProperties" classname="model.edit.MultiPropertyEditTest" time="0.0"/>
+  <testcase name="testEditSeriesBothStartAndEndTime" classname="model.edit.MultiPropertyEditTest" time="0.0"/>
+  <testcase name="testEditSeriesEndTimeWithDescription" classname="model.edit.MultiPropertyEditTest" time="0.0"/>
+  <testcase name="testMultiPropertyEditErrorIncludesEventIndex" classname="model.edit.MultiPropertyEditTest" time="0.001"/>
+  <testcase name="testMultiPropertyEditPreventsDuplicates" classname="model.edit.MultiPropertyEditTest" time="0.0"/>
+  <testcase name="testEditSeriesStartTimeWithLocation" classname="model.edit.MultiPropertyEditTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

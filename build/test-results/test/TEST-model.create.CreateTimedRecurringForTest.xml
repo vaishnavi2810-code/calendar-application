@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="model.create.CreateTimedRecurringForTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.0">
+  <properties/>
+  <testcase name="testCreateTimedRecurringForCollision" classname="model.create.CreateTimedRecurringForTest" time="0.0"/>
+  <testcase name="testCreateTimedRecurringForSuccess" classname="model.create.CreateTimedRecurringForTest" time="0.0"/>
+  <testcase name="testCreateTimedRecurringForSpansMultipleDays" classname="model.create.CreateTimedRecurringForTest" time="0.0"/>
+  <testcase name="testCreateTimedRecurringForEndBeforeStart" classname="model.create.CreateTimedRecurringForTest" time="0.0"/>
+  <system-out><![CDATA[✓ TEST PASSED: Created 6 recurring timed events.
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="model.export.GoogleCsvExporterTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.011">
+  <properties/>
+  <testcase name="testExportDtoGetFileTypeUppercase" classname="model.export.GoogleCsvExporterTest" time="0.0"/>
+  <testcase name="testExportEmptyCollection" classname="model.export.GoogleCsvExporterTest" time="0.002"/>
+  <testcase name="testExportDtoNoExtension" classname="model.export.GoogleCsvExporterTest" time="0.0"/>
+  <testcase name="testExportSubjectWithQuotes" classname="model.export.GoogleCsvExporterTest" time="0.004"/>
+  <testcase name="testIntegrationExportDtoWithExporter" classname="model.export.GoogleCsvExporterTest" time="0.001"/>
+  <testcase name="testExportDtoMultipleDots" classname="model.export.GoogleCsvExporterTest" time="0.0"/>
+  <testcase name="testExportDtoGetFileName" classname="model.export.GoogleCsvExporterTest" time="0.0"/>
+  <testcase name="testCsvStructureIntegrity" classname="model.export.GoogleCsvExporterTest" time="0.001"/>
+  <testcase name="testExportSingleEvent" classname="model.export.GoogleCsvExporterTest" time="0.0"/>
+  <testcase name="testExportSubjectWithComma" classname="model.export.GoogleCsvExporterTest" time="0.001"/>
+  <testcase name="testDateTimeFormatting" classname="model.export.GoogleCsvExporterTest" time="0.0"/>
+  <testcase name="testExportDtoDotAtBeginning" classname="model.export.GoogleCsvExporterTest" time="0.0"/>
+  <testcase name="testExportDtoGetFileTypeCsv" classname="model.export.GoogleCsvExporterTest" time="0.0"/>
+  <testcase name="testExportMultipleEvents" classname="model.export.GoogleCsvExporterTest" time="0.001"/>
+  <testcase name="testExportReturnsAbsolutePath" classname="model.export.GoogleCsvExporterTest" time="0.0"/>
+  <system-out><![CDATA[✓ TEST PASSED: ExportEventDto converts extension to lowercase
+✓ TEST PASSED: Empty collection exported (header only)
+✓ TEST PASSED: ExportEventDto handles missing extension
+✓ TEST PASSED: Subject with quotes properly escaped
+  Row: "The ""Big"" Meeting",11/22/2025,10:00 AM,11/22/2025,11:00 AM,,,
+✓ TEST PASSED: ExportEventDto + GoogleCsvExporter integration
+  DTO File: integration_test.csv
+  DTO Type: csv
+  Export Path: /Users/vaishnavihemaljariwala/PDP/f25-hw6-cal3-group-PDPGroupAssignments_VaishnaviDheeraj/integration_test.csv
+✓ TEST PASSED: ExportEventDto extracts correct extension with multiple dots
+✓ TEST PASSED: ExportEventDto returns correct filename
+✓ TEST PASSED: CSV structure is valid
+  Columns: 5
+✓ TEST PASSED: Single event exported successfully
+  File: /Users/vaishnavihemaljariwala/PDP/f25-hw6-cal3-group-PDPGroupAssignments_VaishnaviDheeraj/test_export.csv
+  File Type: csv
+✓ TEST PASSED: Subject with comma properly escaped
+  Row: "Meeting, Review, Planning",11/22/2025,10:00 AM,11/22/2025,11:00 AM,,,
+✓ TEST PASSED: Date/time formatting correct
+  Start Date: 11/22/2025
+  Start Time: 02:30 PM
+✓ TEST PASSED: ExportEventDto handles hidden files
+✓ TEST PASSED: ExportEventDto correctly identifies CSV type
+✓ TEST PASSED: Multiple events exported
+  Total events: 3
+  CSV rows: 3
+✓ TEST PASSED: Absolute path returned
+  Path: /Users/vaishnavihemaljariwala/PDP/f25-hw6-cal3-group-PDPGroupAssignments_VaishnaviDheeraj/test_export.csv
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

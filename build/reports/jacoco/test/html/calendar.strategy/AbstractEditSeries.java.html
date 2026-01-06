@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractEditSeries.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.strategy</a> &gt; <span class="el_source">AbstractEditSeries.java</span></div><h1>AbstractEditSeries.java</h1><pre class="source lang-java linenums">package calendar.strategy;
+
+import static calendar.util.EditEvent.createModifiedEvent;
+import static calendar.util.EditEvent.createModifiedEventMulti;
+import static calendar.util.EditEvent.parseDateTime;
+import static calendar.util.EditEvent.validateNoDuplicate;
+
+import calendar.constants.CreateCalendarConstants;
+import calendar.dto.EditEventDto;
+import calendar.interfacetypes.Iedit;
+import calendar.model.Event;
+import calendar.model.EventBuilder;
+import calendar.util.EventFinder;
+import java.time.Duration;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+/**
+ * Abstract template for &quot;edit&quot; strategies.
+ * Implements the common algorithm for editing one or more events,
+ * leaving the specific event-selection logic to subclasses.
+ */
+<span class="fc" id="L30">public abstract class AbstractEditSeries implements Iedit {</span>
+
+  /**
+   * This is the &quot;Template Method.&quot; It defines the skeleton of the edit algorithm.
+   */
+  @Override
+  public void edit(EditEventDto dto, Set&lt;Event&gt; events, ZoneId timezone) throws Exception {
+<span class="fc" id="L37">    ZonedDateTime targetStart = parseDateTime(dto.getTargetStartDateTime(), timezone);</span>
+<span class="fc" id="L38">    Set&lt;Event&gt; originalEvents = new HashSet&lt;&gt;(events);</span>
+<span class="fc" id="L39">    List&lt;Event&gt; matchingEvents = EventFinder.findBySubjectAndStart(</span>
+<span class="fc" id="L40">        dto.getTargetSubject(),</span>
+        targetStart,
+        originalEvents
+    );
+<span class="fc bfc" id="L44" title="All 2 branches covered.">    if (matchingEvents.isEmpty()) {</span>
+<span class="fc" id="L45">      throw new Exception(&quot;Event not found with subject '&quot;</span>
+<span class="fc" id="L46">          + dto.getTargetSubject()</span>
+          + &quot;' starting at &quot; + targetStart);
+    }
+<span class="fc" id="L49">    Set&lt;Event&gt; eventsToRemove = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L50">    Set&lt;Event&gt; eventsToCommit = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">    for (Event targetEvent : matchingEvents) {</span>
+<span class="fc" id="L52">      String seriesId = targetEvent.getSeriesId();</span>
+<span class="pc bpc" id="L53" title="1 of 4 branches missed.">      if (seriesId == null || seriesId.isEmpty()) {</span>
+<span class="fc" id="L54">        eventsToRemove.add(targetEvent);</span>
+        Event newEvent;
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">        if (dto.hasMultipleProperties()) {</span>
+<span class="nc" id="L57">          newEvent = createModifiedEventMulti(</span>
+              targetEvent,
+<span class="nc" id="L59">              dto.getPropertyChanges(),</span>
+              &quot;&quot;,
+              timezone,
+              events,
+              eventsToRemove,
+              eventsToCommit
+          );
+        } else {
+<span class="fc" id="L67">          newEvent = createModifiedEvent(targetEvent, dto, &quot;&quot;, timezone);</span>
+<span class="fc" id="L68">          validateNoDuplicate(newEvent, events, eventsToCommit, eventsToRemove);</span>
+        }
+
+<span class="fc" id="L71">        eventsToCommit.add(newEvent);</span>
+
+<span class="fc" id="L73">      } else {</span>
+<span class="fc" id="L74">        List&lt;Event&gt; futureEvents = getEventsToEdit(seriesId, targetStart, events);</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        if (dto.hasMultipleProperties()) {</span>
+<span class="fc" id="L76">          handleMultiPropertySeriesEdit(</span>
+              dto,
+              targetEvent,
+              futureEvents,
+              seriesId,
+              timezone,
+              events,
+              eventsToRemove,
+              eventsToCommit
+          );
+        } else {
+<span class="fc" id="L87">          handleSinglePropertySeriesEdit(</span>
+              dto,
+              targetEvent,
+              futureEvents,
+              seriesId,
+              timezone,
+              events,
+              eventsToRemove,
+              eventsToCommit
+          );
+        }
+      }
+<span class="fc" id="L99">    }</span>
+<span class="fc" id="L100">    events.removeAll(eventsToRemove);</span>
+<span class="fc" id="L101">    events.addAll(eventsToCommit);</span>
+<span class="fc" id="L102">  }</span>
+
+  /**
+   * Handles editing a series with multiple properties changed.
+   */
+  private void handleMultiPropertySeriesEdit(EditEventDto dto,
+                                             Event targetEvent,
+                                             List&lt;Event&gt; futureEvents,
+                                             String seriesId,
+                                             ZoneId timezone,
+                                             Set&lt;Event&gt; allEvents,
+                                             Set&lt;Event&gt; eventsToRemove,
+                                             Set&lt;Event&gt; eventsToCommit) throws Exception {
+<span class="fc" id="L115">    Map&lt;String, String&gt; changes = dto.getPropertyChanges();</span>
+<span class="fc" id="L116">    boolean hasStartChange = changes.containsKey(&quot;start&quot;);</span>
+<span class="fc" id="L117">    boolean hasEndChange = changes.containsKey(&quot;end&quot;);</span>
+<span class="fc bfc" id="L118" title="All 4 branches covered.">    if (hasStartChange &amp;&amp; hasEndChange) {</span>
+<span class="fc" id="L119">      handleBothTimesChanged(</span>
+          changes,
+          futureEvents,
+          seriesId,
+          timezone,
+          allEvents,
+          eventsToRemove,
+          eventsToCommit
+      );
+<span class="fc bfc" id="L128" title="All 2 branches covered.">    } else if (hasStartChange) {</span>
+<span class="fc" id="L129">      handleOnlyStartChanged(</span>
+          changes,
+          targetEvent,
+          futureEvents,
+          timezone,
+          allEvents,
+          eventsToRemove,
+          eventsToCommit
+      );
+<span class="fc bfc" id="L138" title="All 2 branches covered.">    } else if (hasEndChange) {</span>
+<span class="fc" id="L139">      handleOnlyEndChanged(</span>
+          changes,
+          targetEvent,
+          futureEvents,
+          seriesId,
+          timezone,
+          allEvents,
+          eventsToRemove,
+          eventsToCommit
+      );
+    } else {
+<span class="fc" id="L150">      handleNonTimeChanges(</span>
+          changes,
+          futureEvents,
+          seriesId,
+          timezone,
+          allEvents,
+          eventsToRemove,
+          eventsToCommit
+      );
+    }
+<span class="fc" id="L160">  }</span>
+
+  /**
+   * Handles the case where both start and end times are changed.
+   * Applies the new times to all events while preserving each event's date.
+   */
+  private void handleBothTimesChanged(Map&lt;String, String&gt; changes,
+                                      List&lt;Event&gt; futureEvents,
+                                      String seriesId,
+                                      ZoneId timezone,
+                                      Set&lt;Event&gt; allEvents,
+                                      Set&lt;Event&gt; eventsToRemove,
+                                      Set&lt;Event&gt; eventsToCommit) throws Exception {
+<span class="fc" id="L173">    futureEvents.sort(Comparator.comparing(Event::getStartDateTime));</span>
+<span class="fc" id="L174">    String newSeriesId = UUID.randomUUID().toString();</span>
+<span class="fc" id="L175">    ZonedDateTime newStartReference = parseDateTime(changes.get(&quot;start&quot;), timezone);</span>
+<span class="fc" id="L176">    ZonedDateTime newEndReference = parseDateTime(changes.get(&quot;end&quot;), timezone);</span>
+<span class="fc" id="L177">    Event firstEvent = futureEvents.get(0);</span>
+<span class="fc" id="L178">    Duration startOffset = Duration.between(firstEvent.getStartDateTime(), newStartReference);</span>
+<span class="fc" id="L179">    Duration endOffset = Duration.between(firstEvent.getEndDateTime(), newEndReference);</span>
+<span class="fc" id="L180">    eventsToRemove.addAll(futureEvents);</span>
+<span class="fc bfc" id="L181" title="All 2 branches covered.">    for (Event oldEvent : futureEvents) {</span>
+<span class="fc" id="L182">      ZonedDateTime adjustedStart = oldEvent.getStartDateTime().plus(startOffset);</span>
+<span class="fc" id="L183">      ZonedDateTime adjustedEnd = oldEvent.getEndDateTime().plus(endOffset);</span>
+<span class="fc bfc" id="L184" title="All 2 branches covered.">      if (!adjustedStart.isBefore(adjustedEnd)) {</span>
+<span class="fc" id="L185">        throw new Exception(&quot;Invalid update: New start time must be before end time&quot;);</span>
+      }
+<span class="pc bpc" id="L187" title="1 of 2 branches missed.">      if (!adjustedStart.toLocalDate().equals(adjustedEnd.toLocalDate())) {</span>
+<span class="nc" id="L188">        throw new Exception(&quot;Invalid update: Events in a series must stay on the same day&quot;);</span>
+      }
+
+<span class="fc" id="L191">      Map&lt;String, String&gt; eventChanges = new HashMap&lt;&gt;(changes);</span>
+<span class="fc" id="L192">      eventChanges.put(&quot;start&quot;, adjustedStart.format(</span>
+          CreateCalendarConstants.DATETIME_FORMATTER));
+<span class="fc" id="L194">      eventChanges.put(&quot;end&quot;, adjustedEnd.format(</span>
+          CreateCalendarConstants.DATETIME_FORMATTER));
+
+<span class="fc" id="L197">      Event newEvent = createModifiedEventMulti(</span>
+          oldEvent,
+          eventChanges,
+          newSeriesId,
+          timezone,
+          allEvents,
+          eventsToRemove,
+          eventsToCommit
+      );
+
+<span class="fc" id="L207">      eventsToCommit.add(newEvent);</span>
+<span class="fc" id="L208">    }</span>
+<span class="fc" id="L209">  }</span>
+
+  /**
+   * Handles the case where only start time is changed.
+   * Calculates offset and applies to both start and end times.
+   */
+  private void handleOnlyStartChanged(Map&lt;String, String&gt; changes,
+                                      Event targetEvent,
+                                      List&lt;Event&gt; futureEvents,
+                                      ZoneId timezone,
+                                      Set&lt;Event&gt; allEvents,
+                                      Set&lt;Event&gt; eventsToRemove,
+                                      Set&lt;Event&gt; eventsToCommit) throws Exception {
+<span class="fc" id="L222">    futureEvents.sort(Comparator.comparing(Event::getStartDateTime));</span>
+<span class="fc" id="L223">    String newSeriesId = UUID.randomUUID().toString();</span>
+<span class="fc" id="L224">    ZonedDateTime newTargetStart = parseDateTime(changes.get(&quot;start&quot;), timezone);</span>
+<span class="fc" id="L225">    Event firstEvent = futureEvents.get(0);</span>
+<span class="fc" id="L226">    Duration offset = Duration.between(firstEvent.getStartDateTime(), newTargetStart);</span>
+<span class="fc" id="L227">    eventsToRemove.addAll(futureEvents);</span>
+<span class="fc" id="L228">    int eventIndex = 0;</span>
+<span class="fc bfc" id="L229" title="All 2 branches covered.">    for (Event oldEvent : futureEvents) {</span>
+<span class="fc" id="L230">      eventIndex++;</span>
+      try {
+<span class="fc" id="L232">        ZonedDateTime adjustedStart = oldEvent.getStartDateTime().plus(offset);</span>
+<span class="fc" id="L233">        ZonedDateTime adjustedEnd = oldEvent.getEndDateTime().plus(offset);</span>
+<span class="fc" id="L234">        Map&lt;String, String&gt; eventChanges = new HashMap&lt;&gt;(changes);</span>
+<span class="fc" id="L235">        eventChanges.put(&quot;start&quot;, adjustedStart.format(</span>
+            calendar.constants.CreateCalendarConstants.DATETIME_FORMATTER));
+<span class="fc" id="L237">        eventChanges.put(&quot;end&quot;, adjustedEnd.format(</span>
+            calendar.constants.CreateCalendarConstants.DATETIME_FORMATTER));
+<span class="fc" id="L239">        Event newEvent = createModifiedEventMulti(</span>
+            oldEvent,
+            eventChanges,
+            newSeriesId,
+            timezone,
+            allEvents,
+            eventsToRemove,
+            eventsToCommit
+        );
+<span class="fc" id="L248">        eventsToCommit.add(newEvent);</span>
+<span class="nc" id="L249">      } catch (Exception e) {</span>
+<span class="nc" id="L250">        throw new Exception(&quot;Failed to update event #&quot; + eventIndex</span>
+            + &quot; in series (starting at &quot;
+<span class="nc" id="L252">            + oldEvent.getStartDateTime() + &quot;): &quot;</span>
+<span class="nc" id="L253">            + e.getMessage());</span>
+<span class="fc" id="L254">      }</span>
+<span class="fc" id="L255">    }</span>
+<span class="fc" id="L256">  }</span>
+
+  /**
+   * Handles the case where only end time is changed.
+   * Calculates offset and applies only to end time, keeps start same.
+   */
+  private void handleOnlyEndChanged(Map&lt;String, String&gt; changes,
+                                    Event targetEvent,
+                                    List&lt;Event&gt; futureEvents,
+                                    String seriesId,
+                                    ZoneId timezone,
+                                    Set&lt;Event&gt; allEvents,
+                                    Set&lt;Event&gt; eventsToRemove,
+                                    Set&lt;Event&gt; eventsToCommit) throws Exception {
+<span class="fc" id="L270">    ZonedDateTime newTargetEnd = parseDateTime(changes.get(&quot;end&quot;), timezone);</span>
+<span class="fc" id="L271">    Duration offset = Duration.between(targetEvent.getEndDateTime(), newTargetEnd);</span>
+<span class="fc" id="L272">    eventsToRemove.addAll(futureEvents);</span>
+<span class="fc" id="L273">    int eventIndex = 0;</span>
+<span class="fc bfc" id="L274" title="All 2 branches covered.">    for (Event oldEvent : futureEvents) {</span>
+<span class="fc" id="L275">      eventIndex++;</span>
+      try {
+<span class="fc" id="L277">        ZonedDateTime adjustedEnd = oldEvent.getEndDateTime().plus(offset);</span>
+<span class="fc" id="L278">        Map&lt;String, String&gt; eventChanges = new HashMap&lt;&gt;(changes);</span>
+<span class="fc" id="L279">        eventChanges.put(&quot;end&quot;, adjustedEnd.format(</span>
+            calendar.constants.CreateCalendarConstants.DATETIME_FORMATTER));
+<span class="fc" id="L281">        Event newEvent = createModifiedEventMulti(</span>
+            oldEvent,
+            eventChanges,
+            seriesId,
+            timezone,
+            allEvents,
+            eventsToRemove,
+            eventsToCommit
+        );
+<span class="fc" id="L290">        eventsToCommit.add(newEvent);</span>
+<span class="fc" id="L291">      } catch (Exception e) {</span>
+<span class="fc" id="L292">        throw new Exception(&quot;Failed to update event #&quot; + eventIndex</span>
+            + &quot; in series (starting at &quot;
+<span class="fc" id="L294">            + oldEvent.getStartDateTime() + &quot;): &quot;</span>
+<span class="fc" id="L295">            + e.getMessage());</span>
+<span class="fc" id="L296">      }</span>
+<span class="fc" id="L297">    }</span>
+<span class="fc" id="L298">  }</span>
+
+  /**
+   * Handles the case where no time properties are changed.
+   * Just updates the specified properties on all events.
+   */
+  private void handleNonTimeChanges(Map&lt;String, String&gt; changes,
+                                    List&lt;Event&gt; futureEvents,
+                                    String seriesId,
+                                    ZoneId timezone,
+                                    Set&lt;Event&gt; allEvents,
+                                    Set&lt;Event&gt; eventsToRemove,
+                                    Set&lt;Event&gt; eventsToCommit) throws Exception {
+<span class="fc" id="L311">    eventsToRemove.addAll(futureEvents);</span>
+<span class="fc" id="L312">    int eventIndex = 0;</span>
+<span class="fc bfc" id="L313" title="All 2 branches covered.">    for (Event oldEvent : futureEvents) {</span>
+<span class="fc" id="L314">      eventIndex++;</span>
+      try {
+<span class="fc" id="L316">        Event newEvent = createModifiedEventMulti(</span>
+            oldEvent,
+            changes,
+            seriesId,
+            timezone,
+            allEvents,
+            eventsToRemove,
+            eventsToCommit
+        );
+<span class="fc" id="L325">        eventsToCommit.add(newEvent);</span>
+<span class="nc" id="L326">      } catch (Exception e) {</span>
+<span class="nc" id="L327">        throw new Exception(&quot;Failed to update event #&quot; + eventIndex</span>
+            + &quot; in series (starting at &quot;
+<span class="nc" id="L329">            + oldEvent.getStartDateTime() + &quot;): &quot;</span>
+<span class="nc" id="L330">            + e.getMessage());</span>
+<span class="fc" id="L331">      }</span>
+<span class="fc" id="L332">    }</span>
+<span class="fc" id="L333">  }</span>
+
+  /**
+   * Handles editing a series with single property changed (existing logic).
+   */
+  private void handleSinglePropertySeriesEdit(EditEventDto dto,
+                                              Event targetEvent,
+                                              List&lt;Event&gt; futureEvents,
+                                              String seriesId,
+                                              ZoneId timezone,
+                                              Set&lt;Event&gt; allEvents,
+                                              Set&lt;Event&gt; eventsToRemove,
+                                              Set&lt;Event&gt; eventsToCommit) throws Exception {
+<span class="fc bfc" id="L346" title="All 2 branches covered.">    if (dto.getProperty().equalsIgnoreCase(&quot;start&quot;)</span>
+<span class="fc bfc" id="L347" title="All 2 branches covered.">        || dto.getProperty().equalsIgnoreCase(&quot;end&quot;)) {</span>
+<span class="fc" id="L348">      String newSeriesId = seriesId;</span>
+<span class="fc bfc" id="L349" title="All 2 branches covered.">      if (dto.getProperty().equalsIgnoreCase(&quot;start&quot;)) {</span>
+<span class="fc" id="L350">        newSeriesId = UUID.randomUUID().toString();</span>
+      }
+      Duration offset;
+<span class="fc bfc" id="L353" title="All 2 branches covered.">      if (dto.getProperty().equalsIgnoreCase(&quot;start&quot;)) {</span>
+<span class="fc" id="L354">        ZonedDateTime newTargetStart = parseDateTime(dto.getNewValue(), timezone);</span>
+<span class="fc" id="L355">        offset = Duration.between(targetEvent.getStartDateTime(), newTargetStart);</span>
+<span class="fc" id="L356">      } else {</span>
+<span class="fc" id="L357">        ZonedDateTime newTargetEnd = parseDateTime(dto.getNewValue(), timezone);</span>
+<span class="fc" id="L358">        offset = Duration.between(targetEvent.getEndDateTime(), newTargetEnd);</span>
+      }
+<span class="fc" id="L360">      eventsToRemove.addAll(futureEvents);</span>
+<span class="fc bfc" id="L361" title="All 2 branches covered.">      for (Event oldEvent : futureEvents) {</span>
+        ZonedDateTime adjustedStart;
+        ZonedDateTime adjustedEnd;
+<span class="fc bfc" id="L364" title="All 2 branches covered.">        if (dto.getProperty().equalsIgnoreCase(&quot;start&quot;)) {</span>
+<span class="fc" id="L365">          adjustedStart = oldEvent.getStartDateTime().plus(offset);</span>
+        } else {
+<span class="fc" id="L367">          adjustedStart = oldEvent.getStartDateTime();</span>
+        }
+<span class="fc" id="L369">        adjustedEnd = oldEvent.getEndDateTime().plus(offset);</span>
+
+<span class="fc bfc" id="L371" title="All 2 branches covered.">        if (!adjustedStart.isBefore(adjustedEnd)) {</span>
+<span class="fc" id="L372">          throw new Exception(&quot;Invalid update: New start time must be before end time&quot;);</span>
+        }
+<span class="fc bfc" id="L374" title="All 2 branches covered.">        if (!adjustedStart.toLocalDate().equals(adjustedEnd.toLocalDate())) {</span>
+<span class="fc" id="L375">          throw new Exception(&quot;Invalid update: Events in a &quot;</span>
+              + &quot;series must start and end on the same day. &quot;
+<span class="fc" id="L377">              + &quot;Event would span from &quot; + adjustedStart.toLocalDate()</span>
+<span class="fc" id="L378">              + &quot; to &quot; + adjustedEnd.toLocalDate());</span>
+        }
+<span class="fc" id="L380">        Event newEvent = new EventBuilder()</span>
+<span class="fc" id="L381">            .setSubject(oldEvent.getSubject())</span>
+<span class="fc" id="L382">            .setStartDateTime(adjustedStart)</span>
+<span class="fc" id="L383">            .setEndDateTime(adjustedEnd)</span>
+<span class="fc" id="L384">            .setSeriesId(newSeriesId)</span>
+<span class="fc" id="L385">            .setDescription(oldEvent.getDescription())</span>
+<span class="fc" id="L386">            .setLocation(oldEvent.getLocation())</span>
+<span class="fc" id="L387">            .setStatus(oldEvent.getStatus())</span>
+<span class="fc" id="L388">            .build();</span>
+<span class="fc" id="L389">        validateNoDuplicate(newEvent, allEvents, eventsToCommit, eventsToRemove);</span>
+<span class="fc" id="L390">        eventsToCommit.add(newEvent);</span>
+<span class="fc" id="L391">      }</span>
+<span class="fc" id="L392">    } else {</span>
+<span class="fc" id="L393">      eventsToRemove.addAll(futureEvents);</span>
+<span class="fc bfc" id="L394" title="All 2 branches covered.">      for (Event oldEvent : futureEvents) {</span>
+<span class="fc" id="L395">        Event newEvent = createModifiedEvent(oldEvent, dto, seriesId, timezone);</span>
+<span class="fc" id="L396">        validateNoDuplicate(newEvent, allEvents, eventsToCommit, eventsToRemove);</span>
+<span class="fc" id="L397">        eventsToCommit.add(newEvent);</span>
+<span class="fc" id="L398">      }</span>
+    }
+<span class="fc" id="L400">  }</span>
+
+
+  /**
+   * Provides the specific implementation for which events in a series to edit.
+   *
+   * @param seriesId    The ID of the series to find.
+   * @param targetStart The start time of the event that was targeted (for &quot;forward&quot; logic).
+   * @param allEvents   The set of all events.
+   * @return A List of events that should be modified by this strategy.
+   */
+  protected abstract List&lt;Event&gt; getEventsToEdit(String seriesId,
+                                                 ZonedDateTime targetStart,
+                                                 Set&lt;Event&gt; allEvents);
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

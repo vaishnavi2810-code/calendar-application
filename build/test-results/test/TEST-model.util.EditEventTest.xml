@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="model.util.EditEventTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.003">
+  <properties/>
+  <testcase name="testEditStartFailsIfSeriesEventSpansMidnight" classname="model.util.EditEventTest" time="0.001"/>
+  <testcase name="testEditEndFailsIfSeriesEventSpansMidnight" classname="model.util.EditEventTest" time="0.0"/>
+  <testcase name="testCreateModifiedEventMultiThrowsOnBatchDuplicate" classname="model.util.EditEventTest" time="0.0"/>
+  <testcase name="testMultiEditBothModifiedInvalidOrder" classname="model.util.EditEventTest" time="0.001"/>
+  <testcase name="testMultiEditStartModifiedInvalidOrder" classname="model.util.EditEventTest" time="0.0"/>
+  <testcase name="testCreateModifiedEventMultiThrowsOnExistingDuplicate" classname="model.util.EditEventTest" time="0.001"/>
+  <testcase name="testCreateModifiedEventMultiIgnoresRemovedEvents" classname="model.util.EditEventTest" time="0.0"/>
+  <testcase name="testMultiEditEndModifiedInvalidOrder" classname="model.util.EditEventTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

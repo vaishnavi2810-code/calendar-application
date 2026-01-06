@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="controller.EditEventLogicTest" tests="16" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:33" hostname="Vaishnavis-MacBook-Pro.local" time="0.066">
+  <properties/>
+  <testcase name="testEditCalendarName" classname="controller.EditEventLogicTest" time="0.005"/>
+  <testcase name="testHandleEditEventScopeForward" classname="controller.EditEventLogicTest" time="0.004"/>
+  <testcase name="testEditCalendarTimezone" classname="controller.EditEventLogicTest" time="0.003"/>
+  <testcase name="testEditCalendarTimezoneFailure" classname="controller.EditEventLogicTest" time="0.003"/>
+  <testcase name="testDropdownListenerTriggersSwitchCalendar" classname="controller.EditEventLogicTest" time="0.003"/>
+  <testcase name="testCreateCalendar" classname="controller.EditEventLogicTest" time="0.003"/>
+  <testcase name="testDateSelectionListenerTriggersLoadEvents" classname="controller.EditEventLogicTest" time="0.001"/>
+  <testcase name="testInitializationCreatesDefaultCalendar" classname="controller.EditEventLogicTest" time="0.003"/>
+  <testcase name="testEditCalendarNameFailure" classname="controller.EditEventLogicTest" time="0.003"/>
+  <testcase name="testRefreshCalendarList" classname="controller.EditEventLogicTest" time="0.002"/>
+  <testcase name="testLoadEventsForDate" classname="controller.EditEventLogicTest" time="0.003"/>
+  <testcase name="testHandleEditEventDateChange" classname="controller.EditEventLogicTest" time="0.004"/>
+  <testcase name="testCreateCalendarErrorHandling" classname="controller.EditEventLogicTest" time="0.003"/>
+  <testcase name="testSwitchCalendar" classname="controller.EditEventLogicTest" time="0.002"/>
+  <testcase name="testSwitchCalendarFailure" classname="controller.EditEventLogicTest" time="0.011"/>
+  <testcase name="testHandleEditEventValidationEndTimeBeforeStartTime" classname="controller.EditEventLogicTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

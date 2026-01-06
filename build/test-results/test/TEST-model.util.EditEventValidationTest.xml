@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="model.util.EditEventValidationTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.012">
+  <properties/>
+  <testcase name="testInternalDuplicateInSameOperation" classname="model.util.EditEventValidationTest" time="0.0"/>
+  <testcase name="testSeriesEventMultiDaySpanValidation" classname="model.util.EditEventValidationTest" time="0.005"/>
+  <testcase name="testDuplicateAgainstExistingEvent" classname="model.util.EditEventValidationTest" time="0.001"/>
+  <testcase name="testValidMultiPropertyEdit" classname="model.util.EditEventValidationTest" time="0.002"/>
+  <testcase name="testValidationErrorOnlyEndModified" classname="model.util.EditEventValidationTest" time="0.002"/>
+  <testcase name="testDuplicateDetectionComprehensive" classname="model.util.EditEventValidationTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

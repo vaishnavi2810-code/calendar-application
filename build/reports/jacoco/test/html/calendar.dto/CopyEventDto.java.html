@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CopyEventDto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.dto</a> &gt; <span class="el_source">CopyEventDto.java</span></div><h1>CopyEventDto.java</h1><pre class="source lang-java linenums">package calendar.dto;
+
+import java.util.regex.Matcher;
+
+/**
+ * Data Transfer Object for copying calendar events.
+ * Encapsulates the parameters required for various copy strategies.
+ */
+public class CopyEventDto {
+
+  /**
+   * Enumeration representing the available types of copy operations.
+   */
+<span class="fc" id="L14">  public enum CopyType {</span>
+<span class="fc" id="L15">    COPY_SINGLE_EVENT,</span>
+<span class="fc" id="L16">    COPY_EVENTS_ON_DATE,</span>
+<span class="fc" id="L17">    COPY_EVENTS_BETWEEN_DATES</span>
+  }
+
+  private final CopyType copyType;
+  private final String targetCalendarName;
+
+  private final String eventName;
+  private final String sourceStartDateTime;
+  private final String targetStartDateTime;
+
+  private final String sourceDate;
+  private final String targetDate;
+
+  private final String intervalStartDate;
+  private final String intervalEndDate;
+  private final String targetStartDate;
+
+  /**
+   * Constructs a CopyEventDto by extracting values from a Regex Matcher.
+   * Parses named groups from the matcher to populate the DTO fields.
+   *
+   * @param copyType the specific type of copy operation
+   * @param matcher  the regex matcher containing the parsed command arguments
+   */
+<span class="fc" id="L41">  public CopyEventDto(CopyType copyType, Matcher matcher) {</span>
+<span class="fc" id="L42">    this.copyType = copyType;</span>
+<span class="fc" id="L43">    this.targetCalendarName = getGroup(matcher, &quot;targetCalendar&quot;);</span>
+
+<span class="fc" id="L45">    this.eventName = getGroup(matcher, &quot;eventName&quot;);</span>
+<span class="fc" id="L46">    this.sourceStartDateTime = getGroup(matcher, &quot;sourceStartDateTime&quot;);</span>
+<span class="fc" id="L47">    this.targetStartDateTime = getGroup(matcher, &quot;targetStartDateTime&quot;);</span>
+
+<span class="fc" id="L49">    this.sourceDate = getGroup(matcher, &quot;sourceDate&quot;);</span>
+<span class="fc" id="L50">    this.targetDate = getGroup(matcher, &quot;targetDate&quot;);</span>
+
+<span class="fc" id="L52">    this.intervalStartDate = getGroup(matcher, &quot;intervalStartDate&quot;);</span>
+<span class="fc" id="L53">    this.intervalEndDate = getGroup(matcher, &quot;intervalEndDate&quot;);</span>
+<span class="fc" id="L54">    this.targetStartDate = getGroup(matcher, &quot;targetStartDate&quot;);</span>
+<span class="fc" id="L55">  }</span>
+
+  /**
+   * Safely retrieves a named group from the matcher.
+   * Strips surrounding quotes from the &quot;eventName&quot; group if present.
+   *
+   * @param matcher   the regex matcher
+   * @param groupName the name of the group to retrieve
+   * @return the matched string value, or null if the group is missing or invalid
+   */
+  private String getGroup(Matcher matcher, String groupName) {
+    try {
+<span class="fc" id="L67">      String val = matcher.group(groupName);</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">      if (val == null) {</span>
+<span class="nc" id="L69">        return null;</span>
+      }
+<span class="fc bfc" id="L71" title="All 2 branches covered.">      if (groupName.equals(&quot;eventName&quot;)</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">              &amp;&amp; val.length() &gt;= 2</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">              &amp;&amp; val.startsWith(&quot;\&quot;&quot;)</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">              &amp;&amp; val.endsWith(&quot;\&quot;&quot;)) {</span>
+<span class="fc" id="L75">        return val.substring(1, val.length() - 1);</span>
+      }
+<span class="fc" id="L77">      return val;</span>
+<span class="fc" id="L78">    } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L79">      return null;</span>
+    }
+  }
+
+  /**
+   * Retrieves the type of copy operation.
+   *
+   * @return the copy type enum
+   */
+  public CopyType getCopyType() {
+<span class="fc" id="L89">    return copyType;</span>
+  }
+
+  /**
+   * Retrieves the name of the target calendar where events will be copied.
+   *
+   * @return the target calendar name
+   */
+  public String getTargetCalendarName() {
+<span class="fc" id="L98">    return targetCalendarName;</span>
+  }
+
+  /**
+   * Retrieves the name of the specific event to copy.
+   * Used for COPY_SINGLE_EVENT.
+   *
+   * @return the event name
+   */
+  public String getEventName() {
+<span class="fc" id="L108">    return eventName;</span>
+  }
+
+  /**
+   * Retrieves the start date/time of the source event.
+   * Used for COPY_SINGLE_EVENT.
+   *
+   * @return the source start date string
+   */
+  public String getSourceStartDateTime() {
+<span class="fc" id="L118">    return sourceStartDateTime;</span>
+  }
+
+  /**
+   * Retrieves the target start date/time for the copied event.
+   * Used for COPY_SINGLE_EVENT.
+   *
+   * @return the target start date string
+   */
+  public String getTargetStartDateTime() {
+<span class="fc" id="L128">    return targetStartDateTime;</span>
+  }
+
+  /**
+   * Retrieves the specific date to copy events from.
+   * Used for COPY_EVENTS_ON_DATE.
+   *
+   * @return the source date string
+   */
+  public String getSourceDate() {
+<span class="fc" id="L138">    return sourceDate;</span>
+  }
+
+  /**
+   * Retrieves the target date to paste events to.
+   * Used for COPY_EVENTS_ON_DATE.
+   *
+   * @return the target date string
+   */
+  public String getTargetDate() {
+<span class="fc" id="L148">    return targetDate;</span>
+  }
+
+  /**
+   * Retrieves the start date of the interval to copy.
+   * Used for COPY_EVENTS_BETWEEN_DATES.
+   *
+   * @return the interval start date string
+   */
+  public String getIntervalStartDate() {
+<span class="fc" id="L158">    return intervalStartDate;</span>
+  }
+
+  /**
+   * Retrieves the end date of the interval to copy.
+   * Used for COPY_EVENTS_BETWEEN_DATES.
+   *
+   * @return the interval end date string
+   */
+  public String getIntervalEndDate() {
+<span class="fc" id="L168">    return intervalEndDate;</span>
+  }
+
+  /**
+   * Retrieves the start date in the target calendar where the sequence begins.
+   * Used for COPY_EVENTS_BETWEEN_DATES.
+   *
+   * @return the target start date string
+   */
+  public String getTargetStartDate() {
+<span class="fc" id="L178">    return targetStartDate;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

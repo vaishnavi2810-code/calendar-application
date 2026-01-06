@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InteractiveInputSource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.input</a> &gt; <span class="el_source">InteractiveInputSource.java</span></div><h1>InteractiveInputSource.java</h1><pre class="source lang-java linenums">package calendar.input;
+
+import calendar.interfacetypes.IinputSource;
+import java.util.Scanner;
+
+/**
+ * Input source for interactive mode using Scanner.
+ * Reads commands from System.in (console input).
+ */
+public class InteractiveInputSource implements IinputSource {
+
+  private final Scanner scanner;
+
+  /**
+   * Constructs a new InteractiveInputSource that reads from standard input.
+   */
+<span class="fc" id="L17">  public InteractiveInputSource() {</span>
+<span class="fc" id="L18">    this.scanner = new Scanner(System.in);</span>
+<span class="fc" id="L19">  }</span>
+
+  /**
+   * Retrieves the next command from the console input.
+   * Prompts the user with a specific character before reading the line.
+   *
+   * @return the trimmed command string, or null if no more input is available
+   */
+  @Override
+  public String getNextCommand() {
+<span class="fc bfc" id="L29" title="All 2 branches covered.">    if (!scanner.hasNextLine()) {</span>
+<span class="fc" id="L30">      return null;</span>
+    }
+<span class="fc" id="L32">    System.out.print(&quot;&gt; &quot;);</span>
+<span class="fc" id="L33">    return scanner.nextLine().trim();</span>
+  }
+
+  /**
+   * Checks if there are more commands available to be read from the input source.
+   *
+   * @return true if there is another line of input, false otherwise
+   */
+  @Override
+  public boolean hasMoreCommands() {
+<span class="fc" id="L43">    return scanner.hasNextLine();</span>
+  }
+
+  /**
+   * Closes the input source and the underlying Scanner.
+   */
+  @Override
+  public void close() {
+<span class="fc" id="L51">    scanner.close();</span>
+<span class="fc" id="L52">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

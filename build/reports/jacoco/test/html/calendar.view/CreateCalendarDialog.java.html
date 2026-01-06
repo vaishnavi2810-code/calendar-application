@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreateCalendarDialog.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.view</a> &gt; <span class="el_source">CreateCalendarDialog.java</span></div><h1>CreateCalendarDialog.java</h1><pre class="source lang-java linenums">package calendar.view;
+
+
+
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.time.ZoneId;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+/**
+ * Dialog for creating a new calendar.
+ * Collects calendar name and timezone from user.
+ */
+public class CreateCalendarDialog extends JDialog {
+
+  private JTextField nameField;
+  private JComboBox&lt;String&gt; timezoneBox;
+<span class="nc" id="L26">  private boolean confirmed = false;</span>
+
+  /**
+   * ok.
+   *
+   * @param parent ok.
+   */
+  public CreateCalendarDialog(JFrame parent) {
+<span class="nc" id="L34">    super(parent, &quot;Create New Calendar&quot;, true);</span>
+<span class="nc" id="L35">    initComponents();</span>
+<span class="nc" id="L36">    layoutComponents();</span>
+<span class="nc" id="L37">    pack();</span>
+<span class="nc" id="L38">    setLocationRelativeTo(parent);</span>
+<span class="nc" id="L39">  }</span>
+
+  private void initComponents() {
+<span class="nc" id="L42">    nameField = new JTextField(15);</span>
+<span class="nc" id="L43">    String[] timezones = ZoneId.getAvailableZoneIds().toArray(new String[0]);</span>
+<span class="nc" id="L44">    timezoneBox = new JComboBox&lt;&gt;(timezones);</span>
+<span class="nc" id="L45">    timezoneBox.setSelectedItem(ZoneId.systemDefault().getId());</span>
+<span class="nc" id="L46">  }</span>
+
+  private void layoutComponents() {
+<span class="nc" id="L49">    JPanel panel = new JPanel(new GridLayout(2, 2, 10, 10));</span>
+<span class="nc" id="L50">    panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));</span>
+<span class="nc" id="L51">    panel.add(new JLabel(&quot;Calendar Name:&quot;));</span>
+<span class="nc" id="L52">    panel.add(nameField);</span>
+<span class="nc" id="L53">    panel.add(new JLabel(&quot;Timezone:&quot;));</span>
+<span class="nc" id="L54">    panel.add(timezoneBox);</span>
+<span class="nc" id="L55">    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));</span>
+<span class="nc" id="L56">    JButton okButton = new JButton(&quot;OK&quot;);</span>
+<span class="nc" id="L57">    JButton cancelButton = new JButton(&quot;Cancel&quot;);</span>
+<span class="nc" id="L58">    okButton.addActionListener(e -&gt; {</span>
+<span class="nc" id="L59">      confirmed = true;</span>
+<span class="nc" id="L60">      dispose();</span>
+<span class="nc" id="L61">    });</span>
+
+<span class="nc" id="L63">    cancelButton.addActionListener(e -&gt; {</span>
+<span class="nc" id="L64">      confirmed = false;</span>
+<span class="nc" id="L65">      dispose();</span>
+<span class="nc" id="L66">    });</span>
+
+<span class="nc" id="L68">    buttonPanel.add(okButton);</span>
+<span class="nc" id="L69">    buttonPanel.add(cancelButton);</span>
+<span class="nc" id="L70">    setLayout(new BorderLayout());</span>
+<span class="nc" id="L71">    add(panel, BorderLayout.CENTER);</span>
+<span class="nc" id="L72">    add(buttonPanel, BorderLayout.SOUTH);</span>
+<span class="nc" id="L73">  }</span>
+
+  /**
+  * Returns the calendar name entered by user.
+  */
+  public String getCalendarName() {
+<span class="nc" id="L79">    return nameField.getText().trim();</span>
+  }
+
+  /**
+  * Returns the timezone selected by user.
+  */
+  public String getTimezone() {
+<span class="nc" id="L86">    return (String) timezoneBox.getSelectedItem();</span>
+  }
+
+  /**
+  * Returns true if user clicked OK, false if cancelled.
+  */
+  public boolean isConfirmed() {
+<span class="nc" id="L93">    return confirmed;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

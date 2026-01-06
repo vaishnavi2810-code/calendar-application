@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EditEvent.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.util</a> &gt; <span class="el_source">EditEvent.java</span></div><h1>EditEvent.java</h1><pre class="source lang-java linenums">package calendar.util;
+
+import static calendar.constants.CreateCalendarConstants.DATETIME_FORMATTER;
+
+import calendar.dto.EditEventDto;
+import calendar.model.Event;
+import calendar.model.EventBuilder;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+/**
+ * Utility methods for editing events.
+ */
+public class EditEvent {
+
+  private EditEvent() {
+
+  }
+
+  /**
+   * Creates a modified version of an event with one property changed.
+   *
+   * @param original The original event
+   * @param dto The edit data transfer object containing the property to change
+   * @param newSeriesId The new series ID (empty string if not in a series)
+   * @return The newly created modified event
+   * @throws Exception if validation fails
+   */
+  public static Event createModifiedEvent(Event original, EditEventDto dto,
+                                          String newSeriesId, ZoneId timezone) throws Exception {
+<span class="fc" id="L41">    EventBuilder builder = new EventBuilder()</span>
+<span class="fc" id="L42">            .setSubject(original.getSubject())</span>
+<span class="fc" id="L43">            .setStartDateTime(original.getStartDateTime())</span>
+<span class="fc" id="L44">            .setEndDateTime(original.getEndDateTime())</span>
+<span class="fc" id="L45">            .setSeriesId(newSeriesId)</span>
+<span class="fc" id="L46">            .setDescription(original.getDescription())</span>
+<span class="fc" id="L47">            .setLocation(original.getLocation())</span>
+<span class="fc" id="L48">            .setStatus(original.getStatus());</span>
+
+<span class="fc bfc" id="L50" title="All 7 branches covered.">    switch (dto.getProperty().toLowerCase()) {</span>
+      case &quot;subject&quot;:
+<span class="fc" id="L52">        builder.setSubject(dto.getNewValue());</span>
+<span class="fc" id="L53">        break;</span>
+
+      case &quot;start&quot;:
+<span class="fc" id="L56">        ZonedDateTime newStart = parseDateTime(dto.getNewValue(), timezone);</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        if (!newStart.isBefore(original.getEndDateTime())) {</span>
+<span class="fc" id="L58">          throw new Exception(&quot;Invalid update: New start time (&quot;</span>
+                  + newStart
+<span class="fc" id="L60">                  + &quot;) must be before end time (&quot; + original.getEndDateTime() + &quot;)&quot;);</span>
+        }
+<span class="pc bpc" id="L62" title="1 of 4 branches missed.">        if (newSeriesId != null &amp;&amp; !newSeriesId.isEmpty()) {</span>
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">          if (!newStart.toLocalDate().equals(original.getEndDateTime().toLocalDate())) {</span>
+<span class="fc" id="L64">            throw new Exception(&quot;Invalid update: Events in a &quot;</span>
+                    +
+                    &quot;series must start and end on the same day. &quot;
+<span class="fc" id="L67">                    + &quot;Event would span from &quot; + newStart.toLocalDate()</span>
+<span class="fc" id="L68">                    + &quot; to &quot; + original.getEndDateTime().toLocalDate());</span>
+          }
+        }
+
+<span class="fc" id="L72">        builder.setStartDateTime(newStart);</span>
+<span class="fc" id="L73">        break;</span>
+
+      case &quot;end&quot;:
+<span class="fc" id="L76">        ZonedDateTime newEnd = parseDateTime(dto.getNewValue(), timezone);</span>
+
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        if (!newEnd.isAfter(original.getStartDateTime())) {</span>
+<span class="fc" id="L79">          throw new Exception(&quot;Invalid update: New end time (&quot;</span>
+                  + newEnd
+<span class="fc" id="L81">                  + &quot;) must be after start time (&quot; + original.getStartDateTime() + &quot;)&quot;);</span>
+        }
+
+<span class="pc bpc" id="L84" title="1 of 4 branches missed.">        if (newSeriesId != null &amp;&amp; !newSeriesId.isEmpty()) {</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">          if (!original.getStartDateTime().toLocalDate().equals(newEnd.toLocalDate())) {</span>
+<span class="fc" id="L86">            throw new Exception(&quot;Invalid update: Events in a series &quot;</span>
+                    +
+                    &quot;must start and end on the same day. &quot;
+<span class="fc" id="L89">                    + &quot;Event would span from &quot; + original.getStartDateTime().toLocalDate()</span>
+<span class="fc" id="L90">                    + &quot; to &quot; + newEnd.toLocalDate());</span>
+          }
+        }
+
+<span class="fc" id="L94">        builder.setEndDateTime(newEnd);</span>
+<span class="fc" id="L95">        break;</span>
+
+      case &quot;description&quot;:
+<span class="fc" id="L98">        builder.setDescription(dto.getNewValue());</span>
+<span class="fc" id="L99">        break;</span>
+
+      case &quot;location&quot;:
+<span class="fc" id="L102">        builder.setLocation(dto.getNewValue());</span>
+<span class="fc" id="L103">        break;</span>
+
+      case &quot;status&quot;:
+<span class="fc" id="L106">        builder.setStatus(dto.getNewValue());</span>
+<span class="fc" id="L107">        break;</span>
+
+      default:
+<span class="fc" id="L110">        throw new Exception(&quot;Unknown property: &quot; + dto.getProperty());</span>
+    }
+
+<span class="fc" id="L113">    return builder.build();</span>
+  }
+
+  /**
+   * Creates a modified version of an event with multiple properties changed.
+   * Validates all proposed changes BEFORE building the event.
+   * Used for multi-property edits (GUI-based interface).
+   *
+   * @param original The original event
+   * @param changes Map of property names to new values
+   * @param newSeriesId The new series ID (empty string if not in a series)
+   * @param timezone The timezone for parsing date-times
+   * @param existingEvents All events in the calendar (for duplicate checking)
+   * @param eventsToRemove Events being removed in the same operation
+   * @param eventsToCommit Events already validated in the same operation
+   * @return The newly created modified event
+   * @throws Exception if validation fails
+   */
+  public static Event createModifiedEventMulti(Event original,
+                                               Map&lt;String, String&gt; changes,
+                                               String newSeriesId,
+                                               ZoneId timezone,
+                                               Set&lt;Event&gt; existingEvents,
+                                               Set&lt;Event&gt; eventsToRemove,
+                                               Set&lt;Event&gt; eventsToCommit) throws Exception {
+<span class="fc" id="L138">    Map&lt;String, Object&gt; proposed = parseProposedChanges(original, changes, timezone);</span>
+<span class="fc" id="L139">    validateProposedValues(proposed, newSeriesId, changes);</span>
+<span class="fc" id="L140">    validateNoDuplicateProposed(</span>
+<span class="fc" id="L141">        (String) proposed.get(&quot;subject&quot;),</span>
+<span class="fc" id="L142">        (ZonedDateTime) proposed.get(&quot;start&quot;),</span>
+<span class="fc" id="L143">        (ZonedDateTime) proposed.get(&quot;end&quot;),</span>
+        existingEvents,
+        eventsToRemove,
+        eventsToCommit
+    );
+<span class="fc" id="L148">    return buildEventFromProposed(proposed, newSeriesId);</span>
+  }
+
+  /**
+   * Parses proposed changes and combines with original values.
+   * Extracts all proposed property values into a map.
+   */
+  private static Map&lt;String, Object&gt; parseProposedChanges(Event original,
+                                                          Map&lt;String, String&gt; changes,
+                                                          ZoneId timezone) throws Exception {
+<span class="fc" id="L158">    Map&lt;String, Object&gt; proposed = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L159">    proposed.put(&quot;subject&quot;, original.getSubject());</span>
+<span class="fc" id="L160">    proposed.put(&quot;start&quot;, original.getStartDateTime());</span>
+<span class="fc" id="L161">    proposed.put(&quot;end&quot;, original.getEndDateTime());</span>
+<span class="fc" id="L162">    proposed.put(&quot;description&quot;, original.getDescription());</span>
+<span class="fc" id="L163">    proposed.put(&quot;location&quot;, original.getLocation());</span>
+<span class="fc" id="L164">    proposed.put(&quot;status&quot;, original.getStatus());</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">    for (Map.Entry&lt;String, String&gt; change : changes.entrySet()) {</span>
+<span class="fc" id="L166">      String property = change.getKey().toLowerCase();</span>
+<span class="fc" id="L167">      String newValue = change.getValue();</span>
+
+<span class="pc bpc" id="L169" title="1 of 7 branches missed.">      switch (property) {</span>
+        case &quot;subject&quot;:
+<span class="fc" id="L171">          proposed.put(&quot;subject&quot;, newValue);</span>
+<span class="fc" id="L172">          break;</span>
+        case &quot;start&quot;:
+<span class="fc" id="L174">          proposed.put(&quot;start&quot;, parseDateTime(newValue, timezone));</span>
+<span class="fc" id="L175">          break;</span>
+        case &quot;end&quot;:
+<span class="fc" id="L177">          proposed.put(&quot;end&quot;, parseDateTime(newValue, timezone));</span>
+<span class="fc" id="L178">          break;</span>
+        case &quot;description&quot;:
+<span class="fc" id="L180">          proposed.put(&quot;description&quot;, newValue);</span>
+<span class="fc" id="L181">          break;</span>
+        case &quot;location&quot;:
+<span class="fc" id="L183">          proposed.put(&quot;location&quot;, newValue);</span>
+<span class="fc" id="L184">          break;</span>
+        case &quot;status&quot;:
+<span class="fc" id="L186">          proposed.put(&quot;status&quot;, newValue);</span>
+<span class="fc" id="L187">          break;</span>
+        default:
+<span class="nc" id="L189">          throw new Exception(&quot;Unknown property: &quot; + property);</span>
+      }
+<span class="fc" id="L191">    }</span>
+
+<span class="fc" id="L193">    return proposed;</span>
+  }
+
+  /**
+   * Validates internal consistency of proposed values.
+   * Checks that proposed values satisfy all business rules.
+   */
+  private static void validateProposedValues(Map&lt;String, Object&gt; proposed,
+                                             String seriesId,
+                                             Map&lt;String, String&gt; changes) throws Exception {
+<span class="fc" id="L203">    List&lt;String&gt; errors = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L204">    ZonedDateTime proposedStart = (ZonedDateTime) proposed.get(&quot;start&quot;);</span>
+<span class="fc" id="L205">    ZonedDateTime proposedEnd = (ZonedDateTime) proposed.get(&quot;end&quot;);</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">    if (!proposedStart.isBefore(proposedEnd)) {</span>
+<span class="fc" id="L207">      StringBuilder error = new StringBuilder();</span>
+<span class="fc" id="L208">      error.append(&quot;Invalid update: Start time (&quot;)</span>
+<span class="fc" id="L209">          .append(proposedStart)</span>
+<span class="fc" id="L210">          .append(&quot;) must be before end time (&quot;)</span>
+<span class="fc" id="L211">          .append(proposedEnd)</span>
+<span class="fc" id="L212">          .append(&quot;)&quot;);</span>
+
+<span class="fc bfc" id="L214" title="All 4 branches covered.">      if (changes.containsKey(&quot;start&quot;) &amp;&amp; changes.containsKey(&quot;end&quot;)) {</span>
+<span class="fc" id="L215">        error.append(&quot;\n  → Both start and end times were modified&quot;);</span>
+<span class="fc bfc" id="L216" title="All 2 branches covered.">      } else if (changes.containsKey(&quot;start&quot;)) {</span>
+<span class="fc" id="L217">        error.append(&quot;\n  → Start time was modified&quot;);</span>
+<span class="pc bpc" id="L218" title="1 of 2 branches missed.">      } else if (changes.containsKey(&quot;end&quot;)) {</span>
+<span class="fc" id="L219">        error.append(&quot;\n  → End time was modified&quot;);</span>
+      }
+
+<span class="fc" id="L222">      errors.add(error.toString());</span>
+    }
+
+<span class="fc bfc" id="L225" title="All 4 branches covered.">    if (seriesId != null &amp;&amp; !seriesId.isEmpty()) {</span>
+<span class="fc bfc" id="L226" title="All 2 branches covered.">      if (!proposedStart.toLocalDate().equals(proposedEnd.toLocalDate())) {</span>
+<span class="fc" id="L227">        errors.add(&quot;Invalid update: Events in a series must start and end on the same day.&quot;</span>
+            + &quot;\n  → Event would span from &quot;
+<span class="fc" id="L229">            + proposedStart.toLocalDate()</span>
+            + &quot; to &quot;
+<span class="fc" id="L231">            + proposedEnd.toLocalDate());</span>
+      }
+    }
+
+<span class="fc bfc" id="L235" title="All 2 branches covered.">    if (!errors.isEmpty()) {</span>
+<span class="fc" id="L236">      throw new Exception(String.join(&quot;\n\n&quot;, errors));</span>
+    }
+<span class="fc" id="L238">  }</span>
+
+  /**
+   * Validates that proposed event values don't create duplicates.
+   * Checks against existing events and other events being created in the same operation.
+   */
+  private static void validateNoDuplicateProposed(String proposedSubject,
+                                                  ZonedDateTime proposedStart,
+                                                  ZonedDateTime proposedEnd,
+                                                  Set&lt;Event&gt; existingEvents,
+                                                  Set&lt;Event&gt; eventsToRemove,
+                                                  Set&lt;Event&gt; eventsToCommit) throws Exception {
+
+<span class="fc bfc" id="L251" title="All 2 branches covered.">    for (Event existing : existingEvents) {</span>
+<span class="fc bfc" id="L252" title="All 2 branches covered.">      if (eventsToRemove.contains(existing)) {</span>
+<span class="fc" id="L253">        continue;</span>
+      }
+
+<span class="pc bpc" id="L256" title="1 of 2 branches missed.">      if (existing.getSubject().equals(proposedSubject)</span>
+<span class="pc bpc" id="L257" title="1 of 2 branches missed.">          &amp;&amp; existing.getStartDateTime().equals(proposedStart)</span>
+<span class="pc bpc" id="L258" title="1 of 2 branches missed.">          &amp;&amp; existing.getEndDateTime().equals(proposedEnd)) {</span>
+<span class="fc" id="L259">        throw new Exception(&quot;Edit operation failed: An event with subject '&quot;</span>
+            + proposedSubject + &quot;' from &quot;
+            + proposedStart + &quot; to &quot;
+            + proposedEnd + &quot; already exists.&quot;);
+      }
+<span class="nc" id="L264">    }</span>
+
+<span class="fc bfc" id="L266" title="All 2 branches covered.">    for (Event newEvent : eventsToCommit) {</span>
+<span class="pc bpc" id="L267" title="1 of 2 branches missed.">      if (newEvent.getSubject().equals(proposedSubject)</span>
+<span class="fc bfc" id="L268" title="All 2 branches covered.">          &amp;&amp; newEvent.getStartDateTime().equals(proposedStart)</span>
+<span class="pc bpc" id="L269" title="1 of 2 branches missed.">          &amp;&amp; newEvent.getEndDateTime().equals(proposedEnd)) {</span>
+<span class="fc" id="L270">        throw new Exception(&quot;Edit operation failed: Would create duplicate events with subject '&quot;</span>
+            + proposedSubject
+            + &quot;' from &quot;
+            + proposedStart
+            + &quot; to &quot;
+            + proposedEnd);
+      }
+<span class="fc" id="L277">    }</span>
+<span class="fc" id="L278">  }</span>
+
+  /**
+   * Builds event from validated proposed values.
+   * This should never fail because all validation is complete.
+   */
+  private static Event buildEventFromProposed(Map&lt;String, Object&gt; proposed,
+                                              String newSeriesId) throws Exception {
+<span class="fc" id="L286">    return new EventBuilder()</span>
+<span class="fc" id="L287">        .setSubject((String) proposed.get(&quot;subject&quot;))</span>
+<span class="fc" id="L288">        .setStartDateTime((ZonedDateTime) proposed.get(&quot;start&quot;))</span>
+<span class="fc" id="L289">        .setEndDateTime((ZonedDateTime) proposed.get(&quot;end&quot;))</span>
+<span class="fc" id="L290">        .setSeriesId(newSeriesId)</span>
+<span class="fc" id="L291">        .setDescription((String) proposed.get(&quot;description&quot;))</span>
+<span class="fc" id="L292">        .setLocation((String) proposed.get(&quot;location&quot;))</span>
+<span class="fc" id="L293">        .setStatus((String) proposed.get(&quot;status&quot;))</span>
+<span class="fc" id="L294">        .build();</span>
+  }
+
+
+  /**
+   * Parses a date-time string into a ZonedDateTime.
+   *
+   * @param dateTimeStr The date-time string in format &quot;yyyy-MM-ddTHH:mm&quot;
+   * @return The parsed ZonedDateTime
+   */
+  public static ZonedDateTime parseDateTime(String dateTimeStr, ZoneId timezone) throws Exception {
+<span class="fc" id="L305">    LocalDateTime floating = LocalDateTime.parse(dateTimeStr, DATETIME_FORMATTER);</span>
+<span class="fc" id="L306">    return ZonedDateTime.of(floating, timezone);</span>
+  }
+
+  /**
+   * Finds an event by subject, start time, AND end time for precise identification.
+   *
+   * @param dto The edit DTO containing the target event identifiers
+   * @param events The set of events to search
+   * @return The found event
+   * @throws Exception if event is not found
+   */
+  public static Event findEventBySubjectStartEnd(EditEventDto dto, Set&lt;Event&gt; events,
+                                                 ZoneId timezone) throws Exception {
+<span class="fc" id="L319">    ZonedDateTime targetStart = parseDateTime(dto.getTargetStartDateTime(), timezone);</span>
+<span class="fc" id="L320">    ZonedDateTime targetEnd = parseDateTime(dto.getTargetEndDateTime(), timezone);</span>
+
+<span class="fc bfc" id="L322" title="All 2 branches covered.">    for (Event event : events) {</span>
+<span class="fc bfc" id="L323" title="All 2 branches covered.">      if (event.getSubject().equals(dto.getTargetSubject())</span>
+<span class="fc bfc" id="L324" title="All 2 branches covered.">              &amp;&amp; event.getStartDateTime().equals(targetStart)</span>
+<span class="pc bpc" id="L325" title="1 of 2 branches missed.">              &amp;&amp; event.getEndDateTime().equals(targetEnd)) {</span>
+<span class="fc" id="L326">        return event;</span>
+      }
+<span class="fc" id="L328">    }</span>
+
+<span class="fc" id="L330">    throw new Exception(&quot;Event not found with subject '&quot;</span>
+<span class="fc" id="L331">            + dto.getTargetSubject()</span>
+            + &quot;' from &quot; + targetStart
+            + &quot; to &quot; + targetEnd);
+  }
+
+  /**
+   * Validates that a new event doesn't create duplicates.
+   * Checks if an event with same subject, start, and end already exists.
+   *
+   * @param newEvent The new event to validate
+   * @param existingEvents All existing events
+   * @param newEvents Events being created in the same operation
+   * @param eventsToRemove Events being removed in the same operation
+   * @throws Exception if duplicate would be created
+   */
+  public static void validateNoDuplicate(Event newEvent, Set&lt;Event&gt; existingEvents,
+                                         Set&lt;Event&gt; newEvents,
+                                         Set&lt;Event&gt; eventsToRemove) throws Exception {
+
+<span class="fc" id="L350">    Set&lt;Event&gt; remainingEvents = existingEvents.stream()</span>
+<span class="fc bfc" id="L351" title="All 2 branches covered.">            .filter(e -&gt; !eventsToRemove.contains(e))</span>
+<span class="fc" id="L352">            .collect(Collectors.toSet());</span>
+
+<span class="fc bfc" id="L354" title="All 2 branches covered.">    if (remainingEvents.contains(newEvent)) {</span>
+<span class="fc" id="L355">      throw new Exception(&quot;Edit operation failed: An event with subject '&quot;</span>
+<span class="fc" id="L356">              + newEvent.getSubject() + &quot;' from &quot;</span>
+<span class="fc" id="L357">              + newEvent.getStartDateTime() + &quot; to &quot;</span>
+<span class="fc" id="L358">              + newEvent.getEndDateTime() + &quot; already exists.&quot;);</span>
+    }
+
+<span class="fc bfc" id="L361" title="All 2 branches covered.">    if (newEvents.contains(newEvent)) {</span>
+<span class="fc" id="L362">      throw new Exception(&quot;Edit operation failed: Would create duplicate events with subject '&quot;</span>
+<span class="fc" id="L363">              + newEvent.getSubject()</span>
+              + &quot;' from &quot;
+<span class="fc" id="L365">              + newEvent.getStartDateTime()</span>
+              + &quot; to &quot;
+<span class="fc" id="L367">              + newEvent.getEndDateTime());</span>
+    }
+<span class="fc" id="L369">  }</span>
+
+  /**
+   * Extracts the set of weekdays on which events in the series occur.
+   */
+  public static Set&lt;DayOfWeek&gt; extractValidWeekdays(List&lt;Event&gt; seriesEvents) {
+<span class="fc" id="L375">    Set&lt;DayOfWeek&gt; validWeekdays = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L376" title="All 2 branches covered.">    for (Event event : seriesEvents) {</span>
+<span class="fc" id="L377">      DayOfWeek weekday = event.getStartDateTime().getDayOfWeek();</span>
+<span class="fc" id="L378">      validWeekdays.add(weekday);</span>
+<span class="fc" id="L379">    }</span>
+<span class="fc" id="L380">    return validWeekdays;</span>
+  }
+
+  /**
+   * Finds the next date on or after fromDate that falls on a valid weekday.
+   */
+  public static LocalDate findNextValidWeekday(LocalDate fromDate, Set&lt;DayOfWeek&gt; validWeekdays) {
+<span class="fc" id="L387">    LocalDate candidate = fromDate;</span>
+<span class="fc bfc" id="L388" title="All 2 branches covered.">    for (int i = 0; i &lt; 7; i++) {</span>
+<span class="fc bfc" id="L389" title="All 2 branches covered.">      if (validWeekdays.contains(candidate.getDayOfWeek())) {</span>
+<span class="fc" id="L390">        return candidate;</span>
+      }
+<span class="fc" id="L392">      candidate = candidate.plusDays(1);</span>
+    }
+<span class="fc" id="L394">    throw new IllegalStateException(&quot;No valid weekday found&quot;);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

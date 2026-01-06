@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EditEventDialog.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.view</a> &gt; <span class="el_source">EditEventDialog.java</span></div><h1>EditEventDialog.java</h1><pre class="source lang-java linenums">package calendar.view;
+
+import calendar.interfacetypes.IeditEventDialogData;
+import calendar.model.Event;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SpinnerDateModel;
+
+
+/**
+ * Dialog for editing an existing event.
+ * Supports editing single event, entire series, or forward events.
+ */
+public class EditEventDialog extends JDialog implements IeditEventDialogData {
+
+  private JTextField startDateField;
+  private JTextField endDateField;
+  private final Event eventToEdit;
+  private JTextField subjectField;
+  private JSpinner startTimeSpinner;
+  private JSpinner endTimeSpinner;
+  private JTextField locationField;
+  private JTextArea descriptionArea;
+  private JRadioButton editSingleRadio;
+  private JRadioButton editSeriesRadio;
+  private JRadioButton editForwardRadio;
+  private JPanel editScopePanel;
+<span class="nc" id="L45">  private boolean confirmed = false;</span>
+<span class="nc" id="L46">  private String editScope = &quot;single&quot;;</span>
+<span class="nc" id="L47">  private boolean isPopulating = false;</span>
+  /**
+   * Creates a dialog for editing an event.
+   *
+   * @param parent parent frame
+   * @param event the event to edit
+   */
+
+  public EditEventDialog(JFrame parent, Event event) {
+<span class="nc" id="L56">    super(parent, &quot;Edit Event&quot;, true);</span>
+<span class="nc" id="L57">    this.eventToEdit = event;</span>
+
+<span class="nc" id="L59">    initComponents();</span>
+<span class="nc" id="L60">    layoutComponents();</span>
+<span class="nc" id="L61">    populateFields();</span>
+<span class="nc" id="L62">    wireUpListeners();</span>
+<span class="nc" id="L63">    pack();</span>
+<span class="nc" id="L64">    setLocationRelativeTo(parent);</span>
+<span class="nc" id="L65">  }</span>
+
+  private void initComponents() {
+<span class="nc" id="L68">    subjectField = new JTextField(20);</span>
+<span class="nc" id="L69">    startDateField = new JTextField(10);</span>
+<span class="nc" id="L70">    endDateField = new JTextField(10);</span>
+
+<span class="nc" id="L72">    SpinnerDateModel startModel = new SpinnerDateModel();</span>
+<span class="nc" id="L73">    startTimeSpinner = new JSpinner(startModel);</span>
+<span class="nc" id="L74">    JSpinner.DateEditor startEditor = new JSpinner.DateEditor(startTimeSpinner, &quot;HH:mm&quot;);</span>
+<span class="nc" id="L75">    startTimeSpinner.setEditor(startEditor);</span>
+
+<span class="nc" id="L77">    SpinnerDateModel endModel = new SpinnerDateModel();</span>
+<span class="nc" id="L78">    endTimeSpinner = new JSpinner(endModel);</span>
+<span class="nc" id="L79">    JSpinner.DateEditor endEditor = new JSpinner.DateEditor(endTimeSpinner, &quot;HH:mm&quot;);</span>
+<span class="nc" id="L80">    endTimeSpinner.setEditor(endEditor);</span>
+<span class="nc" id="L81">    locationField = new JTextField(20);</span>
+<span class="nc" id="L82">    descriptionArea = new JTextArea(3, 20);</span>
+<span class="nc" id="L83">    descriptionArea.setLineWrap(true);</span>
+<span class="nc" id="L84">    descriptionArea.setWrapStyleWord(true);</span>
+<span class="nc" id="L85">    editSingleRadio = new JRadioButton(&quot;Edit this event only&quot;, true);</span>
+<span class="nc" id="L86">    editSeriesRadio = new JRadioButton(&quot;Edit all events in series&quot;);</span>
+<span class="nc" id="L87">    editForwardRadio = new JRadioButton(&quot;Edit this and following events&quot;);</span>
+<span class="nc" id="L88">    ButtonGroup scopeGroup = new ButtonGroup();</span>
+<span class="nc" id="L89">    scopeGroup.add(editSingleRadio);</span>
+<span class="nc" id="L90">    scopeGroup.add(editSeriesRadio);</span>
+<span class="nc" id="L91">    scopeGroup.add(editForwardRadio);</span>
+<span class="nc" id="L92">  }</span>
+
+  private void layoutComponents() {
+<span class="nc" id="L95">    JPanel mainPanel = new JPanel();</span>
+<span class="nc" id="L96">    mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));</span>
+<span class="nc" id="L97">    mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));</span>
+<span class="nc" id="L98">    JPanel eventInfoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));</span>
+<span class="nc" id="L99">    eventInfoPanel.add(new JLabel(&quot;Editing event on: &quot;));</span>
+<span class="nc" id="L100">    LocalDate eventDate = eventToEdit.getStartDateTime().toLocalDate();</span>
+<span class="nc" id="L101">    JLabel dateLabel = new JLabel(eventDate.toString());</span>
+<span class="nc" id="L102">    dateLabel.setFont(dateLabel.getFont().deriveFont(Font.BOLD));</span>
+<span class="nc" id="L103">    eventInfoPanel.add(dateLabel);</span>
+<span class="nc" id="L104">    mainPanel.add(eventInfoPanel);</span>
+<span class="nc" id="L105">    mainPanel.add(Box.createVerticalStrut(10));</span>
+<span class="nc" id="L106">    JPanel subjectPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));</span>
+<span class="nc" id="L107">    subjectPanel.add(new JLabel(&quot;Event Name:&quot;));</span>
+<span class="nc" id="L108">    subjectPanel.add(subjectField);</span>
+<span class="nc" id="L109">    mainPanel.add(subjectPanel);</span>
+<span class="nc" id="L110">    mainPanel.add(Box.createVerticalStrut(5));</span>
+<span class="nc" id="L111">    JPanel dateTimePanel = new JPanel(new GridLayout(4, 2, 5, 5));</span>
+<span class="nc" id="L112">    dateTimePanel.setBorder(BorderFactory.createTitledBorder(&quot;Date and Time&quot;));</span>
+
+<span class="nc" id="L114">    dateTimePanel.add(new JLabel(&quot;Start Date (yyyy-MM-dd):&quot;));</span>
+<span class="nc" id="L115">    dateTimePanel.add(startDateField);</span>
+
+<span class="nc" id="L117">    dateTimePanel.add(new JLabel(&quot;Start Time:&quot;));</span>
+<span class="nc" id="L118">    dateTimePanel.add(startTimeSpinner);</span>
+
+<span class="nc" id="L120">    dateTimePanel.add(new JLabel(&quot;End Date (yyyy-MM-dd):&quot;));</span>
+<span class="nc" id="L121">    dateTimePanel.add(endDateField);</span>
+
+<span class="nc" id="L123">    dateTimePanel.add(new JLabel(&quot;End Time:&quot;));</span>
+<span class="nc" id="L124">    dateTimePanel.add(endTimeSpinner);</span>
+
+<span class="nc" id="L126">    mainPanel.add(dateTimePanel);</span>
+<span class="nc" id="L127">    mainPanel.add(Box.createVerticalStrut(5));</span>
+<span class="nc" id="L128">    JPanel locationPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));</span>
+<span class="nc" id="L129">    locationPanel.add(new JLabel(&quot;Location:&quot;));</span>
+<span class="nc" id="L130">    locationPanel.add(locationField);</span>
+<span class="nc" id="L131">    mainPanel.add(locationPanel);</span>
+<span class="nc" id="L132">    mainPanel.add(Box.createVerticalStrut(5));</span>
+<span class="nc" id="L133">    JPanel descriptionPanel = new JPanel(new BorderLayout());</span>
+<span class="nc" id="L134">    descriptionPanel.add(new JLabel(&quot;Description:&quot;), BorderLayout.NORTH);</span>
+<span class="nc" id="L135">    descriptionPanel.add(new javax.swing.JScrollPane(descriptionArea), BorderLayout.CENTER);</span>
+<span class="nc" id="L136">    descriptionPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));</span>
+<span class="nc" id="L137">    mainPanel.add(descriptionPanel);</span>
+<span class="nc" id="L138">    mainPanel.add(Box.createVerticalStrut(10));</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">    boolean isRecurring = eventToEdit.getSeriesId() != null</span>
+<span class="nc bnc" id="L140" title="All 2 branches missed.">        &amp;&amp; !eventToEdit.getSeriesId().isEmpty();</span>
+
+<span class="nc bnc" id="L142" title="All 2 branches missed.">    if (isRecurring) {</span>
+<span class="nc" id="L143">      editScopePanel = new JPanel();</span>
+<span class="nc" id="L144">      editScopePanel.setLayout(new BoxLayout(editScopePanel, BoxLayout.Y_AXIS));</span>
+<span class="nc" id="L145">      editScopePanel.setBorder(BorderFactory.createTitledBorder(&quot;Edit Scope&quot;));</span>
+<span class="nc" id="L146">      JPanel singlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));</span>
+<span class="nc" id="L147">      singlePanel.add(editSingleRadio);</span>
+<span class="nc" id="L148">      editScopePanel.add(singlePanel);</span>
+<span class="nc" id="L149">      JPanel seriesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));</span>
+<span class="nc" id="L150">      seriesPanel.add(editSeriesRadio);</span>
+<span class="nc" id="L151">      editScopePanel.add(seriesPanel);</span>
+<span class="nc" id="L152">      JPanel forwardPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));</span>
+<span class="nc" id="L153">      forwardPanel.add(editForwardRadio);</span>
+<span class="nc" id="L154">      editScopePanel.add(forwardPanel);</span>
+<span class="nc" id="L155">      mainPanel.add(editScopePanel);</span>
+<span class="nc" id="L156">      mainPanel.add(Box.createVerticalStrut(10));</span>
+    }
+<span class="nc" id="L158">    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));</span>
+<span class="nc" id="L159">    JButton saveButton = new JButton(&quot;Save&quot;);</span>
+<span class="nc" id="L160">    JButton cancelButton = new JButton(&quot;Cancel&quot;);</span>
+<span class="nc" id="L161">    saveButton.addActionListener(e -&gt; {</span>
+<span class="nc" id="L162">      confirmed = true;</span>
+<span class="nc" id="L163">      dispose();</span>
+<span class="nc" id="L164">    });</span>
+<span class="nc" id="L165">    cancelButton.addActionListener(e -&gt; {</span>
+<span class="nc" id="L166">      confirmed = false;</span>
+<span class="nc" id="L167">      dispose();</span>
+<span class="nc" id="L168">    });</span>
+<span class="nc" id="L169">    buttonPanel.add(saveButton);</span>
+<span class="nc" id="L170">    buttonPanel.add(cancelButton);</span>
+<span class="nc" id="L171">    setLayout(new BorderLayout());</span>
+<span class="nc" id="L172">    add(mainPanel, BorderLayout.CENTER);</span>
+<span class="nc" id="L173">    add(buttonPanel, BorderLayout.SOUTH);</span>
+<span class="nc" id="L174">  }</span>
+
+  private void populateFields() {
+<span class="nc" id="L177">    isPopulating = true;</span>
+<span class="nc" id="L178">    subjectField.setText(eventToEdit.getSubject());</span>
+<span class="nc" id="L179">    LocalDate startDate = eventToEdit.getStartDateTime().toLocalDate();</span>
+<span class="nc" id="L180">    startDateField.setText(startDate.toString());</span>
+
+<span class="nc" id="L182">    LocalDate endDate = eventToEdit.getEndDateTime().toLocalDate();</span>
+<span class="nc" id="L183">    endDateField.setText(endDate.toString());</span>
+<span class="nc" id="L184">    LocalTime startTime = eventToEdit.getStartDateTime().toLocalTime();</span>
+<span class="nc" id="L185">    java.util.Date startTimeValue = java.util.Date.from(</span>
+<span class="nc" id="L186">        startTime.atDate(LocalDate.now())</span>
+<span class="nc" id="L187">            .atZone(java.time.ZoneId.systemDefault()).toInstant()</span>
+    );
+<span class="nc" id="L189">    startTimeSpinner.setValue(startTimeValue);</span>
+<span class="nc" id="L190">    LocalTime endTime = eventToEdit.getEndDateTime().toLocalTime();</span>
+<span class="nc" id="L191">    java.util.Date endTimeValue = java.util.Date.from(</span>
+<span class="nc" id="L192">        endTime.atDate(LocalDate.now())</span>
+<span class="nc" id="L193">            .atZone(java.time.ZoneId.systemDefault()).toInstant()</span>
+    );
+<span class="nc" id="L195">    endTimeSpinner.setValue(endTimeValue);</span>
+<span class="nc bnc" id="L196" title="All 2 branches missed.">    if (eventToEdit.getLocation() != null) {</span>
+<span class="nc" id="L197">      locationField.setText(eventToEdit.getLocation());</span>
+    }
+<span class="nc bnc" id="L199" title="All 2 branches missed.">    if (eventToEdit.getDescription() != null) {</span>
+<span class="nc" id="L200">      descriptionArea.setText(eventToEdit.getDescription());</span>
+    }
+<span class="nc" id="L202">    isPopulating = false;</span>
+<span class="nc" id="L203">  }</span>
+
+  private void wireUpListeners() {
+<span class="nc" id="L206">    editSingleRadio.addActionListener(e -&gt; editScope = &quot;single&quot;);</span>
+<span class="nc" id="L207">    editSeriesRadio.addActionListener(e -&gt; editScope = &quot;series&quot;);</span>
+<span class="nc" id="L208">    editForwardRadio.addActionListener(e -&gt; editScope = &quot;forward&quot;);</span>
+<span class="nc" id="L209">    editSingleRadio.addActionListener(e -&gt; editScope = &quot;single&quot;);</span>
+<span class="nc" id="L210">    editSeriesRadio.addActionListener(e -&gt; editScope = &quot;series&quot;);</span>
+<span class="nc" id="L211">    editForwardRadio.addActionListener(e -&gt; editScope = &quot;forward&quot;);</span>
+<span class="nc" id="L212">    startDateField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {</span>
+      @Override
+      public void insertUpdate(javax.swing.event.DocumentEvent e) {
+<span class="nc" id="L215">        updateEndDateBasedOnStartDate();</span>
+<span class="nc" id="L216">      }</span>
+
+      @Override
+      public void removeUpdate(javax.swing.event.DocumentEvent e) {
+<span class="nc" id="L220">        updateEndDateBasedOnStartDate();</span>
+<span class="nc" id="L221">      }</span>
+
+      @Override
+      public void changedUpdate(javax.swing.event.DocumentEvent e) {
+<span class="nc" id="L225">        updateEndDateBasedOnStartDate();</span>
+<span class="nc" id="L226">      }</span>
+    });
+<span class="nc" id="L228">  }</span>
+
+
+  public boolean isConfirmed() {
+<span class="nc" id="L232">    return confirmed;</span>
+  }
+
+  public String getEditScope() {
+<span class="nc" id="L236">    return editScope;</span>
+  }
+
+  public String getSubject() {
+<span class="nc" id="L240">    return subjectField.getText().trim();</span>
+  }
+
+  public String getEventLocation() {
+<span class="nc" id="L244">    return locationField.getText().trim();</span>
+  }
+
+  public String getDescription() {
+<span class="nc" id="L248">    return descriptionArea.getText().trim();</span>
+  }
+
+  /**
+   * Gets the start time from the spinner.
+   *
+   * @return the start time
+   */
+  public LocalTime getStartTime() {
+<span class="nc" id="L257">    java.util.Date date = (java.util.Date) startTimeSpinner.getValue();</span>
+<span class="nc" id="L258">    return date.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalTime();</span>
+  }
+
+  /**
+   * Gets the end time from the spinner.
+   *
+   * @return the end time
+   */
+  public LocalTime getEndTime() {
+<span class="nc" id="L267">    java.util.Date date = (java.util.Date) endTimeSpinner.getValue();</span>
+<span class="nc" id="L268">    return date.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalTime();</span>
+  }
+
+  public Event getOriginalEvent() {
+<span class="nc" id="L272">    return eventToEdit;</span>
+  }
+
+  public LocalDate getEventDate() {
+<span class="nc" id="L276">    return eventToEdit.getStartDateTime().toLocalDate();</span>
+  }
+
+  /**
+   * this function returns the start date of an event.
+   *
+   * @return LocalDate
+   */
+  public LocalDate getStartDate() {
+<span class="nc" id="L285">    String startDateText = startDateField.getText().trim();</span>
+    try {
+<span class="nc" id="L287">      LocalDate parsed = LocalDate.parse(startDateText);</span>
+<span class="nc" id="L288">      return parsed;</span>
+<span class="nc" id="L289">    } catch (Exception e) {</span>
+<span class="nc" id="L290">      e.printStackTrace();</span>
+<span class="nc" id="L291">      return eventToEdit.getStartDateTime().toLocalDate();</span>
+    }
+  }
+
+  /**
+   * this function returns the end date of an event.
+   *
+   * @return LocalDate
+   */
+  public LocalDate getEndDate() {
+<span class="nc" id="L301">    String endDateText = endDateField.getText().trim();</span>
+    try {
+<span class="nc" id="L303">      LocalDate parsed = LocalDate.parse(endDateText);</span>
+<span class="nc" id="L304">      return parsed;</span>
+<span class="nc" id="L305">    } catch (Exception e) {</span>
+<span class="nc" id="L306">      e.printStackTrace();</span>
+<span class="nc" id="L307">      return eventToEdit.getEndDateTime().toLocalDate();</span>
+    }
+  }
+
+  /**
+   * Automatically updates the end date field when start date changes.
+   * Maintains the original duration (days between start and end).
+   */
+  private void updateEndDateBasedOnStartDate() {
+<span class="nc bnc" id="L316" title="All 2 branches missed.">    if (isPopulating) {</span>
+<span class="nc" id="L317">      return;</span>
+    }
+    try {
+<span class="nc" id="L320">      String startDateText = startDateField.getText().trim();</span>
+<span class="nc bnc" id="L321" title="All 2 branches missed.">      if (startDateText.isEmpty()) {</span>
+<span class="nc" id="L322">        return;</span>
+      }
+<span class="nc" id="L324">      LocalDate newStartDate = LocalDate.parse(startDateText);</span>
+<span class="nc" id="L325">      LocalDate originalStartDate = eventToEdit.getStartDateTime().toLocalDate();</span>
+<span class="nc" id="L326">      LocalDate originalEndDate = eventToEdit.getEndDateTime().toLocalDate();</span>
+<span class="nc" id="L327">      long daysDifference = java.time.temporal.ChronoUnit.DAYS.between(</span>
+          originalStartDate,
+          originalEndDate
+      );
+<span class="nc" id="L331">      LocalDate newEndDate = newStartDate.plusDays(daysDifference);</span>
+<span class="nc" id="L332">      String currentEndDateText = endDateField.getText().trim();</span>
+<span class="nc bnc" id="L333" title="All 2 branches missed.">      if (currentEndDateText.isEmpty()</span>
+              ||
+<span class="nc bnc" id="L335" title="All 2 branches missed.">          currentEndDateText.equals(originalEndDate.toString())) {</span>
+<span class="nc" id="L336">        endDateField.setText(newEndDate.toString());</span>
+      }
+<span class="nc" id="L338">    } catch (Exception e) {</span>
+<span class="nc" id="L339">      e.printStackTrace();</span>
+<span class="nc" id="L340">    }</span>
+<span class="nc" id="L341">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

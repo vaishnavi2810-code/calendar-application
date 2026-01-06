@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="controller.EventControllerTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.003">
+  <properties/>
+  <testcase name="testControllerDelegatesToParserService" classname="controller.EventControllerTest" time="0.0"/>
+  <testcase name="testProcessCommandFindsParserAndExecutes" classname="controller.EventControllerTest" time="0.0"/>
+  <testcase name="testProcessMultipleCommandsWithDifferentParsers" classname="controller.EventControllerTest" time="0.0"/>
+  <testcase name="testCommandExecutionOrderIsCorrect" classname="controller.EventControllerTest" time="0.0"/>
+  <testcase name="testProcessCommandThrowsExceptionWhenNoParserFound" classname="controller.EventControllerTest" time="0.0"/>
+  <testcase name="testProcessCommandPassesCorrectService" classname="controller.EventControllerTest" time="0.001"/>
+  <testcase name="testProcessCommandWithEmptyParserList" classname="controller.EventControllerTest" time="0.0"/>
+  <testcase name="testProcessCommandHandlesExecutionException" classname="controller.EventControllerTest" time="0.0"/>
+  <testcase name="testMultipleExecutionsOfSameCommand" classname="controller.EventControllerTest" time="0.0"/>
+  <testcase name="testProcessCommandStopsAtFirstMatch" classname="controller.EventControllerTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

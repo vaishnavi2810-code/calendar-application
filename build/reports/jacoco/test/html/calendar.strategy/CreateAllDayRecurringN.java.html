@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreateAllDayRecurringN.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.strategy</a> &gt; <span class="el_source">CreateAllDayRecurringN.java</span></div><h1>CreateAllDayRecurringN.java</h1><pre class="source lang-java linenums">package calendar.strategy;
+
+import static calendar.constants.CreateCalendarConstants.parseWeekdays;
+
+import calendar.dto.CreateEventDto;
+import calendar.interfacetypes.Icreate;
+import calendar.model.Event;
+import calendar.model.EventBuilder;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+/**
+ * Strategy implementation for creating recurring all-day events with a fixed number of occurrences.
+ * This class generates a series of all-day events that occur on specified weekdays for a defined
+ * number of repetitions. All-day events are created with default hours of 8:00 AM to 5:00 PM.
+ * All events in the series share a common series ID for identification purposes.
+ */
+<span class="fc" id="L24">public class CreateAllDayRecurringN implements Icreate {</span>
+  /**
+   * Creates a set of recurring all-day events based on the specified parameters.
+   * Starting from the given date, iterates through subsequent days and creates events
+   * on matching weekdays until the specified number of occurrences is reached.
+   * Each event is assigned the same series ID to indicate they belong to the same recurring series.
+   * All-day events are created with default times of 8:00 AM to 5:00 PM in the configured timezone.
+   *
+   * @param data the data transfer object containing event creation parameters including
+   *             subject, start date, weekdays pattern, and number of occurrences
+   * @param list the existing set of events to check for conflicts before creating new events
+   * @return a set containing all newly created event occurrences
+   * @throws Exception if any event in the series conflicts with an existing event,
+   *                   or if the number of occurrences cannot be parsed
+   */
+  public Set&lt;Event&gt; create(CreateEventDto data, Set&lt;Event&gt; list, ZoneId timezone) throws Exception {
+<span class="fc" id="L40">    LocalDate date = LocalDate.parse(data.getOnDate());</span>
+<span class="fc" id="L41">    LocalTime startTime = LocalTime.of(8, 0);</span>
+<span class="fc" id="L42">    LocalTime endTime = LocalTime.of(17, 0);</span>
+<span class="fc" id="L43">    Set&lt;DayOfWeek&gt; wantedDays = parseWeekdays(data.getWeekdays());</span>
+<span class="fc" id="L44">    int n = Integer.parseInt(data.getnTimes());</span>
+<span class="fc" id="L45">    int eventsCreated = 0;</span>
+<span class="fc" id="L46">    Set&lt;Event&gt; newEvents = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L47">    String seriesId = UUID.randomUUID().toString();</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">    while (eventsCreated &lt; n) {</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">      if (wantedDays.contains(date.getDayOfWeek())) {</span>
+<span class="fc" id="L50">        ZonedDateTime eventStart = ZonedDateTime.of(date, startTime, timezone);</span>
+<span class="fc" id="L51">        ZonedDateTime eventEnd = ZonedDateTime.of(date, endTime, timezone);</span>
+<span class="fc" id="L52">        Event event = new EventBuilder()</span>
+<span class="fc" id="L53">            .setSubject(data.getSubject())</span>
+<span class="fc" id="L54">            .setStartDateTime(eventStart)</span>
+<span class="fc" id="L55">            .setEndDateTime(eventEnd)</span>
+<span class="fc" id="L56">            .setSeriesId(seriesId)</span>
+<span class="fc" id="L57">            .build();</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        if (list.contains(event)) {</span>
+<span class="fc" id="L59">          throw new Exception(&quot;Event already exists&quot;);</span>
+        }
+<span class="fc" id="L61">        newEvents.add(event);</span>
+<span class="fc" id="L62">        eventsCreated++;</span>
+      }
+<span class="fc" id="L64">      date = date.plusDays(1);</span>
+    }
+<span class="fc" id="L66">    return newEvents;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

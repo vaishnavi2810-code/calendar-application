@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="constants.CreateCalendarConstantsTests" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:33" hostname="Vaishnavis-MacBook-Pro.local" time="0.001">
+  <properties/>
+  <testcase name="testParseWeekdaysAllValidDays" classname="constants.CreateCalendarConstantsTests" time="0.0"/>
+  <testcase name="testParseWeekdaysWithInvalidCharacters" classname="constants.CreateCalendarConstantsTests" time="0.0"/>
+  <testcase name="testConstructorIsPrivate" classname="constants.CreateCalendarConstantsTests" time="0.001"/>
+  <testcase name="testParseWeekdaysNull" classname="constants.CreateCalendarConstantsTests" time="0.0"/>
+  <testcase name="testParseWeekdaysSingleValidDay" classname="constants.CreateCalendarConstantsTests" time="0.0"/>
+  <testcase name="testParseWeekdaysMixedCaseAndNoise" classname="constants.CreateCalendarConstantsTests" time="0.0"/>
+  <testcase name="testParseWeekdaysEmptyString" classname="constants.CreateCalendarConstantsTests" time="0.0"/>
+  <testcase name="testParseWeekdaysWithDuplicates" classname="constants.CreateCalendarConstantsTests" time="0.0"/>
+  <testcase name="testParseWeekdaysLowercaseInput" classname="constants.CreateCalendarConstantsTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

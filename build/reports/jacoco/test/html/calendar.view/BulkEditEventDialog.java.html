@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BulkEditEventDialog.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.view</a> &gt; <span class="el_source">BulkEditEventDialog.java</span></div><h1>BulkEditEventDialog.java</h1><pre class="source lang-java linenums">package calendar.view;
+
+import calendar.model.Event;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerDateModel;
+import javax.swing.border.EmptyBorder;
+
+/**
+ * Dialog to bulk edit multiple events.
+ * Pre-fills fields with the first event in sorted order.
+ */
+public class BulkEditEventDialog extends JDialog {
+
+  private JTextField subjectField;
+  private JTextField startDateField;
+  private JSpinner startTimeSpinner;
+  private JTextField endDateField;
+  private JSpinner endTimeSpinner;
+  private JTextField locationField;
+  private JTextField descriptionField;
+<span class="nc" id="L41">  private boolean confirmed = false;</span>
+
+  /**
+   * constructor to initialise dialog and its parent.
+   *
+   * @param parent ok.
+   * @param events ok.
+   * @param calendarZone ok.
+   */
+  public BulkEditEventDialog(JFrame parent, List&lt;Event&gt; events, ZoneId calendarZone) {
+<span class="nc" id="L51">    super(parent, &quot;Bulk Edit Events&quot;, true);</span>
+
+<span class="nc bnc" id="L53" title="All 4 branches missed.">    if (events == null || events.isEmpty()) {</span>
+<span class="nc" id="L54">      throw new IllegalArgumentException(&quot;Events list cannot be empty&quot;);</span>
+    }
+
+<span class="nc" id="L57">    events.sort(Comparator.comparing(Event::getStartDateTime));</span>
+
+<span class="nc" id="L59">    Event firstEvent = events.get(0);</span>
+<span class="nc" id="L60">    initComponents(firstEvent, calendarZone);</span>
+<span class="nc" id="L61">    layoutComponents();</span>
+
+<span class="nc" id="L63">    pack();</span>
+<span class="nc" id="L64">    setLocationRelativeTo(parent);</span>
+<span class="nc" id="L65">  }</span>
+
+  private void initComponents(Event firstEvent, ZoneId calendarZone) {
+<span class="nc" id="L68">    subjectField = new JTextField(firstEvent.getSubject(), 20);</span>
+
+<span class="nc" id="L70">    ZonedDateTime startZdt = firstEvent.getStartDateTime();</span>
+<span class="nc" id="L71">    ZonedDateTime endZdt = firstEvent.getEndDateTime();</span>
+
+<span class="nc" id="L73">    startDateField = new JTextField(startZdt.toLocalDate().toString(), 15);</span>
+<span class="nc" id="L74">    endDateField = new JTextField(endZdt.toLocalDate().toString(), 15);</span>
+
+<span class="nc" id="L76">    startTimeSpinner = createTimeSpinner(startZdt, calendarZone);</span>
+<span class="nc" id="L77">    endTimeSpinner = createTimeSpinner(endZdt, calendarZone);</span>
+
+<span class="nc bnc" id="L79" title="All 2 branches missed.">    locationField = new JTextField(firstEvent.getLocation() != null</span>
+<span class="nc" id="L80">            ? firstEvent.getLocation() : &quot;&quot;, 20);</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">    descriptionField = new JTextField(firstEvent.getDescription() != null</span>
+<span class="nc" id="L82">            ? firstEvent.getDescription() : &quot;&quot;, 20);</span>
+<span class="nc" id="L83">  }</span>
+
+  private JSpinner createTimeSpinner(ZonedDateTime zdt, ZoneId calendarZone) {
+<span class="nc" id="L86">    LocalTime time = zdt.withZoneSameInstant(calendarZone).toLocalTime();</span>
+<span class="nc" id="L87">    LocalDate today = LocalDate.now();</span>
+<span class="nc" id="L88">    Date dateValue = Date.from(today.atTime(time).atZone(ZoneId.systemDefault()).toInstant());</span>
+<span class="nc" id="L89">    SpinnerDateModel model = new SpinnerDateModel();</span>
+<span class="nc" id="L90">    model.setValue(dateValue);</span>
+<span class="nc" id="L91">    JSpinner spinner = new JSpinner(model);</span>
+<span class="nc" id="L92">    spinner.setEditor(new JSpinner.DateEditor(spinner, &quot;HH:mm&quot;));</span>
+<span class="nc" id="L93">    return spinner;</span>
+  }
+
+  private void layoutComponents() {
+<span class="nc" id="L97">    JPanel mainPanel = new JPanel();</span>
+<span class="nc" id="L98">    mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));</span>
+<span class="nc" id="L99">    mainPanel.setBorder(new EmptyBorder(15, 15, 15, 15));</span>
+
+<span class="nc" id="L101">    JLabel title = new JLabel(&quot;Edit All Matching Events&quot;);</span>
+<span class="nc" id="L102">    title.setFont(title.getFont().deriveFont(Font.BOLD, 14f));</span>
+<span class="nc" id="L103">    JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));</span>
+<span class="nc" id="L104">    titlePanel.add(title);</span>
+<span class="nc" id="L105">    mainPanel.add(titlePanel);</span>
+<span class="nc" id="L106">    mainPanel.add(Box.createVerticalStrut(10));</span>
+<span class="nc" id="L107">    JPanel fieldsPanel = new JPanel(new GridLayout(7, 2, 5, 5));</span>
+<span class="nc" id="L108">    fieldsPanel.setBorder(BorderFactory.createTitledBorder(&quot;Event Details&quot;));</span>
+
+<span class="nc" id="L110">    fieldsPanel.add(new JLabel(&quot;Subject:&quot;));</span>
+<span class="nc" id="L111">    fieldsPanel.add(subjectField);</span>
+
+<span class="nc" id="L113">    fieldsPanel.add(new JLabel(&quot;Start Date (yyyy-MM-dd):&quot;));</span>
+<span class="nc" id="L114">    fieldsPanel.add(startDateField);</span>
+
+<span class="nc" id="L116">    fieldsPanel.add(new JLabel(&quot;Start Time:&quot;));</span>
+<span class="nc" id="L117">    fieldsPanel.add(startTimeSpinner);</span>
+
+<span class="nc" id="L119">    fieldsPanel.add(new JLabel(&quot;End Date (yyyy-MM-dd):&quot;));</span>
+<span class="nc" id="L120">    fieldsPanel.add(endDateField);</span>
+
+<span class="nc" id="L122">    fieldsPanel.add(new JLabel(&quot;End Time:&quot;));</span>
+<span class="nc" id="L123">    fieldsPanel.add(endTimeSpinner);</span>
+
+<span class="nc" id="L125">    fieldsPanel.add(new JLabel(&quot;Location:&quot;));</span>
+<span class="nc" id="L126">    fieldsPanel.add(locationField);</span>
+
+<span class="nc" id="L128">    fieldsPanel.add(new JLabel(&quot;Description:&quot;));</span>
+<span class="nc" id="L129">    fieldsPanel.add(descriptionField);</span>
+
+<span class="nc" id="L131">    mainPanel.add(fieldsPanel);</span>
+<span class="nc" id="L132">    mainPanel.add(Box.createVerticalStrut(15));</span>
+
+<span class="nc" id="L134">    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));</span>
+<span class="nc" id="L135">    JButton okButton = new JButton(&quot;OK&quot;);</span>
+<span class="nc" id="L136">    JButton cancelButton = new JButton(&quot;Cancel&quot;);</span>
+
+<span class="nc" id="L138">    okButton.addActionListener(e -&gt; {</span>
+<span class="nc" id="L139">      confirmed = true;</span>
+<span class="nc" id="L140">      dispose();</span>
+<span class="nc" id="L141">    });</span>
+
+<span class="nc" id="L143">    cancelButton.addActionListener(e -&gt; {</span>
+<span class="nc" id="L144">      confirmed = false;</span>
+<span class="nc" id="L145">      dispose();</span>
+<span class="nc" id="L146">    });</span>
+
+<span class="nc" id="L148">    buttonPanel.add(okButton);</span>
+<span class="nc" id="L149">    buttonPanel.add(cancelButton);</span>
+
+<span class="nc" id="L151">    mainPanel.add(buttonPanel);</span>
+
+<span class="nc" id="L153">    setLayout(new BorderLayout());</span>
+<span class="nc" id="L154">    add(mainPanel, BorderLayout.CENTER);</span>
+<span class="nc" id="L155">  }</span>
+
+  public boolean isConfirmed() {
+<span class="nc" id="L158">    return confirmed;</span>
+  }
+
+  public String getSubject() {
+<span class="nc" id="L162">    return subjectField.getText().trim();</span>
+  }
+
+  public LocalDate getStartDate() {
+<span class="nc" id="L166">    return LocalDate.parse(startDateField.getText().trim());</span>
+  }
+
+  /**
+   * this returns start time in localtime format.
+   *
+   * @return Local time .
+   */
+  public LocalTime getStartTime() {
+<span class="nc" id="L175">    Date spinnerDate = (Date) startTimeSpinner.getValue();</span>
+<span class="nc" id="L176">    java.util.Calendar cal = java.util.Calendar.getInstance();</span>
+<span class="nc" id="L177">    cal.setTime(spinnerDate);</span>
+<span class="nc" id="L178">    int hour = cal.get(java.util.Calendar.HOUR_OF_DAY);</span>
+<span class="nc" id="L179">    int minute = cal.get(java.util.Calendar.MINUTE);</span>
+<span class="nc" id="L180">    return LocalTime.of(hour, minute);</span>
+  }
+
+  /**
+   * this returns end date in localdate format.
+   *
+   * @return Local date .
+   */
+  public LocalDate getEndDate() {
+<span class="nc" id="L189">    return LocalDate.parse(endDateField.getText().trim());</span>
+  }
+
+  /**
+   * this returns end time in localtime format.
+   *
+   * @return Local time .
+   */
+  public LocalTime getEndTime() {
+<span class="nc" id="L198">    Date spinnerDate = (Date) endTimeSpinner.getValue();</span>
+<span class="nc" id="L199">    java.util.Calendar cal = java.util.Calendar.getInstance();</span>
+<span class="nc" id="L200">    cal.setTime(spinnerDate);</span>
+<span class="nc" id="L201">    int hour = cal.get(java.util.Calendar.HOUR_OF_DAY);</span>
+<span class="nc" id="L202">    int minute = cal.get(java.util.Calendar.MINUTE);</span>
+<span class="nc" id="L203">    return LocalTime.of(hour, minute);</span>
+  }
+
+  public String getEventLocation() {
+<span class="nc" id="L207">    return locationField.getText().trim();</span>
+  }
+
+  public String getDescription() {
+<span class="nc" id="L211">    return descriptionField.getText().trim();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

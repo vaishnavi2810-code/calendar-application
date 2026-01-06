@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CommandParserService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.service</a> &gt; <span class="el_source">CommandParserService.java</span></div><h1>CommandParserService.java</h1><pre class="source lang-java linenums">package calendar.service;
+
+import calendar.interfacetypes.Icommand;
+import calendar.interfacetypes.Iparser;
+import calendar.model.CalendarModel;
+import calendar.parser.CalendarParser;
+import calendar.parser.CopyEventParser;
+import calendar.parser.CreateEventParser;
+import calendar.parser.EditEventParser;
+import calendar.parser.ExportEventParser;
+import calendar.parser.QueryEventParser;
+import java.util.ArrayList;
+import java.util.List;
+
+
+/**
+ * Service for parsing command strings into executable command objects.
+ * Maintains a collection of parser implementations and delegates parsing to the appropriate parser
+ * based on the command string. Supports calendar operations, event creation, queries, edits,
+ * exports, and copy operations.
+ */
+public class CommandParserService {
+  private final List&lt;Iparser&gt; parsers;
+
+  /**
+  * Constructs a new CommandParserService with all available parsers.
+  * Initializes parsers for calendar, create, query, edit, export, and copy commands.
+  */
+<span class="fc" id="L29">  public CommandParserService() {</span>
+<span class="fc" id="L30">    this.parsers = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L31">    this.parsers.add(new CalendarParser());</span>
+<span class="fc" id="L32">    this.parsers.add(new CreateEventParser());</span>
+<span class="fc" id="L33">    this.parsers.add(new QueryEventParser());</span>
+<span class="fc" id="L34">    this.parsers.add(new EditEventParser());</span>
+<span class="fc" id="L35">    this.parsers.add(new ExportEventParser());</span>
+<span class="fc" id="L36">    this.parsers.add(new CopyEventParser());</span>
+<span class="fc" id="L37">  }</span>
+
+  /**
+   * Parses a command string and returns the appropriate command object.
+   * Iterates through available parsers until one can handle the command.
+   *
+   * @param command the command string to parse
+   * @param service the calendar service to inject into commands
+   * @return the parsed command object ready for execution
+   * @throws Exception if the command is unknown or invalid
+   */
+  public Icommand parse(String command, CalendarModel service) throws Exception {
+<span class="fc bfc" id="L49" title="All 2 branches covered.">    for (Iparser parser : parsers) {</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">      if (parser.canHandle(command)) {</span>
+<span class="fc" id="L51">        return parser.parse(command, service);</span>
+      }
+<span class="fc" id="L53">    }</span>
+<span class="fc" id="L54">    throw new Exception(&quot;Error: Unknown command.&quot;);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

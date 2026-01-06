@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="parser.CopyEventParserTest" tests="27" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.028">
+  <properties/>
+  <testcase name="testParseCopyEventsOnDateCaseInsensitive" classname="parser.CopyEventParserTest" time="0.001"/>
+  <testcase name="testParseExtraSpacesStillWorks" classname="parser.CopyEventParserTest" time="0.0"/>
+  <testcase name="testParseInvalidDateTimeFormatThrowsException" classname="parser.CopyEventParserTest" time="0.0"/>
+  <testcase name="testParseCopySingleEventWithSpacesInName" classname="parser.CopyEventParserTest" time="0.001"/>
+  <testcase name="testParserChecksPattersInCorrectOrder" classname="parser.CopyEventParserTest" time="0.0"/>
+  <testcase name="testParseMissingDashesInTargetThrowsException" classname="parser.CopyEventParserTest" time="0.001"/>
+  <testcase name="testParseMissingTargetCalendarThrowsException" classname="parser.CopyEventParserTest" time="0.004"/>
+  <testcase name="testParseCopyEventsOnDate" classname="parser.CopyEventParserTest" time="0.001"/>
+  <testcase name="testParseCopyEventsBetweenDates" classname="parser.CopyEventParserTest" time="0.001"/>
+  <testcase name="testParseCalendarNameWithUnderscores" classname="parser.CopyEventParserTest" time="0.0"/>
+  <testcase name="testParseCopyEventsOnDateWithDifferentCalendarName" classname="parser.CopyEventParserTest" time="0.0"/>
+  <testcase name="testParseEventNameWithNumbers" classname="parser.CopyEventParserTest" time="0.0"/>
+  <testcase name="testParseCopySingleEventWithoutQuotes" classname="parser.CopyEventParserTest" time="0.0"/>
+  <testcase name="testParseLeapYearDate" classname="parser.CopyEventParserTest" time="0.0"/>
+  <testcase name="testParseWrongKeywordOrderThrowsException" classname="parser.CopyEventParserTest" time="0.001"/>
+  <testcase name="testParseCopyEventsBetweenDatesCaseInsensitive" classname="parser.CopyEventParserTest" time="0.005"/>
+  <testcase name="testParseSameDateForSourceAndTarget" classname="parser.CopyEventParserTest" time="0.001"/>
+  <testcase name="testParseInvalidDateFormatThrowsException" classname="parser.CopyEventParserTest" time="0.001"/>
+  <testcase name="testParseCopyEventsBetweenDatesLongRange" classname="parser.CopyEventParserTest" time="0.0"/>
+  <testcase name="testParseCopySingleEvent" classname="parser.CopyEventParserTest" time="0.0"/>
+  <testcase name="testParseInvalidCopyEventsOnDateThrowsException" classname="parser.CopyEventParserTest" time="0.007"/>
+  <testcase name="testCanHandleInvalidCommands" classname="parser.CopyEventParserTest" time="0.001"/>
+  <testcase name="testParseEventNameWithSpecialCharacters" classname="parser.CopyEventParserTest" time="0.0"/>
+  <testcase name="testParseInvalidCopySingleEventThrowsException" classname="parser.CopyEventParserTest" time="0.0"/>
+  <testcase name="testCanHandleValidCopyCommands" classname="parser.CopyEventParserTest" time="0.0"/>
+  <testcase name="testParseInvalidCopyEventsBetweenThrowsException" classname="parser.CopyEventParserTest" time="0.0"/>
+  <testcase name="testParseCopySingleEventCaseInsensitive" classname="parser.CopyEventParserTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

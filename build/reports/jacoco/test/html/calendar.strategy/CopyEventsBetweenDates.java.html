@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CopyEventsBetweenDates.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.strategy</a> &gt; <span class="el_source">CopyEventsBetweenDates.java</span></div><h1>CopyEventsBetweenDates.java</h1><pre class="source lang-java linenums">package calendar.strategy;
+
+import calendar.dto.CopyEventDto;
+import calendar.model.Calendar;
+import calendar.model.Event;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * Strategy for copying all events within a date range.
+ * Maintains weekday consistency by adjusting the target date to match the first event's weekday.
+ * All events are shifted by the same number of days to preserve relative positions.
+ */
+<span class="fc" id="L19">public class CopyEventsBetweenDates extends AbstractCopyEventsByDate {</span>
+
+<span class="fc" id="L21">  private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd&quot;);</span>
+
+  @Override
+  protected List&lt;Event&gt; getEventsInDateRange(CopyEventDto dto, Calendar sourceCalendar)
+      throws Exception {
+<span class="fc" id="L26">    LocalDate intervalStartDate = LocalDate.parse(dto.getIntervalStartDate(), FORMATTER);</span>
+<span class="fc" id="L27">    LocalDate intervalEndDate = LocalDate.parse(dto.getIntervalEndDate(), FORMATTER);</span>
+
+<span class="fc" id="L29">    ZonedDateTime intervalStart = intervalStartDate.atStartOfDay(sourceCalendar.getTimezone());</span>
+<span class="fc" id="L30">    ZonedDateTime intervalEnd = intervalEndDate.atTime(23, 59, 59)</span>
+<span class="fc" id="L31">        .atZone(sourceCalendar.getTimezone());</span>
+
+<span class="fc" id="L33">    return sourceCalendar.getEvents().stream()</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">        .filter(e -&gt; !e.getStartDateTime().isAfter(intervalEnd)</span>
+<span class="fc bfc" id="L35" title="All 2 branches covered.">            &amp;&amp; !e.getEndDateTime().isBefore(intervalStart))</span>
+<span class="fc" id="L36">        .collect(Collectors.toList());</span>
+  }
+
+  @Override
+  protected LocalDate calculateTargetDate(CopyEventDto dto, LocalDate firstEventDate)
+      throws Exception {
+<span class="fc" id="L42">    LocalDate userProvidedTargetDate = LocalDate.parse(dto.getTargetStartDate(), FORMATTER);</span>
+<span class="fc" id="L43">    DayOfWeek firstEventWeekday = firstEventDate.getDayOfWeek();</span>
+
+    // Adjust target date to match the first event's weekday
+<span class="fc" id="L46">    return adjustToMatchWeekday(userProvidedTargetDate, firstEventWeekday);</span>
+  }
+
+  /**
+   * Adjusts the target date to match the source weekday.
+   * If the target date already falls on the same weekday, it is returned unchanged.
+   * Otherwise, the date is adjusted forward to the next occurrence of that weekday.
+   */
+  private LocalDate adjustToMatchWeekday(LocalDate targetDate, DayOfWeek sourceWeekday) {
+<span class="fc" id="L55">    DayOfWeek targetWeekday = targetDate.getDayOfWeek();</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">    if (targetWeekday == sourceWeekday) {</span>
+<span class="fc" id="L57">      return targetDate;</span>
+    }
+<span class="fc" id="L59">    return targetDate.with(TemporalAdjusters.next(sourceWeekday));</span>
+  }
+
+  @Override
+  protected String getNoEventsFoundMessage(CopyEventDto dto) {
+<span class="fc" id="L64">    return &quot;No events found between &quot;</span>
+<span class="fc" id="L65">        + dto.getIntervalStartDate() + &quot; and &quot; + dto.getIntervalEndDate();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

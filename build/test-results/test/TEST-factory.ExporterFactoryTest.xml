@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="factory.ExporterFactoryTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.005">
+  <properties/>
+  <testcase name="testGetExporterCsvUpperCaseReturnsGoogleCsvExporter" classname="factory.ExporterFactoryTest" time="0.0"/>
+  <testcase name="testGetExporterFileNameDotAtStartThrowsException" classname="factory.ExporterFactoryTest" time="0.004"/>
+  <testcase name="testGetExporterFileNameEndsWithDotThrowsException" classname="factory.ExporterFactoryTest" time="0.0"/>
+  <testcase name="testGetExporterIcalExtensionReturnsIcalExporter" classname="factory.ExporterFactoryTest" time="0.0"/>
+  <testcase name="testGetExporterNullFileNameThrowsException" classname="factory.ExporterFactoryTest" time="0.0"/>
+  <testcase name="testGetExporterXmlFileTypeThrowsException" classname="factory.ExporterFactoryTest" time="0.0"/>
+  <testcase name="testGetExporterMultipleDotsInFileNameWorks" classname="factory.ExporterFactoryTest" time="0.0"/>
+  <testcase name="testGetExporterCsvExtensionReturnsGoogleCsvExporter" classname="factory.ExporterFactoryTest" time="0.0"/>
+  <testcase name="testGetExporterIcsExtensionReturnsIcalExporter" classname="factory.ExporterFactoryTest" time="0.0"/>
+  <testcase name="testPrivateConstructor" classname="factory.ExporterFactoryTest" time="0.0"/>
+  <testcase name="testGetExporterCsvMixedCaseReturnsGoogleCsvExporter" classname="factory.ExporterFactoryTest" time="0.001"/>
+  <testcase name="testGetExporterFileNameWithoutExtensionThrowsException" classname="factory.ExporterFactoryTest" time="0.0"/>
+  <testcase name="testGetExporterFileNameJustDotThrowsException" classname="factory.ExporterFactoryTest" time="0.0"/>
+  <testcase name="testGetExporterUnsupportedFileTypeThrowsException" classname="factory.ExporterFactoryTest" time="0.0"/>
+  <testcase name="testGetExporterEmptyFileNameThrowsException" classname="factory.ExporterFactoryTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

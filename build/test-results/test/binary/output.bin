@@ -1,0 +1,157 @@
+©«> command1
+©«> command2
+©¬> command1
+©¬> command2
+©¬> command3
+©­> command1
+©­> command2
+¹¸Kâœ“ TEST PASSED: Copy events on date throws exception when no events found
+¹ºLâœ“ TEST PASSED: Copy events between maintains weekday and relative spacing
+¹»Eâœ“ TEST PASSED: Multi-day event preserves duration and weekday span
+¹¼;âœ“ TEST PASSED: Relative spacing between events preserved
+¹½Oâœ“ TEST PASSED: Copy single event uses user-specified time in target timezone
+¹ÀEâœ“ TEST PASSED: Weekday consistency maintained for all days of week
+¹ÂKâœ“ TEST PASSED: Copy events between maintains partial series relationship
+¹Ã6âœ“ TEST PASSED: Copy single event detects duplicates
+¹Å7âœ“ TEST PASSED: Copy fails when no calendar is active
+¹Æ5âœ“ TEST PASSED: Copy preserves all event properties
+¹Ç;âœ“ TEST PASSED: Copy single event generates new series ID
+¹ËAâœ“ TEST PASSED: Copy events on date converts timezone correctly
+¹Í@âœ“ TEST PASSED: Timezone conversion EST to PST works correctly
+¹ÎAâœ“ TEST PASSED: Copy single event maintains weekday consistency
+¹ÏCâœ“ TEST PASSED: Copy events on date maintains weekday consistency
+¹ĞDâœ“ TEST PASSED: Copy within same calendar doesn't convert timezone
+¹ÓCâœ“ TEST PASSED: No weekday adjustment when target already matches
+ÕÔ+âœ“ TEST PASSED: Created 10 all-day events
+ÕÔ  Subject: Cleanup
+ÕÖ+âœ“ TEST PASSED: Created 10 all-day events
+ÕÖ  Subject: Weekend Cleanup
+ÕÖ%  Days: Sundays from Nov 1 to Nov 30
+ÙÚ5âœ“ TEST PASSED: Created 3 recurring all-day events.
+İŞCreated event: Meeting
+İŞ  Test passed!
+İŞ  Created event: Meeting
+İŞ5  Start: 2025-11-01T08:00-07:00[America/Los_Angeles]
+İŞ3  End: 2025-11-01T17:00-07:00[America/Los_Angeles]
+àâ  Test passed!
+àâ  Created event: Meeting
+àâ5  Start: 2025-11-01T10:00-07:00[America/Los_Angeles]
+àâ3  End: 2025-11-01T11:00-07:00[America/Los_Angeles]
+åæ3âœ“ TEST PASSED: Created 6 recurring timed events.
+êí3âœ“ TEST PASSED: Created 9 recurring timed events.
+ğï7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğñ7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğñKâœ“ TEST PASSED: EditSeries end property keeps seriesId and applies offset
+ğò7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğó7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğóEâœ“ TEST PASSED: validateNoDuplicate passes when no duplicates exist
+ğô7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğôCâœ“ TEST PASSED: EditForward non-time property keeps same seriesId
+ğõ7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğõCâœ“ TEST PASSED: EditForward throws exception when event not found
+ğö7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ÷7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ÷Bâœ“ TEST PASSED: EditSeries throws exception when event not found
+ğø7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğøKâœ“ TEST PASSED: EditEvent validates end time multi-day span with seriesId
+ğù7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğú7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğû7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğü7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğüAâœ“ TEST PASSED: EditEvent throws exception for unknown property
+ğı7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğş7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğşHâœ“ TEST PASSED: findEventBySubjectStartEnd throws when event not found
+ğÿ7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ€7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ€;âœ“ TEST PASSED: EditForward prevents multi-day event span
+ğ7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğLâœ“ TEST PASSED: EditForward end property keeps seriesId and applies offset
+ğ‚7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğƒ7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ„7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ„Aâœ“ TEST PASSED: parseDateTime parses date-time string correctly
+ğ…7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ…Iâœ“ TEST PASSED: validateNoDuplicate detects duplicates in newEvents set
+ğ†7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ†:âœ“ TEST PASSED: EditSeries prevents multi-day event span
+ğ‡7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğˆ7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ‰7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğŠ7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ‹7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ‹Câœ“ TEST PASSED: EditSeries successfully edits non-time properties
+ğŒ7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğBâœ“ TEST PASSED: EditSeries non-time property keeps same seriesId
+ğ7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğCâœ“ TEST PASSED: findBySeries returns empty list for null seriesId
+ğ7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğFâœ“ TEST PASSED: findBySubjectFromStart returns empty when no matches
+ğ7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ‘7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ‘Iâœ“ TEST PASSED: findBySubjectFromStart finds events from specified time
+ğ’7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ“7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ“Eâœ“ TEST PASSED: findSeriesFrom returns empty list for null seriesId
+ğ”7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ•7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ–7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ—7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ˜7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ˜Hâœ“ TEST PASSED: findBySubjectFromStart correctly filters by start time
+ğ™7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğš7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ›7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğœ7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğœFâœ“ TEST PASSED: findSeriesFrom returns empty list for empty seriesId
+ğ7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğŸ7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ 7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ Eâœ“ TEST PASSED: EditForward validates adjusted start < adjusted end
+ğ¡7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ¢7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ¢>âœ“ TEST PASSED: EditSeries rolls back on duplicate detection
+ğ£7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ£Bâœ“ TEST PASSED: findEventBySubjectStartEnd finds event correctly
+ğ¤7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ¤Dâœ“ TEST PASSED: findBySeries returns empty list for empty seriesId
+ğ¥7DEBUG: Calendar names in repository: ["Test Calendar"]
+ğ¥?âœ“ TEST PASSED: EditSeries handles non-series event correctly
+ğ¦7DEBUG: Calendar names in repository: ["Test Calendar"]
+°¯@âœ“ TEST PASSED: ExportEventDto converts extension to lowercase
+°±9âœ“ TEST PASSED: Empty collection exported (header only)
+°²:âœ“ TEST PASSED: ExportEventDto handles missing extension
+°³6âœ“ TEST PASSED: Subject with quotes properly escaped
+°³H  Row: "The ""Big"" Meeting",11/22/2025,10:00 AM,11/22/2025,11:00 AM,,,
+°´@âœ“ TEST PASSED: ExportEventDto + GoogleCsvExporter integration
+°´!  DTO File: integration_test.csv
+°´  DTO Type: csv
+°´~  Export Path: /Users/vaishnavihemaljariwala/PDP/f25-hw6-cal3-group-PDPGroupAssignments_VaishnaviDheeraj/integration_test.csv
+°µNâœ“ TEST PASSED: ExportEventDto extracts correct extension with multiple dots
+°¶9âœ“ TEST PASSED: ExportEventDto returns correct filename
+°·(âœ“ TEST PASSED: CSV structure is valid
+°·  Columns: 5
+°¸4âœ“ TEST PASSED: Single event exported successfully
+°¸r  File: /Users/vaishnavihemaljariwala/PDP/f25-hw6-cal3-group-PDPGroupAssignments_VaishnaviDheeraj/test_export.csv
+°¸  File Type: csv
+°¹5âœ“ TEST PASSED: Subject with comma properly escaped
+°¹N  Row: "Meeting, Review, Planning",11/22/2025,10:00 AM,11/22/2025,11:00 AM,,,
+°º.âœ“ TEST PASSED: Date/time formatting correct
+°º  Start Date: 11/22/2025
+°º  Start Time: 02:30 PM
+°»5âœ“ TEST PASSED: ExportEventDto handles hidden files
+°¼>âœ“ TEST PASSED: ExportEventDto correctly identifies CSV type
+°½*âœ“ TEST PASSED: Multiple events exported
+°½  Total events: 3
+°½  CSV rows: 3
+°¾(âœ“ TEST PASSED: Absolute path returned
+°¾r  Path: /Users/vaishnavihemaljariwala/PDP/f25-hw6-cal3-group-PDPGroupAssignments_VaishnaviDheeraj/test_export.csv
+ÆÅ)âœ“ TEST PASSED: Found 2 events in range
+ÆÈ0âœ“ TEST PASSED: Found no events in empty range
+ÆÉ5âœ“ TEST PASSED: Found 3 events across multiple days
+ĞÏ2âœ“ TEST PASSED: Status is BUSY at specified time
+ĞÑ,âœ“ TEST PASSED: Found 2 overlapping events
+ĞÔ*âœ“ TEST PASSED: Busy at exact start time
+ĞÕ7âœ“ TEST PASSED: Status is AVAILABLE at specified time

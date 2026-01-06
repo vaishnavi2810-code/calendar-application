@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GuiDtoBuilderService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.service</a> &gt; <span class="el_source">GuiDtoBuilderService.java</span></div><h1>GuiDtoBuilderService.java</h1><pre class="source lang-java linenums">package calendar.service;
+
+import calendar.dto.CalendarDto;
+import calendar.dto.CreateEventDto;
+import calendar.dto.EditEventDto;
+import calendar.dto.QueryEventDto;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * Service that builds DTOs from GUI input data.
+ */
+<span class="fc" id="L17">public class GuiDtoBuilderService {</span>
+
+<span class="fc" id="L19">  private static final DateTimeFormatter DATE_FORMAT =</span>
+<span class="fc" id="L20">          DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd&quot;);</span>
+<span class="fc" id="L21">  private static final DateTimeFormatter DATETIME_FORMAT =</span>
+<span class="fc" id="L22">          DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd'T'HH:mm&quot;);</span>
+
+
+  /**
+   * Builds a DTO for creating a new calendar.
+   */
+  public CalendarDto buildCreateCalendarDto(String name, String timezone) {
+<span class="fc bfc" id="L29" title="All 4 branches covered.">    if (name == null || name.isEmpty()) {</span>
+<span class="fc" id="L30">      throw new IllegalArgumentException(&quot;name is null or empty&quot;);</span>
+    }
+<span class="fc" id="L32">    return CalendarDto.createCalendar(name, timezone);</span>
+  }
+
+  /**
+   * Builds a DTO for switching to a calendar.
+   */
+  public CalendarDto buildUseCalendarDto(String name) {
+<span class="fc" id="L39">    return CalendarDto.useCalendar(name);</span>
+  }
+
+  /**
+   * Builds a DTO for editing a calendar property.
+   */
+  public CalendarDto buildEditCalendarDto(String name, String property, String value) {
+<span class="fc" id="L46">    return CalendarDto.editCalendar(name, property, value);</span>
+  }
+
+
+  /**
+   * Builds a DTO for a timed single event.
+   */
+  public CreateEventDto buildTimedSingleEventDto(String subject, LocalDateTime start,
+                                                 LocalDateTime end) {
+<span class="fc" id="L55">    String startStr = start.format(DATETIME_FORMAT);</span>
+<span class="fc" id="L56">    String endStr = end.format(DATETIME_FORMAT);</span>
+<span class="fc" id="L57">    return CreateEventDto.timedSingle(subject, startStr, endStr);</span>
+  }
+
+  /**
+   * Builds a DTO for a recurring timed event with fixed repetitions.
+   */
+  public CreateEventDto buildTimedRecurringForDto(String subject, LocalDateTime start,
+                                                  LocalDateTime end, Set&lt;DayOfWeek&gt; weekdays,
+                                                  int times) {
+<span class="fc" id="L66">    String startStr = start.format(DATETIME_FORMAT);</span>
+<span class="fc" id="L67">    String endStr = end.format(DATETIME_FORMAT);</span>
+<span class="fc" id="L68">    String weekdaysStr = formatWeekdays(weekdays);</span>
+<span class="fc" id="L69">    return CreateEventDto.timedRecurringFor(subject, startStr, endStr,</span>
+<span class="fc" id="L70">            weekdaysStr, String.valueOf(times));</span>
+  }
+
+  /**
+   * Builds a DTO for a recurring timed event until a date.
+   */
+  public CreateEventDto buildTimedRecurringUntilDto(String subject, LocalDateTime start,
+                                                    LocalDateTime end, Set&lt;DayOfWeek&gt; weekdays,
+                                                    LocalDate until) {
+<span class="fc" id="L79">    String startStr = start.format(DATETIME_FORMAT);</span>
+<span class="fc" id="L80">    String endStr = end.format(DATETIME_FORMAT);</span>
+<span class="fc" id="L81">    String weekdaysStr = formatWeekdays(weekdays);</span>
+<span class="fc" id="L82">    String untilStr = until.format(DATE_FORMAT);</span>
+<span class="fc" id="L83">    return CreateEventDto.timedRecurringUntil(subject, startStr, endStr,</span>
+            weekdaysStr, untilStr);
+  }
+
+  /**
+   * Builds a DTO for a single all-day event.
+   */
+  public CreateEventDto buildAllDaySingleEventDto(String subject, LocalDate date) {
+<span class="fc" id="L91">    String dateStr = date.format(DATE_FORMAT);</span>
+<span class="fc" id="L92">    return CreateEventDto.allDaySingle(subject, dateStr);</span>
+  }
+
+  /**
+   * Builds a DTO for a recurring all-day event with fixed repetitions.
+   */
+  public CreateEventDto buildAllDayRecurringForDto(String subject, LocalDate date,
+                                                   Set&lt;DayOfWeek&gt; weekdays, int times) {
+<span class="fc" id="L100">    String dateStr = date.format(DATE_FORMAT);</span>
+<span class="fc" id="L101">    String weekdaysStr = formatWeekdays(weekdays);</span>
+<span class="fc" id="L102">    return CreateEventDto.allDayRecurringFor(subject, dateStr,</span>
+<span class="fc" id="L103">            weekdaysStr, String.valueOf(times));</span>
+  }
+
+  /**
+   * Builds a DTO for a recurring all-day event until a date.
+   */
+  public CreateEventDto buildAllDayRecurringUntilDto(String subject, LocalDate date,
+                                                     Set&lt;DayOfWeek&gt; weekdays, LocalDate until) {
+<span class="fc" id="L111">    String dateStr = date.format(DATE_FORMAT);</span>
+<span class="fc" id="L112">    String weekdaysStr = formatWeekdays(weekdays);</span>
+<span class="fc" id="L113">    String untilStr = until.format(DATE_FORMAT);</span>
+<span class="fc" id="L114">    return CreateEventDto.allDayRecurringUntil(subject, dateStr, weekdaysStr, untilStr);</span>
+  }
+
+  /**
+   * Builds a query DTO for events on a specific date.
+   *
+   * @param date the date to query
+   * @return configured QueryEventDto
+   */
+  public QueryEventDto buildQueryForDate(LocalDate date) {
+<span class="fc" id="L124">    String dateStr = date.format(DATE_FORMAT);</span>
+<span class="fc" id="L125">    return QueryEventDto.forDate(dateStr);</span>
+  }
+
+  /**
+   * Builds a DTO for editing a single event instance with multiple properties.
+   */
+  public EditEventDto buildEditSingleEventDto(String targetSubject,
+                                              LocalDateTime targetStart,
+                                              LocalDateTime targetEnd,
+                                              Map&lt;String, String&gt; propertyChanges) {
+<span class="fc" id="L135">    String targetStartStr = targetStart.format(DATETIME_FORMAT);</span>
+<span class="fc" id="L136">    String targetEndStr = targetEnd.format(DATETIME_FORMAT);</span>
+
+<span class="fc" id="L138">    return EditEventDto.editSingle(targetSubject, targetStartStr, targetEndStr, propertyChanges);</span>
+  }
+
+  /**
+   * Builds a DTO for editing all events in a series with multiple properties.
+   */
+  public EditEventDto buildEditSeriesDto(String targetSubject,
+                                         LocalDateTime targetStart,
+                                         Map&lt;String, String&gt; propertyChanges) {
+<span class="fc" id="L147">    String targetStartStr = targetStart.format(DATETIME_FORMAT);</span>
+
+<span class="fc" id="L149">    return EditEventDto.editSeries(targetSubject, targetStartStr, propertyChanges);</span>
+  }
+
+  /**
+   * Builds a DTO for editing this and following events with multiple properties.
+   */
+  public EditEventDto buildEditForwardDto(String targetSubject,
+                                          LocalDateTime fromStart,
+                                          Map&lt;String, String&gt; propertyChanges) {
+<span class="fc" id="L158">    String fromStartStr = fromStart.format(DATETIME_FORMAT);</span>
+
+<span class="fc" id="L160">    return EditEventDto.editForward(targetSubject, fromStartStr, propertyChanges);</span>
+  }
+
+  /**
+   * Builds a query DTO for events in a datetime range.
+   *
+   * @param start start datetime
+   * @param end end datetime
+   * @return configured QueryEventDto
+   */
+  public QueryEventDto buildQueryForRange(LocalDateTime start, LocalDateTime end) {
+<span class="fc" id="L171">    String startStr = start.format(DATETIME_FORMAT);</span>
+<span class="fc" id="L172">    String endStr = end.format(DATETIME_FORMAT);</span>
+<span class="fc" id="L173">    return QueryEventDto.forRange(startStr, endStr);</span>
+  }
+
+  /**
+   * Builds a query DTO for status at a specific instant.
+   *
+   * @param instant the instant to check status
+   * @return configured QueryEventDto
+   */
+  public QueryEventDto buildQueryForStatus(LocalDateTime instant) {
+<span class="fc" id="L183">    String instantStr = instant.format(DATETIME_FORMAT);</span>
+<span class="fc" id="L184">    return QueryEventDto.forStatus(instantStr);</span>
+  }
+
+  private String formatWeekdays(Set&lt;DayOfWeek&gt; weekdays) {
+<span class="fc" id="L188">    StringBuilder sb = new StringBuilder();</span>
+<span class="fc bfc" id="L189" title="All 2 branches covered.">    if (weekdays.contains(DayOfWeek.MONDAY)) {</span>
+<span class="fc" id="L190">      sb.append('M');</span>
+    }
+<span class="fc bfc" id="L192" title="All 2 branches covered.">    if (weekdays.contains(DayOfWeek.TUESDAY)) {</span>
+<span class="fc" id="L193">      sb.append('T');</span>
+    }
+<span class="fc bfc" id="L195" title="All 2 branches covered.">    if (weekdays.contains(DayOfWeek.WEDNESDAY)) {</span>
+<span class="fc" id="L196">      sb.append('W');</span>
+    }
+<span class="fc bfc" id="L198" title="All 2 branches covered.">    if (weekdays.contains(DayOfWeek.THURSDAY)) {</span>
+<span class="fc" id="L199">      sb.append('R');</span>
+    }
+<span class="fc bfc" id="L201" title="All 2 branches covered.">    if (weekdays.contains(DayOfWeek.FRIDAY)) {</span>
+<span class="fc" id="L202">      sb.append('F');</span>
+    }
+<span class="fc bfc" id="L204" title="All 2 branches covered.">    if (weekdays.contains(DayOfWeek.SATURDAY)) {</span>
+<span class="fc" id="L205">      sb.append('S');</span>
+    }
+<span class="fc bfc" id="L207" title="All 2 branches covered.">    if (weekdays.contains(DayOfWeek.SUNDAY)) {</span>
+<span class="fc" id="L208">      sb.append('U');</span>
+    }
+<span class="fc" id="L210">    return sb.toString();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

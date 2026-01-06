@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HeadlessInputSource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.input</a> &gt; <span class="el_source">HeadlessInputSource.java</span></div><h1>HeadlessInputSource.java</h1><pre class="source lang-java linenums">package calendar.input;
+
+import calendar.interfacetypes.IinputSource;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Queue;
+
+/**
+ * Input source for headless mode reading from a file.
+ * Reads all commands from a file and queues them for processing.
+ */
+public class HeadlessInputSource implements IinputSource {
+
+  private final Queue&lt;String&gt; commands;
+
+  /**
+   * Creates a headless input source from a file.
+   *
+   * @param filename the path to the file containing commands
+   * @throws IOException if the file cannot be read
+   */
+<span class="fc" id="L24">  public HeadlessInputSource(String filename) throws IOException {</span>
+<span class="fc" id="L25">    this.commands = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L26">    loadCommandsFromFile(filename);</span>
+<span class="fc" id="L27">  }</span>
+
+  private void loadCommandsFromFile(String filename) throws IOException {
+<span class="fc" id="L30">    try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {</span>
+      String line;
+<span class="fc bfc" id="L32" title="All 2 branches covered.">      while ((line = reader.readLine()) != null) {</span>
+<span class="fc" id="L33">        String trimmed = line.trim();</span>
+<span class="fc bfc" id="L34" title="All 4 branches covered.">        if (!trimmed.isEmpty() &amp;&amp; !trimmed.startsWith(&quot;#&quot;)) {</span>
+<span class="fc" id="L35">          commands.add(trimmed);</span>
+        }
+<span class="fc" id="L37">      }</span>
+    }
+<span class="fc" id="L39">  }</span>
+
+  @Override
+  public String getNextCommand() {
+<span class="fc bfc" id="L43" title="All 2 branches covered.">    if (commands.isEmpty()) {</span>
+<span class="fc" id="L44">      return null;</span>
+    }
+<span class="fc" id="L46">    String command = commands.poll();</span>
+<span class="fc" id="L47">    System.out.println(&quot;&gt; &quot; + command);</span>
+<span class="fc" id="L48">    return command;</span>
+  }
+
+  @Override
+  public boolean hasMoreCommands() {
+<span class="fc bfc" id="L53" title="All 2 branches covered.">    return !commands.isEmpty();</span>
+  }
+
+  @Override
+  public void close() {
+<span class="fc" id="L58">    commands.clear();</span>
+<span class="fc" id="L59">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

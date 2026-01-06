@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EventBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.model</a> &gt; <span class="el_source">EventBuilder.java</span></div><h1>EventBuilder.java</h1><pre class="source lang-java linenums">package calendar.model;
+
+import java.time.ZonedDateTime;
+
+/**
+ * This is a builder class for creating Event objects using the Builder pattern.
+ * Provides an interface for constructing events with various properties.
+ * All fields are initialized with default values and can be set using setter methods.
+ */
+public class EventBuilder {
+
+  private String subject;
+  private ZonedDateTime startDateTime;
+  private ZonedDateTime endDateTime;
+  private String seriesId;
+  private String description;
+  private String location;
+  private String status;
+
+  /**
+   * Constructs a new EventBuilder with default values.
+   * Default values are empty strings for text fields and current time for date/time fields.
+   */
+<span class="fc" id="L24">  public EventBuilder() {</span>
+<span class="fc" id="L25">    this.subject = &quot;&quot;;</span>
+<span class="fc" id="L26">    this.startDateTime = ZonedDateTime.now();</span>
+<span class="fc" id="L27">    this.endDateTime = ZonedDateTime.now();</span>
+<span class="fc" id="L28">    this.seriesId = &quot;&quot;;</span>
+<span class="fc" id="L29">    this.description = &quot;&quot;;</span>
+<span class="fc" id="L30">    this.location = &quot;&quot;;</span>
+<span class="fc" id="L31">    this.status = &quot;&quot;;</span>
+<span class="fc" id="L32">  }</span>
+
+
+  /**
+   * Sets the subject (title) of the event.
+   *
+   * @param subject the event subject or title
+   * @return this EventBuilder instance for method chaining
+   */
+  public EventBuilder setSubject(String subject) {
+<span class="fc" id="L42">    this.subject = subject;</span>
+<span class="fc" id="L43">    return this;</span>
+  }
+
+  /**
+   * Sets the start date and time of the event.
+   *
+   * @param startDateTime the event start date and time with timezone
+   * @return this EventBuilder instance for method chaining
+   */
+  public EventBuilder setStartDateTime(ZonedDateTime startDateTime) {
+<span class="fc" id="L53">    this.startDateTime = startDateTime;</span>
+<span class="fc" id="L54">    return this;</span>
+  }
+
+  /**
+   * Sets the end date and time of the event.
+   *
+   * @param endDateTime the event end date and time with timezone
+   * @return this EventBuilder instance for method chaining
+   */
+  public EventBuilder setEndDateTime(ZonedDateTime endDateTime) {
+<span class="fc" id="L64">    this.endDateTime = endDateTime;</span>
+<span class="fc" id="L65">    return this;</span>
+  }
+
+  /**
+   * Sets the series identifier for recurring events.
+   * Events with the same seriesId belong to the same recurring series.
+   *
+   * @param seriesId the unique identifier for the event series, or empty string for single events
+   * @return this EventBuilder instance for method chaining
+   */
+  public EventBuilder setSeriesId(String seriesId) {
+<span class="fc" id="L76">    this.seriesId = seriesId;</span>
+<span class="fc" id="L77">    return this;</span>
+  }
+
+  /**
+   * Sets the description providing additional details about the event.
+   *
+   * @param description the event description or notes
+   * @return this EventBuilder instance for method chaining
+   */
+  public EventBuilder setDescription(String description) {
+<span class="fc" id="L87">    this.description = description;</span>
+<span class="fc" id="L88">    return this;</span>
+  }
+
+
+  /**
+   * Sets the physical or virtual location where the event takes place.
+   *
+   * @param location the event location (e.g., &quot;Conference Room A&quot;, &quot;Zoom&quot;)
+   * @return this EventBuilder instance for method chaining
+   */
+  public EventBuilder setLocation(String location) {
+<span class="fc" id="L99">    this.location = location;</span>
+<span class="fc" id="L100">    return this;</span>
+  }
+
+  /**
+   * Sets the status of the event.
+   *
+   * @param status the event status (e.g., &quot;confirmed&quot;, &quot;pending&quot;, &quot;cancelled&quot;)
+   * @return this EventBuilder instance for method chaining
+   */
+  public EventBuilder setStatus(String status) {
+<span class="fc" id="L110">    this.status = status;</span>
+<span class="fc" id="L111">    return this;</span>
+  }
+
+  /**
+   * Constructs and returns the Event object with all configured properties.
+   * This is the final step in the builder pattern.
+   *
+   * @return a new Event object with the specified properties
+   */
+  public Event build() {
+<span class="fc" id="L121">    return new Event(this.subject, this.startDateTime, this.endDateTime,</span>
+        this.seriesId, this.description, this.location, this.status);
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

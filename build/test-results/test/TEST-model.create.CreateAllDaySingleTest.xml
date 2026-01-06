@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="model.create.CreateAllDaySingleTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.0">
+  <properties/>
+  <testcase name="createAllDaySingleTestError" classname="model.create.CreateAllDaySingleTest" time="0.0"/>
+  <testcase name="createAllDaySingleTestOk" classname="model.create.CreateAllDaySingleTest" time="0.0"/>
+  <system-out><![CDATA[Created event: Meeting
+  Test passed!
+  Created event: Meeting
+  Start: 2025-11-01T08:00-07:00[America/Los_Angeles]
+  End: 2025-11-01T17:00-07:00[America/Los_Angeles]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

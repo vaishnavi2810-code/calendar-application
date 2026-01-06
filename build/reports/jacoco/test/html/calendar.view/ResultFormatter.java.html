@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ResultFormatter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.view</a> &gt; <span class="el_source">ResultFormatter.java</span></div><h1>ResultFormatter.java</h1><pre class="source lang-java linenums">package calendar.view;
+
+import calendar.dto.QueryEventDto;
+import calendar.dto.QueryResultDto;
+import calendar.dto.SimpleMessageDto;
+import calendar.interfacetypes.IresultDto;
+import calendar.model.Event;
+import java.time.format.DateTimeFormatter;
+import java.util.Set;
+
+/**
+ * A service dedicated to formatting &quot;response DTOs&quot; (IResultDto)
+ * into human-readable strings for the view (console).
+ * This class contains all the &quot;fat view&quot; logic for display.
+ */
+<span class="fc" id="L16">public class ResultFormatter {</span>
+
+<span class="fc" id="L18">  private static final DateTimeFormatter PRINT_TIME_FORMAT = DateTimeFormatter.ofPattern(&quot;HH:mm&quot;);</span>
+<span class="fc" id="L19">  private static final DateTimeFormatter PRINT_DATE_FORMAT =</span>
+<span class="fc" id="L20">          DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd&quot;);</span>
+
+  /**
+  * Main formatting method. It inspects the DTO type and delegates
+  * to the correct private formatting method.
+  *
+  * @param result The response DTO from a command.
+  * @return A formatted, human-readable string.
+  */
+  public String format(IresultDto result) {
+<span class="pc bpc" id="L30" title="1 of 2 branches missed.">    if (result == null) {</span>
+<span class="nc" id="L31">      return &quot;&quot;;</span>
+    }
+
+
+<span class="fc bfc" id="L35" title="All 2 branches covered.">    if (result instanceof SimpleMessageDto) {</span>
+<span class="fc" id="L36">      return ((SimpleMessageDto) result).getMessage();</span>
+    }
+
+
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">    if (result instanceof QueryResultDto) {</span>
+<span class="fc" id="L41">      return formatQuery((QueryResultDto) result);</span>
+    }
+
+<span class="nc" id="L44">    return &quot;Error: Unrecognized result type.&quot;;</span>
+  }
+
+  /**
+  * Formats the response from a QueryEventCommand.
+  * This contains all the logic that used to be in
+  * QueryEventCommand.formatAndPrint().
+  */
+  private String formatQuery(QueryResultDto queryResult) {
+<span class="fc" id="L53">    Set&lt;Event&gt; events = queryResult.getEvents();</span>
+<span class="fc" id="L54">    QueryEventDto.QueryType type = queryResult.getQueryType();</span>
+
+<span class="fc bfc" id="L56" title="All 2 branches covered.">    if (type == QueryEventDto.QueryType.SHOW_STATUS_AT) {</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">      return events.isEmpty() ? &quot;available&quot; : &quot;busy&quot;;</span>
+    }
+
+<span class="fc bfc" id="L60" title="All 2 branches covered.">    if (events.isEmpty()) {</span>
+<span class="fc" id="L61">      return &quot;No events found.&quot;;</span>
+    }
+
+<span class="fc" id="L64">    StringBuilder output = new StringBuilder();</span>
+<span class="fc" id="L65">    output.append(&quot;Query results:\n&quot;);</span>
+<span class="fc" id="L66">    int i = 1;</span>
+
+<span class="fc bfc" id="L68" title="All 2 branches covered.">    for (Event event : events) {</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">      if (type == QueryEventDto.QueryType.PRINT_ON_DATE) {</span>
+<span class="pc bpc" id="L70" title="1 of 4 branches missed.">        String location = (event.getLocation() != null &amp;&amp; !event.getLocation().isEmpty())</span>
+<span class="fc" id="L71">            ? &quot; at &quot; + event.getLocation() : &quot;&quot;;</span>
+<span class="fc" id="L72">        output.append(String.format(&quot;- %s: %s (from %s to %s)%s\n&quot;,</span>
+<span class="fc" id="L73">            i++,</span>
+<span class="fc" id="L74">            event.getSubject(),</span>
+<span class="fc" id="L75">            event.getStartDateTime().format(PRINT_TIME_FORMAT),</span>
+<span class="fc" id="L76">            event.getEndDateTime().format(PRINT_TIME_FORMAT),</span>
+            location
+        ));
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">      } else if (type == QueryEventDto.QueryType.PRINT_IN_RANGE) {</span>
+<span class="pc bpc" id="L80" title="1 of 4 branches missed.">        String location = (event.getLocation() != null &amp;&amp; !event.getLocation().isEmpty())</span>
+<span class="fc" id="L81">                        ? &quot; at &quot; + event.getLocation() : &quot;&quot;;</span>
+<span class="fc" id="L82">        output.append(String.format(&quot;- %s starting on %s at %s, ending on %s at %s%s\n&quot;,</span>
+<span class="fc" id="L83">                        event.getSubject(),</span>
+<span class="fc" id="L84">                        event.getStartDateTime().format(PRINT_DATE_FORMAT),</span>
+<span class="fc" id="L85">                        event.getStartDateTime().format(PRINT_TIME_FORMAT),</span>
+<span class="fc" id="L86">                        event.getEndDateTime().format(PRINT_DATE_FORMAT),</span>
+<span class="fc" id="L87">                        event.getEndDateTime().format(PRINT_TIME_FORMAT),</span>
+                        location
+        ));
+      }
+<span class="fc" id="L91">    }</span>
+<span class="fc" id="L92">    return output.toString().trim();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

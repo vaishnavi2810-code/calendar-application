@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CalendarCommand.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.command</a> &gt; <span class="el_source">CalendarCommand.java</span></div><h1>CalendarCommand.java</h1><pre class="source lang-java linenums">package calendar.command;
+
+import calendar.dto.CalendarDto;
+import calendar.dto.SimpleMessageDto;
+import calendar.interfacetypes.IcalendarStrategy;
+import calendar.interfacetypes.Icommand;
+import calendar.interfacetypes.IresultDto;
+import calendar.model.CalendarModel;
+import calendar.strategy.CreateCalendar;
+import calendar.strategy.EditCalendar;
+import calendar.strategy.UseCalendar;
+import java.util.HashMap;
+import java.util.Map;
+/**
+ * Command for executing all &quot;calendar-level&quot; logic (create, edit, use, copy).
+ * Returns a SimpleMessageDto on success, or throws an exception on failure.
+ */
+
+public class CalendarCommand implements Icommand {
+  private final CalendarDto dto;
+  private final CalendarModel service;
+  private final Map&lt;CalendarDto.CalendarCommandType, IcalendarStrategy&gt; strategyMap;
+
+  /**
+   * Creates a calendar-level command.
+   *
+   * @param dto the DTO containing all parsed data for the command
+   * @param service the calendar service
+   */
+<span class="fc" id="L30">  public CalendarCommand(CalendarDto dto, CalendarModel service) {</span>
+<span class="fc" id="L31">    this.dto = dto;</span>
+<span class="fc" id="L32">    this.service = service;</span>
+<span class="fc" id="L33">    this.strategyMap = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L34">    this.strategyMap.put(CalendarDto.CalendarCommandType.CREATE_CALENDAR, new CreateCalendar());</span>
+<span class="fc" id="L35">    this.strategyMap.put(CalendarDto.CalendarCommandType.USE_CALENDAR, new UseCalendar());</span>
+<span class="fc" id="L36">    this.strategyMap.put(CalendarDto.CalendarCommandType.EDIT_CALENDAR, new EditCalendar());</span>
+<span class="fc" id="L37">  }</span>
+
+  @Override
+  public IresultDto execute() throws Exception {
+<span class="fc" id="L41">    IcalendarStrategy strategy = strategyMap.get(dto.getType());</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">    if (strategy == null) {</span>
+<span class="fc" id="L43">      throw new Exception(&quot;Error: No strategy found for command type &quot; + dto.getType());</span>
+    }
+<span class="fc" id="L45">    strategy.execute(dto, service);</span>
+<span class="fc" id="L46">    return new SimpleMessageDto(getSuccessMessage(dto));</span>
+  }
+
+  /**
+   * Creates a user-friendly success message based on the command type.
+   */
+  private String getSuccessMessage(CalendarDto dto) {
+<span class="pc bpc" id="L53" title="1 of 4 branches missed.">    switch (dto.getType()) {</span>
+      case CREATE_CALENDAR:
+<span class="fc" id="L55">        return &quot;Calendar '&quot; + dto.getCalendarName() + &quot;' created.&quot;;</span>
+      case EDIT_CALENDAR:
+<span class="fc" id="L57">        return &quot;Calendar '&quot; + dto.getCalendarName() + &quot;' updated.&quot;;</span>
+      case USE_CALENDAR:
+<span class="fc" id="L59">        return &quot;Active calendar set to '&quot; + dto.getCalendarName() + &quot;'.&quot;;</span>
+      default:
+<span class="nc" id="L61">        return &quot;Operation successful.&quot;;</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

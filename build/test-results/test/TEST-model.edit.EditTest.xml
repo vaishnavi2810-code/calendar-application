@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="model.edit.EditTest" tests="55" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.047">
+  <properties/>
+  <testcase name="testValidTimeRangeEdit" classname="model.edit.EditTest" time="0.002"/>
+  <testcase name="testEditSeriesEndPropertyKeepsSeriesIdAndAppliesOffset" classname="model.edit.EditTest" time="0.004"/>
+  <testcase name="testEditAllPropertiesOfEvent" classname="model.edit.EditTest" time="0.002"/>
+  <testcase name="testValidateNoDuplicatePassesWhenNoDuplicate" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditForwardNonTimePropertyKeepsSeriesId" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testEditForwardEventNotFound" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testEditForwardStartPropertyBreaksSeriesAndAppliesOffset" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditSeriesEventNotFound" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testEditEndTimeMultiDaySpanWithSeriesIdThrowsException" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testGetGroupReturnsNullWhenMatcherGroupIsNull" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditNonExistentEventShouldFail" classname="model.edit.EditTest" time="0.007"/>
+  <testcase name="testEditSeriesOnNonSeriesEventWorksLikeEditSingle" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testCreateModifiedEventUnknownPropertyThrowsException" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditForwardUpdatesFutureEventsOnly" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testFindEventBySubjectStartEndThrowsWhenNotFound" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditForwardOnNonSeriesEventWorksLikeEditSingle" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditForwardMultiDaySpanThrowsException" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testEditForwardEndPropertyKeepsSeriesIdAndAppliesOffset" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditSeriesThenEditSingleInstance" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditSeriesUpdatesAllEvents" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testParseDateTimeParsesCorrectly" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testValidateNoDuplicateThrowsForDuplicateInNewEvents" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testEditSeriesMultiDaySpanThrowsException" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testEditSeriesEndTimeBeforeStartTimeThrowsException" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditSingleEventLocation" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testEditCreatingDuplicateShouldFail" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditSeriesDescriptionKeepsSameSeriesId" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditSeriesSuccessfulNonTimeEdit" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testMultipleEditsOnSameEvent" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditSeriesNonTimePropertyKeepsSameSeriesId" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testFindBySeriesReturnsEmptyForNullSeriesId" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testFindBySubjectFromStartReturnsEmptyWhenNoMatches" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testEditSeriesSuccessfulTimeEdit" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testFindBySubjectFromStartFindsMatchingEvents" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditStartTimeGreaterThanEndTimeShouldFail" classname="model.edit.EditTest" time="0.002"/>
+  <testcase name="testFindSeriesFromReturnsEmptyForNullSeriesId" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEventsEqualsMethod" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditEndTimeLessThanStartTimeShouldFail" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testDummyCalendarName" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditForwardNonSeriesEvent" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testFindBySubjectFromStartFiltersCorrectly" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditStartTimeCrossesDayBoundaryInSeries" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testEditSingleStartPropertyBreaksFromSeries" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditForwardPreservesSeriesIdForNonStartProperties" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testFindSeriesFromReturnsEmptyForEmptySeriesId" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testEditForwardUpdatesFutureEventsOnly1" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditSeriesStartTimeBreaksAllFromSeries" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditSingleEventSubject" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditForwardInvalidTimeAdjustmentThrowsException" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testToStringReturnsExpectedFormat" classname="model.edit.EditTest" time="0.008"/>
+  <testcase name="testEditSeriesRollbackOnDuplicateDetection" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testFindEventBySubjectStartEndFindsEvent" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testFindBySeriesReturnsEmptyForEmptySeriesId" classname="model.edit.EditTest" time="0.0"/>
+  <testcase name="testEditSeriesOnNonSeriesEvent" classname="model.edit.EditTest" time="0.001"/>
+  <testcase name="testEditForwardStartTimeBreaksFutureEventsFromSeries" classname="model.edit.EditTest" time="0.0"/>
+  <system-out><![CDATA[DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: EditSeries end property keeps seriesId and applies offset
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: validateNoDuplicate passes when no duplicates exist
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: EditForward non-time property keeps same seriesId
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: EditForward throws exception when event not found
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: EditSeries throws exception when event not found
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: EditEvent validates end time multi-day span with seriesId
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: EditEvent throws exception for unknown property
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: findEventBySubjectStartEnd throws when event not found
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: EditForward prevents multi-day event span
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: EditForward end property keeps seriesId and applies offset
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: parseDateTime parses date-time string correctly
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: validateNoDuplicate detects duplicates in newEvents set
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: EditSeries prevents multi-day event span
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: EditSeries successfully edits non-time properties
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: EditSeries non-time property keeps same seriesId
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: findBySeries returns empty list for null seriesId
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: findBySubjectFromStart returns empty when no matches
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: findBySubjectFromStart finds events from specified time
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: findSeriesFrom returns empty list for null seriesId
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: findBySubjectFromStart correctly filters by start time
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: findSeriesFrom returns empty list for empty seriesId
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: EditForward validates adjusted start < adjusted end
+DEBUG: Calendar names in repository: ["Test Calendar"]
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: EditSeries rolls back on duplicate detection
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: findEventBySubjectStartEnd finds event correctly
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: findBySeries returns empty list for empty seriesId
+DEBUG: Calendar names in repository: ["Test Calendar"]
+✓ TEST PASSED: EditSeries handles non-series event correctly
+DEBUG: Calendar names in repository: ["Test Calendar"]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

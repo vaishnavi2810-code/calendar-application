@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="input.HeadlessInputSourceTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.009">
+  <properties/>
+  <testcase name="testClose" classname="input.HeadlessInputSourceTest" time="0.001"/>
+  <testcase name="testNonExistentFileThrowsException" classname="input.HeadlessInputSourceTest" time="0.001"/>
+  <testcase name="testSkipComments" classname="input.HeadlessInputSourceTest" time="0.004"/>
+  <testcase name="testLoadCommandsFromFile" classname="input.HeadlessInputSourceTest" time="0.001"/>
+  <testcase name="testSkipEmptyLines" classname="input.HeadlessInputSourceTest" time="0.001"/>
+  <testcase name="testGetNextCommandReturnsNullWhenEmpty" classname="input.HeadlessInputSourceTest" time="0.001"/>
+  <system-out><![CDATA[> command1
+> command2
+> command1
+> command2
+> command3
+> command1
+> command2
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

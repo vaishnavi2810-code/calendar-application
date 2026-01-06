@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="model.create.CreateAllDayRecurringUntilTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.004">
+  <properties/>
+  <testcase name="testCreateAllDayRecurringUntilWithoutQuotes" classname="model.create.CreateAllDayRecurringUntilTest" time="0.002"/>
+  <testcase name="testCreateAllDayRecurringUntilWithQuotes" classname="model.create.CreateAllDayRecurringUntilTest" time="0.001"/>
+  <testcase name="testCreateAllDayRecurringUntilErrors" classname="model.create.CreateAllDayRecurringUntilTest" time="0.001"/>
+  <system-out><![CDATA[✓ TEST PASSED: Created 10 all-day events
+  Subject: Cleanup
+✓ TEST PASSED: Created 10 all-day events
+  Subject: Weekend Cleanup
+  Days: Sundays from Nov 1 to Nov 30
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

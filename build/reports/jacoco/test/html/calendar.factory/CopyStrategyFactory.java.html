@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CopyStrategyFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.factory</a> &gt; <span class="el_source">CopyStrategyFactory.java</span></div><h1>CopyStrategyFactory.java</h1><pre class="source lang-java linenums">package calendar.factory;
+
+import calendar.dto.CopyEventDto;
+import calendar.interfacetypes.Icopy;
+import calendar.strategy.CopyEventsBetweenDates;
+import calendar.strategy.CopyEventsOnDate;
+import calendar.strategy.CopySingleEvent;
+
+
+/**
+ * Factory for creating copy strategy instances based on copy operation type.
+ * Provides different strategies for copying single events, events on a date
+ * or events between dates.
+ */
+<span class="nc" id="L15">public class CopyStrategyFactory {</span>
+
+  /**
+  * Returns the appropriate copy strategy implementation based on the specified copy type.
+  * Supports copying single events, all events on a specific date
+  * or all events within a date range.
+  *
+  * @param type the type of copy operation to perform
+  * @return the corresponding copy strategy implementation
+  * @throws IllegalArgumentException if the copy type is unknown or not supported
+  */
+  public static Icopy getStrategy(CopyEventDto.CopyType type) {
+<span class="pc bpc" id="L27" title="1 of 4 branches missed.">    switch (type) {</span>
+      case COPY_SINGLE_EVENT:
+<span class="fc" id="L29">        return new CopySingleEvent();</span>
+      case COPY_EVENTS_ON_DATE:
+<span class="fc" id="L31">        return new CopyEventsOnDate();</span>
+      case COPY_EVENTS_BETWEEN_DATES:
+<span class="fc" id="L33">        return new CopyEventsBetweenDates();</span>
+      default:
+<span class="nc" id="L35">        throw new IllegalArgumentException(&quot;Unknown copy command type: &quot; + type);</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreateStrategyFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.factory</a> &gt; <span class="el_source">CreateStrategyFactory.java</span></div><h1>CreateStrategyFactory.java</h1><pre class="source lang-java linenums">package calendar.factory;
+
+import calendar.dto.CreateEventDto;
+import calendar.interfacetypes.Icreate;
+import calendar.strategy.CreateAllDayRecurringN;
+import calendar.strategy.CreateAllDayRecurringUntil;
+import calendar.strategy.CreateAllDaySingle;
+import calendar.strategy.CreateEventSingle;
+import calendar.strategy.CreateTimedRecurringFor;
+import calendar.strategy.CreateTimedRecurringUntil;
+
+/**
+ * Factory for creating event creation strategy instances based on command type.
+ * Provides different strategies for creating single events, all-day events, and recurring events.
+ */
+<span class="nc" id="L16">public class CreateStrategyFactory {</span>
+
+  /**
+  * Returns the appropriate Icreate strategy based on the command type.
+   *
+  * @param type The type of event creation command.
+  * @return The concrete Icreate strategy.
+  */
+  public static Icreate getStrategy(CreateEventDto.CommandType type) {
+<span class="pc bpc" id="L25" title="1 of 7 branches missed.">    switch (type) {</span>
+      case ALL_DAY_SINGLE:
+<span class="fc" id="L27">        return new CreateAllDaySingle();</span>
+      case ALL_DAY_RECURRING_FOR:
+<span class="fc" id="L29">        return new CreateAllDayRecurringN();</span>
+      case TIMED_SINGLE:
+<span class="fc" id="L31">        return new CreateEventSingle();</span>
+      case TIMED_RECURRING_FOR:
+<span class="fc" id="L33">        return new CreateTimedRecurringFor();</span>
+      case TIMED_RECURRING_UNTIL:
+<span class="fc" id="L35">        return new CreateTimedRecurringUntil();</span>
+      case ALL_DAY_RECURRING_UNTIL:
+<span class="fc" id="L37">        return new CreateAllDayRecurringUntil();</span>
+      default:
+<span class="nc" id="L39">        throw new IllegalArgumentException(&quot;Unknown creation command type: &quot; + type);</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

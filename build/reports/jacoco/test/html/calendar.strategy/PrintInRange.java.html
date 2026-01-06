@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PrintInRange.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.strategy</a> &gt; <span class="el_source">PrintInRange.java</span></div><h1>PrintInRange.java</h1><pre class="source lang-java linenums">package calendar.strategy;
+
+import static calendar.constants.CreateCalendarConstants.DATETIME_FORMATTER;
+
+import calendar.dto.QueryEventDto;
+import calendar.interfacetypes.Iquery;
+import calendar.model.Event;
+import calendar.util.EventFinder;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * Strategy implementation for finding events within a specified date-time range.
+ * This class queries the calendar for all events that occur between the specified
+ * start and end date-times (inclusive), and returns them as a set for display.
+ */
+<span class="fc" id="L21">public class PrintInRange implements Iquery {</span>
+
+  /**
+   * Finds all events that occur within the specified date-time range.
+   * Returns events that have any overlap with the time period between the range
+   * start and range end specified in the query DTO. The search is inclusive of
+   * both boundary times.
+   *
+   * @param dto the query data transfer object containing the range start and end date-times
+   * @param allEvents the complete set of calendar events to search through
+   * @return a set of events occurring within the specified range, or an empty set if none match
+   * @throws Exception if the query parameters are invalid or if an error occurs during the search
+   */
+  @Override
+  public Set&lt;Event&gt; find(QueryEventDto dto, Set&lt;Event&gt; allEvents,
+                         ZoneId timezone) throws Exception {
+<span class="fc" id="L37">    String startStr = dto.getRangeStart();</span>
+<span class="fc" id="L38">    String endStr = dto.getRangeEnd();</span>
+<span class="fc bfc" id="L39" title="All 4 branches covered.">    if (startStr == null || endStr == null) {</span>
+<span class="fc" id="L40">      throw new Exception(&quot;Invalid query: missing start or end time.&quot;);</span>
+    }
+<span class="fc" id="L42">    ZonedDateTime rangeStart = ZonedDateTime.of(</span>
+<span class="fc" id="L43">            LocalDateTime.parse(startStr, DATETIME_FORMATTER),</span>
+            timezone
+    );
+<span class="fc" id="L46">    ZonedDateTime rangeEnd = ZonedDateTime.of(</span>
+<span class="fc" id="L47">            LocalDateTime.parse(endStr, DATETIME_FORMATTER),</span>
+            timezone
+    );
+<span class="fc bfc" id="L50" title="All 2 branches covered.">    if (rangeStart.isAfter(rangeEnd)) {</span>
+<span class="fc" id="L51">      throw new Exception(&quot;Error: Start time must be before end time.&quot;);</span>
+    }
+<span class="fc" id="L53">    List&lt;Event&gt; inRange = EventFinder.findInRange(rangeStart, rangeEnd, allEvents);</span>
+<span class="fc" id="L54">    return new HashSet&lt;&gt;(inRange);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

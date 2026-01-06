@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="model.create.CreateEventSingleTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.0">
+  <properties/>
+  <testcase name="testCreateSingleEventStartGreaterThanEnd" classname="model.create.CreateEventSingleTest" time="0.0"/>
+  <testcase name="testCreateSingleEventBasicSuccessWithoutQuotes" classname="model.create.CreateEventSingleTest" time="0.0"/>
+  <testcase name="testCreateSingleEventBasicSuccessWithQuotes" classname="model.create.CreateEventSingleTest" time="0.0"/>
+  <testcase name="testCreateSingleEvent_collision" classname="model.create.CreateEventSingleTest" time="0.0"/>
+  <system-out><![CDATA[  Test passed!
+  Created event: Meeting
+  Start: 2025-11-01T10:00-07:00[America/Los_Angeles]
+  End: 2025-11-01T11:00-07:00[America/Los_Angeles]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

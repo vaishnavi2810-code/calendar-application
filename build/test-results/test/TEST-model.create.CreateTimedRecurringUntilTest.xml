@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="model.create.CreateTimedRecurringUntilTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.001">
+  <properties/>
+  <testcase name="testCreateTimedRecurringUntilEndBeforeStart" classname="model.create.CreateTimedRecurringUntilTest" time="0.0"/>
+  <testcase name="testCreateTimedRecurringUntilCollision" classname="model.create.CreateTimedRecurringUntilTest" time="0.0"/>
+  <testcase name="testCreateTimedRecurringUntilSpansMultipleDays" classname="model.create.CreateTimedRecurringUntilTest" time="0.0"/>
+  <testcase name="testCreateTimedRecurringUntilSuccess" classname="model.create.CreateTimedRecurringUntilTest" time="0.001"/>
+  <testcase name="testCreateTimedRecurringUntilUntilDateBeforeStartDate" classname="model.create.CreateTimedRecurringUntilTest" time="0.0"/>
+  <system-out><![CDATA[✓ TEST PASSED: Created 9 recurring timed events.
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

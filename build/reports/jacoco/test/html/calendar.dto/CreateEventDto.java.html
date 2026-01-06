@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreateEventDto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.dto</a> &gt; <span class="el_source">CreateEventDto.java</span></div><h1>CreateEventDto.java</h1><pre class="source lang-java linenums">package calendar.dto;
+
+import java.util.regex.Matcher;
+
+/**
+ * Data Transfer Object for creating calendar events. Encapsulates all the parameters
+ * needed to create different types of events including timed and all-day events,
+ * with support for both single and recurring event patterns.
+ */
+public class CreateEventDto {
+
+  /**
+   * Enumeration of different event creation command types.
+   */
+<span class="fc" id="L15">  public enum CommandType {</span>
+<span class="fc" id="L16">    TIMED_SINGLE,</span>
+<span class="fc" id="L17">    TIMED_RECURRING_FOR,</span>
+<span class="fc" id="L18">    TIMED_RECURRING_UNTIL,</span>
+<span class="fc" id="L19">    ALL_DAY_SINGLE,</span>
+<span class="fc" id="L20">    ALL_DAY_RECURRING_FOR,</span>
+<span class="fc" id="L21">    ALL_DAY_RECURRING_UNTIL</span>
+  }
+
+  private final CommandType type;
+  private final String subject;
+  private final String startDateTime;
+  private final String endDateTime;
+  private final String onDate;
+  private final String weekdays;
+  private final String ntimes;
+  private final String untilDate;
+
+  /**
+   * Creates a CreateEventDto by extracting relevant fields from the provided matcher
+   * based on the command type.
+   *
+   * @param type the type of event creation command being processed
+   * @param matcher the regex matcher containing the parsed command data with named groups
+   */
+<span class="fc" id="L40">  public CreateEventDto(CommandType type, Matcher matcher) {</span>
+<span class="fc" id="L41">    this.type = type;</span>
+<span class="fc" id="L42">    this.subject = getGroup(matcher, &quot;subject&quot;);</span>
+<span class="fc" id="L43">    this.startDateTime = getGroup(matcher, &quot;start&quot;);</span>
+<span class="fc" id="L44">    this.endDateTime = getGroup(matcher, &quot;end&quot;);</span>
+<span class="fc" id="L45">    this.onDate = getGroup(matcher, &quot;date&quot;);</span>
+<span class="fc" id="L46">    this.weekdays = getGroup(matcher, &quot;weekdays&quot;);</span>
+<span class="fc" id="L47">    this.ntimes = getGroup(matcher, &quot;N&quot;);</span>
+<span class="fc" id="L48">    this.untilDate = getGroup(matcher, &quot;until&quot;);</span>
+<span class="fc" id="L49">  }</span>
+
+  /**
+   * Creates a CreateEventDto directly from parameters without using a Matcher.
+   * Used for GUI mode where data comes from form fields rather than text parsing.
+   *
+   * @param type the type of event creation command being processed
+   * @param subject the event subject/name
+   * @param startDateTime start date-time in YYYY-MM-DDTHH:mm format
+   * @param endDateTime end date-time in YYYY-MM-DDTHH:mm format
+   * @param onDate date in YYYY-MM-DD format for all-day events
+   * @param weekdays weekdays string (e.g., &quot;MWF&quot; for Mon/Wed/Fri)
+   * @param ntimes number of repetitions as string
+   * @param untilDate end date in YYYY-MM-DD format for recurring events
+   */
+  private CreateEventDto(CommandType type, String subject, String startDateTime,
+                         String endDateTime, String onDate, String weekdays,
+<span class="fc" id="L66">                         String ntimes, String untilDate) {</span>
+<span class="fc" id="L67">    this.type = type;</span>
+<span class="fc" id="L68">    this.subject = subject;</span>
+<span class="fc" id="L69">    this.startDateTime = startDateTime;</span>
+<span class="fc" id="L70">    this.endDateTime = endDateTime;</span>
+<span class="fc" id="L71">    this.onDate = onDate;</span>
+<span class="fc" id="L72">    this.weekdays = weekdays;</span>
+<span class="fc" id="L73">    this.ntimes = ntimes;</span>
+<span class="fc" id="L74">    this.untilDate = untilDate;</span>
+<span class="fc" id="L75">  }</span>
+
+  private String getGroup(Matcher matcher, String groupName) {
+    try {
+<span class="fc" id="L79">      String val = matcher.group(groupName);</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">      if (groupName.equals(&quot;subject&quot;)</span>
+              &amp;&amp;
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">              val.length() &gt;= 2</span>
+              &amp;&amp;
+<span class="fc bfc" id="L84" title="All 2 branches covered.">              val.startsWith(&quot;\&quot;&quot;)</span>
+              &amp;&amp;
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">              val.endsWith(&quot;\&quot;&quot;)) {</span>
+<span class="fc" id="L87">        return val.substring(1, val.length() - 1);</span>
+      }
+<span class="fc" id="L89">      return val;</span>
+<span class="fc" id="L90">    } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L91">      return null;</span>
+    }
+  }
+
+  /**
+   * Creates a DTO for a single timed event.
+   *
+   * @param subject event name
+   * @param startDateTime start in YYYY-MM-DDTHH:mm format
+   * @param endDateTime end in YYYY-MM-DDTHH:mm format
+   * @return configured CreateEventDto
+   */
+  public static CreateEventDto timedSingle(String subject, String startDateTime,
+                                           String endDateTime) {
+<span class="fc" id="L105">    return new CreateEventDto(CommandType.TIMED_SINGLE, subject, startDateTime,</span>
+            endDateTime, null, null, null, null);
+  }
+
+  /**
+   * Creates a DTO for a recurring timed event with fixed repetitions.
+   *
+   * @param subject event name
+   * @param startDateTime start in YYYY-MM-DDTHH:mm format
+   * @param endDateTime end in YYYY-MM-DDTHH:mm format
+   * @param weekdays days to repeat (e.g., &quot;MWF&quot;)
+   * @param times number of repetitions
+   * @return configured CreateEventDto
+   */
+  public static CreateEventDto timedRecurringFor(String subject, String startDateTime,
+                                                 String endDateTime, String weekdays,
+                                                 String times) {
+<span class="fc" id="L122">    return new CreateEventDto(CommandType.TIMED_RECURRING_FOR, subject, startDateTime,</span>
+            endDateTime, null, weekdays, times, null);
+  }
+
+  /**
+   * Creates a DTO for a recurring timed event until a date.
+   *
+   * @param subject event name
+   * @param startDateTime start in YYYY-MM-DDTHH:mm format
+   * @param endDateTime end in YYYY-MM-DDTHH:mm format
+   * @param weekdays days to repeat (e.g., &quot;MWF&quot;)
+   * @param untilDate end date in YYYY-MM-DD format
+   * @return configured CreateEventDto
+   */
+  public static CreateEventDto timedRecurringUntil(String subject, String startDateTime,
+                                                   String endDateTime, String weekdays,
+                                                   String untilDate) {
+<span class="fc" id="L139">    return new CreateEventDto(CommandType.TIMED_RECURRING_UNTIL, subject, startDateTime,</span>
+            endDateTime, null, weekdays, null, untilDate);
+  }
+
+  /**
+   * Creates a DTO for a single all-day event.
+   *
+   * @param subject event name
+   * @param date date in YYYY-MM-DD format
+   * @return configured CreateEventDto
+   */
+  public static CreateEventDto allDaySingle(String subject, String date) {
+<span class="fc" id="L151">    return new CreateEventDto(CommandType.ALL_DAY_SINGLE, subject, null, null,</span>
+            date, null, null, null);
+  }
+
+  /**
+   * Creates a DTO for a recurring all-day event with fixed repetitions.
+   *
+   * @param subject event name
+   * @param date starting date in YYYY-MM-DD format
+   * @param weekdays days to repeat (e.g., &quot;MWF&quot;)
+   * @param times number of repetitions
+   * @return configured CreateEventDto
+   */
+  public static CreateEventDto allDayRecurringFor(String subject, String date,
+                                                  String weekdays, String times) {
+<span class="fc" id="L166">    return new CreateEventDto(CommandType.ALL_DAY_RECURRING_FOR, subject, null, null,</span>
+            date, weekdays, times, null);
+  }
+
+  /**
+   * Creates a DTO for a recurring all-day event until a date.
+   *
+   * @param subject event name
+   * @param date starting date in YYYY-MM-DD format
+   * @param weekdays days to repeat (e.g., &quot;MWF&quot;)
+   * @param untilDate end date in YYYY-MM-DD format
+   * @return configured CreateEventDto
+   */
+  public static CreateEventDto allDayRecurringUntil(String subject, String date,
+                                                    String weekdays, String untilDate) {
+<span class="fc" id="L181">    return new CreateEventDto(CommandType.ALL_DAY_RECURRING_UNTIL, subject, null, null,</span>
+            date, weekdays, null, untilDate);
+  }
+
+  public CommandType getType() {
+<span class="fc" id="L186">    return type;</span>
+  }
+
+  public String getSubject() {
+<span class="fc" id="L190">    return subject;</span>
+  }
+
+  public String getStartDateTime() {
+<span class="fc" id="L194">    return startDateTime;</span>
+  }
+
+  public String getEndDateTime() {
+<span class="fc" id="L198">    return endDateTime;</span>
+  }
+
+  public String getOnDate() {
+<span class="fc" id="L202">    return onDate;</span>
+  }
+
+  public String getWeekdays() {
+<span class="fc" id="L206">    return weekdays;</span>
+  }
+
+  /**
+   * Returns the number of times a recurring event should repeat.
+   *
+   * @return the repetition count string
+   */
+  public String getnTimes() {
+<span class="fc" id="L215">    return ntimes;</span>
+  }
+
+  public String getUntilDate() {
+<span class="fc" id="L219">    return untilDate;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

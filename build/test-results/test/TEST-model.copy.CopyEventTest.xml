@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="model.copy.CopyEventTest" tests="27" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.021">
+  <properties/>
+  <testcase name="testCopyEventsOnDateNoEventsFound" classname="model.copy.CopyEventTest" time="0.001"/>
+  <testcase name="testCopyEventsBetweenDatesBasic" classname="model.copy.CopyEventTest" time="0.002"/>
+  <testcase name="testCopyMultiDayEvent" classname="model.copy.CopyEventTest" time="0.001"/>
+  <testcase name="testRelativeSpacingPreserved" classname="model.copy.CopyEventTest" time="0.002"/>
+  <testcase name="testCopySingleEventTimezoneConversion" classname="model.copy.CopyEventTest" time="0.002"/>
+  <testcase name="testCopyEventsBetweenMixedEvents" classname="model.copy.CopyEventTest" time="0.001"/>
+  <testcase name="testCopyEventsOnDatePreservesSeriesRelationship" classname="model.copy.CopyEventTest" time="0.001"/>
+  <testcase name="testWeekdayAdjustmentForAllDaysOfWeek" classname="model.copy.CopyEventTest" time="0.001"/>
+  <testcase name="testCopyEventsBetweenDuplicateFails" classname="model.copy.CopyEventTest" time="0.001"/>
+  <testcase name="testCopyEventsBetweenPartialSeriesCopy" classname="model.copy.CopyEventTest" time="0.0"/>
+  <testcase name="testCopySingleEventDuplicateFails" classname="model.copy.CopyEventTest" time="0.001"/>
+  <testcase name="testCopySingleEventNotFound" classname="model.copy.CopyEventTest" time="0.0"/>
+  <testcase name="testCopyEventWithNoActiveCalendar" classname="model.copy.CopyEventTest" time="0.001"/>
+  <testcase name="testCopyPreservesAllEventProperties" classname="model.copy.CopyEventTest" time="0.0"/>
+  <testcase name="testCopySingleEventGeneratesNewSeriesId" classname="model.copy.CopyEventTest" time="0.0"/>
+  <testcase name="testCopySeriesAllOrNothingBehavior" classname="model.copy.CopyEventTest" time="0.001"/>
+  <testcase name="testWeekdayConsistencyWhenAlreadyMatches" classname="model.copy.CopyEventTest" time="0.0"/>
+  <testcase name="testCopyWithinSameCalendar" classname="model.copy.CopyEventTest" time="0.001"/>
+  <testcase name="testCopyEventsOnDateTimezoneConversion" classname="model.copy.CopyEventTest" time="0.001"/>
+  <testcase name="testMultipleSeriesGetDifferentNewIds" classname="model.copy.CopyEventTest" time="0.0"/>
+  <testcase name="testTimezoneConversionEstToPst" classname="model.copy.CopyEventTest" time="0.001"/>
+  <testcase name="testCopySingleEventBasic" classname="model.copy.CopyEventTest" time="0.0"/>
+  <testcase name="testCopyEventsOnDateBasic" classname="model.copy.CopyEventTest" time="0.0"/>
+  <testcase name="testCopyWithinSameCalendarNoTimezoneConversion" classname="model.copy.CopyEventTest" time="0.001"/>
+  <testcase name="testCopyEventsBetweenTargetCalendarNotFound" classname="model.copy.CopyEventTest" time="0.0"/>
+  <testcase name="testCopyEventsBetweenNoEventsFound" classname="model.copy.CopyEventTest" time="0.0"/>
+  <testcase name="testCopyEventsOnDateAlreadyOnCorrectWeekday" classname="model.copy.CopyEventTest" time="0.001"/>
+  <system-out><![CDATA[✓ TEST PASSED: Copy events on date throws exception when no events found
+✓ TEST PASSED: Copy events between maintains weekday and relative spacing
+✓ TEST PASSED: Multi-day event preserves duration and weekday span
+✓ TEST PASSED: Relative spacing between events preserved
+✓ TEST PASSED: Copy single event uses user-specified time in target timezone
+✓ TEST PASSED: Weekday consistency maintained for all days of week
+✓ TEST PASSED: Copy events between maintains partial series relationship
+✓ TEST PASSED: Copy single event detects duplicates
+✓ TEST PASSED: Copy fails when no calendar is active
+✓ TEST PASSED: Copy preserves all event properties
+✓ TEST PASSED: Copy single event generates new series ID
+✓ TEST PASSED: Copy events on date converts timezone correctly
+✓ TEST PASSED: Timezone conversion EST to PST works correctly
+✓ TEST PASSED: Copy single event maintains weekday consistency
+✓ TEST PASSED: Copy events on date maintains weekday consistency
+✓ TEST PASSED: Copy within same calendar doesn't convert timezone
+✓ TEST PASSED: No weekday adjustment when target already matches
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

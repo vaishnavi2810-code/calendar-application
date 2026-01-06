@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreateEventDialog.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.view</a> &gt; <span class="el_source">CreateEventDialog.java</span></div><h1>CreateEventDialog.java</h1><pre class="source lang-java linenums">package calendar.view;
+
+import calendar.interfacetypes.IcreateEventDialogData;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.HashSet;
+import java.util.Set;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerDateModel;
+import javax.swing.SpinnerNumberModel;
+
+/**
+ * Dialog for creating a new event.
+ * Supports timed and all-day events, single and recurring.
+ */
+public class CreateEventDialog extends JDialog implements IcreateEventDialogData {
+
+  private JTextField subjectField;
+  private JCheckBox allDayCheckbox;
+  private JSpinner startTimeSpinner;
+  private JSpinner endTimeSpinner;
+  private JCheckBox recurringCheckbox;
+  private JCheckBox mondayBox;
+  private JCheckBox tuesdayBox;
+  private JCheckBox wednesdayBox;
+  private JCheckBox thursdayBox;
+  private JCheckBox fridayBox;
+  private JCheckBox saturdayBox;
+  private JCheckBox sundayBox;
+  private JRadioButton timesRadio;
+  private JRadioButton untilRadio;
+  private JSpinner timesSpinner;
+  private JSpinner untilDateSpinner;
+  private JPanel timePanel;
+  private JPanel recurringPanel;
+  private final LocalDate selectedDate;
+<span class="nc" id="L54">  private boolean confirmed = false;</span>
+  private JSpinner endDateSpinner;
+
+  /**
+   * Creates a dialog for creating an event on a specific date.
+   *
+   * @param parent       the parent frame to which this dialog is attached
+   * @param selectedDate the initial date selected for the event
+   */
+  public CreateEventDialog(JFrame parent, LocalDate selectedDate) {
+<span class="nc" id="L64">    super(parent, &quot;Create Event&quot;, true);</span>
+<span class="nc" id="L65">    this.selectedDate = selectedDate;</span>
+<span class="nc" id="L66">    initComponents();</span>
+<span class="nc" id="L67">    layoutComponents();</span>
+<span class="nc" id="L68">    wireUpListeners();</span>
+<span class="nc" id="L69">    pack();</span>
+<span class="nc" id="L70">    setLocationRelativeTo(parent);</span>
+<span class="nc" id="L71">  }</span>
+
+  private void initComponents() {
+<span class="nc" id="L74">    subjectField = new JTextField(20);</span>
+<span class="nc" id="L75">    allDayCheckbox = new JCheckBox(&quot;All-day event&quot;);</span>
+<span class="nc" id="L76">    SpinnerDateModel startModel = new SpinnerDateModel();</span>
+<span class="nc" id="L77">    startTimeSpinner = new JSpinner(startModel);</span>
+<span class="nc" id="L78">    JSpinner.DateEditor startEditor = new JSpinner.DateEditor(startTimeSpinner, &quot;HH:mm&quot;);</span>
+<span class="nc" id="L79">    startTimeSpinner.setEditor(startEditor);</span>
+<span class="nc" id="L80">    startTimeSpinner.setValue(java.util.Date.from(</span>
+<span class="nc" id="L81">            LocalTime.of(9, 0).atDate(LocalDate.now())</span>
+<span class="nc" id="L82">                    .atZone(java.time.ZoneId.systemDefault()).toInstant()</span>
+    ));
+
+<span class="nc" id="L85">    SpinnerDateModel endDateDateModel = new SpinnerDateModel();</span>
+<span class="nc" id="L86">    endDateSpinner = new JSpinner(endDateDateModel);</span>
+<span class="nc" id="L87">    JSpinner.DateEditor endDateEditor = new JSpinner.DateEditor(endDateSpinner, &quot;yyyy-MM-dd&quot;);</span>
+<span class="nc" id="L88">    endDateSpinner.setEditor(endDateEditor);</span>
+<span class="nc" id="L89">    endDateSpinner.setValue(java.sql.Date.valueOf(selectedDate));</span>
+<span class="nc" id="L90">    SpinnerDateModel endModel = new SpinnerDateModel();</span>
+<span class="nc" id="L91">    endTimeSpinner = new JSpinner(endModel);</span>
+<span class="nc" id="L92">    JSpinner.DateEditor endEditor = new JSpinner.DateEditor(endTimeSpinner, &quot;HH:mm&quot;);</span>
+<span class="nc" id="L93">    endTimeSpinner.setEditor(endEditor);</span>
+<span class="nc" id="L94">    endTimeSpinner.setValue(java.util.Date.from(</span>
+<span class="nc" id="L95">            LocalTime.of(10, 0).atDate(LocalDate.now())</span>
+<span class="nc" id="L96">                    .atZone(java.time.ZoneId.systemDefault()).toInstant()</span>
+    ));
+<span class="nc" id="L98">    recurringCheckbox = new JCheckBox(&quot;Recurring event&quot;);</span>
+<span class="nc" id="L99">    mondayBox = new JCheckBox(&quot;Mon&quot;);</span>
+<span class="nc" id="L100">    tuesdayBox = new JCheckBox(&quot;Tue&quot;);</span>
+<span class="nc" id="L101">    wednesdayBox = new JCheckBox(&quot;Wed&quot;);</span>
+<span class="nc" id="L102">    thursdayBox = new JCheckBox(&quot;Thu&quot;);</span>
+<span class="nc" id="L103">    fridayBox = new JCheckBox(&quot;Fri&quot;);</span>
+<span class="nc" id="L104">    saturdayBox = new JCheckBox(&quot;Sat&quot;);</span>
+<span class="nc" id="L105">    sundayBox = new JCheckBox(&quot;Sun&quot;);</span>
+
+<span class="nc" id="L107">    timesRadio = new JRadioButton(&quot;Repeat&quot;, true);</span>
+<span class="nc" id="L108">    untilRadio = new JRadioButton(&quot;Repeat until&quot;);</span>
+<span class="nc" id="L109">    ButtonGroup group = new ButtonGroup();</span>
+<span class="nc" id="L110">    group.add(timesRadio);</span>
+<span class="nc" id="L111">    group.add(untilRadio);</span>
+
+<span class="nc" id="L113">    timesSpinner = new JSpinner(new SpinnerNumberModel(5, 1, 100, 1));</span>
+<span class="nc" id="L114">    SpinnerDateModel untilModel = new SpinnerDateModel();</span>
+<span class="nc" id="L115">    untilDateSpinner = new JSpinner(untilModel);</span>
+<span class="nc" id="L116">    JSpinner.DateEditor untilEditor = new JSpinner.DateEditor(untilDateSpinner, &quot;yyyy-MM-dd&quot;);</span>
+<span class="nc" id="L117">    untilDateSpinner.setEditor(untilEditor);</span>
+<span class="nc" id="L118">    untilDateSpinner.setValue(java.util.Date.from(</span>
+<span class="nc" id="L119">            selectedDate.plusMonths(1).atStartOfDay()</span>
+<span class="nc" id="L120">                    .atZone(java.time.ZoneId.systemDefault()).toInstant()</span>
+    ));
+<span class="nc" id="L122">  }</span>
+
+  private void layoutComponents() {
+<span class="nc" id="L125">    JPanel mainPanel = new JPanel();</span>
+<span class="nc" id="L126">    mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));</span>
+<span class="nc" id="L127">    mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));</span>
+<span class="nc" id="L128">    JPanel dateInfoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));</span>
+<span class="nc" id="L129">    dateInfoPanel.add(new JLabel(&quot;Creating event on: &quot;));</span>
+<span class="nc" id="L130">    JLabel dateLabel = new JLabel(selectedDate.toString());</span>
+<span class="nc" id="L131">    dateLabel.setFont(dateLabel.getFont().deriveFont(Font.BOLD));</span>
+<span class="nc" id="L132">    dateInfoPanel.add(dateLabel);</span>
+<span class="nc" id="L133">    mainPanel.add(dateInfoPanel);</span>
+<span class="nc" id="L134">    mainPanel.add(Box.createVerticalStrut(10));</span>
+<span class="nc" id="L135">    JPanel subjectPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));</span>
+<span class="nc" id="L136">    subjectPanel.add(new JLabel(&quot;Event Name:&quot;));</span>
+<span class="nc" id="L137">    subjectPanel.add(subjectField);</span>
+<span class="nc" id="L138">    mainPanel.add(subjectPanel);</span>
+<span class="nc" id="L139">    mainPanel.add(Box.createVerticalStrut(5));</span>
+<span class="nc" id="L140">    JPanel allDayPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));</span>
+<span class="nc" id="L141">    allDayPanel.add(allDayCheckbox);</span>
+<span class="nc" id="L142">    mainPanel.add(allDayPanel);</span>
+<span class="nc" id="L143">    timePanel = new JPanel(new GridLayout(3, 2, 5, 5));</span>
+<span class="nc" id="L144">    timePanel.add(new JLabel(&quot;Start Time:&quot;));</span>
+<span class="nc" id="L145">    timePanel.add(startTimeSpinner);</span>
+<span class="nc" id="L146">    timePanel.add(new JLabel(&quot;End Date:&quot;));</span>
+<span class="nc" id="L147">    timePanel.add(endDateSpinner);</span>
+<span class="nc" id="L148">    timePanel.add(new JLabel(&quot;End Time:&quot;));</span>
+<span class="nc" id="L149">    timePanel.add(endTimeSpinner);</span>
+<span class="nc" id="L150">    mainPanel.add(timePanel);</span>
+<span class="nc" id="L151">    mainPanel.add(Box.createVerticalStrut(10));</span>
+<span class="nc" id="L152">    JPanel recurPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));</span>
+<span class="nc" id="L153">    recurPanel.add(recurringCheckbox);</span>
+<span class="nc" id="L154">    mainPanel.add(recurPanel);</span>
+<span class="nc" id="L155">    recurringPanel = new JPanel();</span>
+<span class="nc" id="L156">    recurringPanel.setLayout(new BoxLayout(recurringPanel, BoxLayout.Y_AXIS));</span>
+<span class="nc" id="L157">    recurringPanel.setBorder(BorderFactory.createTitledBorder(&quot;Recurrence Options&quot;));</span>
+<span class="nc" id="L158">    JPanel weekdayPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));</span>
+<span class="nc" id="L159">    weekdayPanel.add(new JLabel(&quot;Repeat on:&quot;));</span>
+<span class="nc" id="L160">    weekdayPanel.add(mondayBox);</span>
+<span class="nc" id="L161">    weekdayPanel.add(tuesdayBox);</span>
+<span class="nc" id="L162">    weekdayPanel.add(wednesdayBox);</span>
+<span class="nc" id="L163">    weekdayPanel.add(thursdayBox);</span>
+<span class="nc" id="L164">    weekdayPanel.add(fridayBox);</span>
+<span class="nc" id="L165">    weekdayPanel.add(saturdayBox);</span>
+<span class="nc" id="L166">    weekdayPanel.add(sundayBox);</span>
+<span class="nc" id="L167">    recurringPanel.add(weekdayPanel);</span>
+<span class="nc" id="L168">    JPanel timesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));</span>
+<span class="nc" id="L169">    timesPanel.add(timesRadio);</span>
+<span class="nc" id="L170">    timesPanel.add(timesSpinner);</span>
+<span class="nc" id="L171">    timesPanel.add(new JLabel(&quot;times&quot;));</span>
+<span class="nc" id="L172">    JPanel untilPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));</span>
+<span class="nc" id="L173">    untilPanel.add(untilRadio);</span>
+<span class="nc" id="L174">    untilPanel.add(untilDateSpinner);</span>
+<span class="nc" id="L175">    JPanel repetitionPanel = new JPanel(new GridLayout(2, 2, 5, 5));</span>
+<span class="nc" id="L176">    repetitionPanel.add(timesPanel);</span>
+<span class="nc" id="L177">    repetitionPanel.add(new JLabel());</span>
+<span class="nc" id="L178">    repetitionPanel.add(untilPanel);</span>
+<span class="nc" id="L179">    repetitionPanel.add(new JLabel());</span>
+<span class="nc" id="L180">    recurringPanel.add(repetitionPanel);</span>
+<span class="nc" id="L181">    recurringPanel.setVisible(false);</span>
+<span class="nc" id="L182">    mainPanel.add(recurringPanel);</span>
+<span class="nc" id="L183">    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));</span>
+<span class="nc" id="L184">    JButton createButton = new JButton(&quot;Create&quot;);</span>
+<span class="nc" id="L185">    JButton cancelButton = new JButton(&quot;Cancel&quot;);</span>
+<span class="nc" id="L186">    createButton.addActionListener(e -&gt; {</span>
+<span class="nc" id="L187">      confirmed = true;</span>
+<span class="nc" id="L188">      dispose();</span>
+<span class="nc" id="L189">    });</span>
+<span class="nc" id="L190">    cancelButton.addActionListener(e -&gt; {</span>
+<span class="nc" id="L191">      confirmed = false;</span>
+<span class="nc" id="L192">      dispose();</span>
+<span class="nc" id="L193">    });</span>
+<span class="nc" id="L194">    buttonPanel.add(createButton);</span>
+<span class="nc" id="L195">    buttonPanel.add(cancelButton);</span>
+<span class="nc" id="L196">    setLayout(new BorderLayout());</span>
+<span class="nc" id="L197">    add(mainPanel, BorderLayout.CENTER);</span>
+<span class="nc" id="L198">    add(buttonPanel, BorderLayout.SOUTH);</span>
+<span class="nc" id="L199">  }</span>
+
+  private void wireUpListeners() {
+<span class="nc" id="L202">    allDayCheckbox.addActionListener(e -&gt; {</span>
+<span class="nc bnc" id="L203" title="All 2 branches missed.">      timePanel.setVisible(!allDayCheckbox.isSelected());</span>
+<span class="nc" id="L204">      pack();</span>
+<span class="nc" id="L205">    });</span>
+<span class="nc" id="L206">    recurringCheckbox.addActionListener(e -&gt; {</span>
+<span class="nc" id="L207">      recurringPanel.setVisible(recurringCheckbox.isSelected());</span>
+<span class="nc" id="L208">      pack();</span>
+<span class="nc" id="L209">    });</span>
+<span class="nc" id="L210">    timesRadio.addActionListener(e -&gt; {</span>
+<span class="nc" id="L211">      timesSpinner.setEnabled(true);</span>
+<span class="nc" id="L212">      untilDateSpinner.setEnabled(false);</span>
+<span class="nc" id="L213">    });</span>
+<span class="nc" id="L214">    untilRadio.addActionListener(e -&gt; {</span>
+<span class="nc" id="L215">      timesSpinner.setEnabled(false);</span>
+<span class="nc" id="L216">      untilDateSpinner.setEnabled(true);</span>
+<span class="nc" id="L217">    });</span>
+<span class="nc" id="L218">    timesSpinner.setEnabled(true);</span>
+<span class="nc" id="L219">    untilDateSpinner.setEnabled(false);</span>
+<span class="nc" id="L220">  }</span>
+
+  /**
+   * Checks if the user confirmed the dialog action (clicked &quot;Create&quot;).
+   *
+   * @return true if confirmed, false otherwise
+   */
+  public boolean isConfirmed() {
+<span class="nc" id="L228">    return confirmed;</span>
+  }
+
+  /**
+   * Retrieves the subject entered for the event.
+   *
+   * @return the event name/subject
+   */
+  public String getSubject() {
+<span class="nc" id="L237">    return subjectField.getText().trim();</span>
+  }
+
+  /**
+   * Checks if the event is marked as all-day.
+   *
+   * @return true if the all-day checkbox is selected
+   */
+  public boolean isAllDay() {
+<span class="nc" id="L246">    return allDayCheckbox.isSelected();</span>
+  }
+
+  /**
+   * Retrieves the start time specified in the spinner.
+   *
+   * @return the selected start time
+   */
+  public LocalTime getStartTime() {
+<span class="nc" id="L255">    java.util.Date date = (java.util.Date) startTimeSpinner.getValue();</span>
+<span class="nc" id="L256">    return date.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalTime();</span>
+  }
+
+  /**
+   * Retrieves the end time specified in the spinner.
+   *
+   * @return the selected end time
+   */
+  public LocalTime getEndTime() {
+<span class="nc" id="L265">    java.util.Date date = (java.util.Date) endTimeSpinner.getValue();</span>
+<span class="nc" id="L266">    return date.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalTime();</span>
+  }
+
+  /**
+   * Checks if the event is marked as recurring.
+   *
+   * @return true if the recurring checkbox is selected
+   */
+  public boolean isRecurring() {
+<span class="nc" id="L275">    return recurringCheckbox.isSelected();</span>
+  }
+
+  /**
+   * Retrieves the set of days selected for recurrence.
+   *
+   * @return a Set of DayOfWeek enums representing the checked days
+   */
+  public Set&lt;DayOfWeek&gt; getSelectedWeekdays() {
+<span class="nc" id="L284">    Set&lt;DayOfWeek&gt; weekdays = new HashSet&lt;&gt;();</span>
+<span class="nc bnc" id="L285" title="All 2 branches missed.">    if (mondayBox.isSelected()) {</span>
+<span class="nc" id="L286">      weekdays.add(DayOfWeek.MONDAY);</span>
+    }
+<span class="nc bnc" id="L288" title="All 2 branches missed.">    if (tuesdayBox.isSelected()) {</span>
+<span class="nc" id="L289">      weekdays.add(DayOfWeek.TUESDAY);</span>
+    }
+<span class="nc bnc" id="L291" title="All 2 branches missed.">    if (wednesdayBox.isSelected()) {</span>
+<span class="nc" id="L292">      weekdays.add(DayOfWeek.WEDNESDAY);</span>
+    }
+<span class="nc bnc" id="L294" title="All 2 branches missed.">    if (thursdayBox.isSelected()) {</span>
+<span class="nc" id="L295">      weekdays.add(DayOfWeek.THURSDAY);</span>
+    }
+<span class="nc bnc" id="L297" title="All 2 branches missed.">    if (fridayBox.isSelected()) {</span>
+<span class="nc" id="L298">      weekdays.add(DayOfWeek.FRIDAY);</span>
+    }
+<span class="nc bnc" id="L300" title="All 2 branches missed.">    if (saturdayBox.isSelected()) {</span>
+<span class="nc" id="L301">      weekdays.add(DayOfWeek.SATURDAY);</span>
+    }
+<span class="nc bnc" id="L303" title="All 2 branches missed.">    if (sundayBox.isSelected()) {</span>
+<span class="nc" id="L304">      weekdays.add(DayOfWeek.SUNDAY);</span>
+    }
+<span class="nc" id="L306">    return weekdays;</span>
+  }
+
+  /**
+   * Checks if the recurrence is limited by a number of occurrences.
+   *
+   * @return true if &quot;Repeat&quot; (times) is selected, false if &quot;Repeat until&quot; is selected
+   */
+  public boolean isRepeatForTimes() {
+<span class="nc" id="L315">    return timesRadio.isSelected();</span>
+  }
+
+  /**
+   * Retrieves the number of times the event should repeat.
+   *
+   * @return the recurrence count
+   */
+  public int getRepeatTimes() {
+<span class="nc" id="L324">    return (Integer) timesSpinner.getValue();</span>
+  }
+
+  /**
+   * Retrieves the cutoff date for the recurrence.
+   *
+   * @return the date until which the event repeats
+   */
+  public LocalDate getRepeatUntilDate() {
+<span class="nc" id="L333">    java.util.Date date = (java.util.Date) untilDateSpinner.getValue();</span>
+<span class="nc" id="L334">    return date.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();</span>
+  }
+
+  /**
+   * Retrieves the initial date selected for the event.
+   *
+   * @return the selected date
+   */
+  public LocalDate getSelectedDate() {
+<span class="nc" id="L343">    return selectedDate;</span>
+  }
+
+  /**
+   * Retrieves the end date specified in the spinner.
+   * This is used for events that span multiple days or strict end definitions.
+   *
+   * @return the end date
+   */
+  public LocalDate getEndDate() {
+<span class="nc" id="L353">    java.util.Date date = (java.util.Date) endDateSpinner.getValue();</span>
+<span class="nc" id="L354">    return date.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

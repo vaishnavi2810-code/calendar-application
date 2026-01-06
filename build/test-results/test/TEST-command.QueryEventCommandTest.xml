@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="command.QueryEventCommandTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:33" hostname="Vaishnavis-MacBook-Pro.local" time="0.009">
+  <properties/>
+  <testcase name="testExecuteShowStatusAtBusy" classname="command.QueryEventCommandTest" time="0.004"/>
+  <testcase name="testExecutePrintOnDateWithEvents" classname="command.QueryEventCommandTest" time="0.001"/>
+  <testcase name="testExecutePrintOnDateNullLocation" classname="command.QueryEventCommandTest" time="0.001"/>
+  <testcase name="testExecuteShowStatusAtAvailable" classname="command.QueryEventCommandTest" time="0.0"/>
+  <testcase name="testExecutePrintInRangeWithEvents" classname="command.QueryEventCommandTest" time="0.0"/>
+  <testcase name="testExecutePrintOnDateNoEvents" classname="command.QueryEventCommandTest" time="0.001"/>
+  <testcase name="testExecutePrintInRangeNoEvents" classname="command.QueryEventCommandTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

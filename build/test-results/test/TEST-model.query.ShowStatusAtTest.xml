@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="model.query.ShowStatusAtTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.002">
+  <properties/>
+  <testcase name="testShowStatusAtBusy" classname="model.query.ShowStatusAtTest" time="0.0"/>
+  <testcase name="testShowStatusAtMultipleOverlappingEvents" classname="model.query.ShowStatusAtTest" time="0.001"/>
+  <testcase name="testFindThrowsOnInvalidDateFormat" classname="model.query.ShowStatusAtTest" time="0.0"/>
+  <testcase name="testFindThrowsOnMissingDateTime" classname="model.query.ShowStatusAtTest" time="0.001"/>
+  <testcase name="testShowStatusAtEdgeCaseStartTime" classname="model.query.ShowStatusAtTest" time="0.0"/>
+  <testcase name="testShowStatusAtAvailable" classname="model.query.ShowStatusAtTest" time="0.0"/>
+  <system-out><![CDATA[✓ TEST PASSED: Status is BUSY at specified time
+✓ TEST PASSED: Found 2 overlapping events
+✓ TEST PASSED: Busy at exact start time
+✓ TEST PASSED: Status is AVAILABLE at specified time
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

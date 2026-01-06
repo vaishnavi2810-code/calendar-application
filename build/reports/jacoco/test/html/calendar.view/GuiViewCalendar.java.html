@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GuiViewCalendar.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.view</a> &gt; <span class="el_source">GuiViewCalendar.java</span></div><h1>GuiViewCalendar.java</h1><pre class="source lang-java linenums">package calendar.view;
+
+import calendar.dto.QueryResultDto;
+import calendar.interfacetypes.IguiViewCalendar;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.TextStyle;
+import java.util.List;
+import java.util.Locale;
+import java.util.function.Consumer;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+
+/**
+ * Calendar GUI View - displays calendar and manages UI components.
+ * Controller handles all business logic and event wiring.
+ */
+public class GuiViewCalendar extends JFrame implements IguiViewCalendar {
+
+  private YearMonth currentMonth;
+  private LocalDate selectedDate;
+  private JLabel monthYearLabel;
+  private JPanel calendarGrid;
+  private JTextArea eventArea;
+  private JButton createEventButton;
+  private JButton editEventButton;
+  private JComboBox&lt;String&gt; calendarDropdown;
+  private JButton createCalendarButton;
+  private JButton editCalendarButton;
+  private JLabel statusLabel;
+  private JButton prevBtn;
+  private JButton nextBtn;
+  private JButton todayBtn;
+  private JButton editEventsBySearchButton;
+  private Consumer&lt;LocalDate&gt; dateSelectionListener;
+  private final ResultFormatter formatter;
+
+  /**
+   * ok.
+   */
+<span class="nc" id="L57">  public GuiViewCalendar() {</span>
+<span class="nc" id="L58">    currentMonth = YearMonth.now();</span>
+<span class="nc" id="L59">    selectedDate = LocalDate.now();</span>
+<span class="nc" id="L60">    this.formatter = new ResultFormatter();</span>
+<span class="nc" id="L61">    setupWindow();</span>
+<span class="nc" id="L62">    initComponents();</span>
+<span class="nc" id="L63">    layoutComponents();</span>
+<span class="nc" id="L64">    renderCalendar();</span>
+<span class="nc" id="L65">  }</span>
+
+  private void setupWindow() {
+<span class="nc" id="L68">    setTitle(&quot;MVCalendar - GUI View&quot;);</span>
+<span class="nc" id="L69">    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
+<span class="nc" id="L70">    setSize(900, 650);</span>
+<span class="nc" id="L71">    setLocationRelativeTo(null);</span>
+<span class="nc" id="L72">  }</span>
+
+  private void initComponents() {
+<span class="nc" id="L75">    calendarDropdown = new JComboBox&lt;&gt;();</span>
+<span class="nc" id="L76">    calendarDropdown.setPreferredSize(new Dimension(200, 30));</span>
+<span class="nc" id="L77">    createEventButton = new JButton(&quot;+ Event creation&quot;);</span>
+<span class="nc" id="L78">    createCalendarButton = new JButton(&quot;+ New Calendar&quot;);</span>
+<span class="nc" id="L79">    editCalendarButton = new JButton(&quot;✎ Edit&quot;);</span>
+<span class="nc" id="L80">    editEventButton = new JButton(&quot;Edit Event&quot;);</span>
+<span class="nc" id="L81">    monthYearLabel = new JLabel(&quot;&quot;, SwingConstants.CENTER);</span>
+<span class="nc" id="L82">    monthYearLabel.setFont(new Font(&quot;Arial&quot;, Font.BOLD, 20));</span>
+<span class="nc" id="L83">    editEventsBySearchButton = new JButton(&quot;Search &amp; Edit&quot;);</span>
+
+<span class="nc" id="L85">    calendarGrid = new JPanel(new GridLayout(7, 7, 2, 2));</span>
+<span class="nc" id="L86">    calendarGrid.setBackground(Color.GRAY);</span>
+
+<span class="nc" id="L88">    eventArea = new JTextArea();</span>
+<span class="nc" id="L89">    eventArea.setEditable(false);</span>
+<span class="nc" id="L90">    eventArea.setFont(new Font(&quot;SansSerif&quot;, Font.PLAIN, 12));</span>
+<span class="nc" id="L91">    eventArea.setText(&quot;Click a date to see events here&quot;);</span>
+
+<span class="nc" id="L93">    eventArea.setLineWrap(true);</span>
+<span class="nc" id="L94">    eventArea.setWrapStyleWord(true);</span>
+<span class="nc" id="L95">    statusLabel = new JLabel(&quot;Ready&quot;);</span>
+<span class="nc" id="L96">    statusLabel.setBorder(new EmptyBorder(5, 10, 5, 10));</span>
+<span class="nc" id="L97">  }</span>
+
+  private void layoutComponents() {
+<span class="nc" id="L100">    setLayout(new BorderLayout(10, 10));</span>
+
+<span class="nc" id="L102">    JPanel topPanel = new JPanel(new BorderLayout(10, 10));</span>
+<span class="nc" id="L103">    topPanel.setBorder(new EmptyBorder(10, 10, 10, 10));</span>
+
+<span class="nc" id="L105">    JLabel title = new JLabel(&quot;My Calendar&quot;, SwingConstants.CENTER);</span>
+<span class="nc" id="L106">    title.setFont(new Font(&quot;Arial&quot;, Font.BOLD, 24));</span>
+<span class="nc" id="L107">    topPanel.add(title, BorderLayout.NORTH);</span>
+
+<span class="nc" id="L109">    JPanel calendarSelectorPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 5));</span>
+<span class="nc" id="L110">    calendarSelectorPanel.add(new JLabel(&quot;Active Calendar:&quot;));</span>
+<span class="nc" id="L111">    calendarSelectorPanel.add(calendarDropdown);</span>
+<span class="nc" id="L112">    calendarSelectorPanel.add(createCalendarButton);</span>
+<span class="nc" id="L113">    calendarSelectorPanel.add(editCalendarButton);</span>
+<span class="nc" id="L114">    topPanel.add(calendarSelectorPanel, BorderLayout.CENTER);</span>
+
+<span class="nc" id="L116">    add(topPanel, BorderLayout.NORTH);</span>
+
+<span class="nc" id="L118">    JPanel centerPanel = new JPanel(new BorderLayout(10, 10));</span>
+<span class="nc" id="L119">    centerPanel.setBorder(new EmptyBorder(10, 10, 10, 10));</span>
+
+<span class="nc" id="L121">    JPanel calendarPanel = new JPanel(new BorderLayout(5, 5));</span>
+
+<span class="nc" id="L123">    JPanel navPanel = new JPanel(new BorderLayout());</span>
+<span class="nc" id="L124">    calendarPanel.add(navPanel, BorderLayout.NORTH);</span>
+<span class="nc" id="L125">    calendarPanel.add(calendarGrid, BorderLayout.CENTER);</span>
+<span class="nc" id="L126">    centerPanel.add(calendarPanel, BorderLayout.CENTER);</span>
+
+
+<span class="nc" id="L129">    this.prevBtn = new JButton(&quot;◀ Previous&quot;);</span>
+<span class="nc" id="L130">    this.nextBtn = new JButton(&quot;Next ▶&quot;);</span>
+<span class="nc" id="L131">    this.todayBtn = new JButton(&quot;Today&quot;);</span>
+<span class="nc" id="L132">    JPanel rightNav = new JPanel(new FlowLayout(FlowLayout.RIGHT));</span>
+<span class="nc" id="L133">    rightNav.add(todayBtn);</span>
+<span class="nc" id="L134">    rightNav.add(nextBtn);</span>
+
+<span class="nc" id="L136">    navPanel.add(prevBtn, BorderLayout.WEST);</span>
+<span class="nc" id="L137">    navPanel.add(monthYearLabel, BorderLayout.CENTER);</span>
+<span class="nc" id="L138">    navPanel.add(rightNav, BorderLayout.EAST);</span>
+
+<span class="nc" id="L140">    JPanel eventPanel = new JPanel(new BorderLayout());</span>
+<span class="nc" id="L141">    eventPanel.setBorder(BorderFactory.createTitledBorder(&quot;Events&quot;));</span>
+<span class="nc" id="L142">    eventPanel.setPreferredSize(new Dimension(300, 0));</span>
+<span class="nc" id="L143">    JScrollPane eventScroll = new JScrollPane(eventArea);</span>
+<span class="nc" id="L144">    eventScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);</span>
+<span class="nc" id="L145">    eventScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);</span>
+<span class="nc" id="L146">    eventPanel.add(eventScroll, BorderLayout.CENTER);</span>
+
+<span class="nc" id="L148">    JPanel buttonPanel = new JPanel(new GridLayout(2, 2, 5, 5));</span>
+<span class="nc" id="L149">    buttonPanel.setBorder(new EmptyBorder(5, 0, 0, 0));</span>
+<span class="nc" id="L150">    JButton refreshBtn = new JButton(&quot;Refresh&quot;);</span>
+<span class="nc" id="L151">    refreshBtn.addActionListener(e -&gt; renderCalendar());</span>
+
+<span class="nc" id="L153">    buttonPanel.add(createEventButton);</span>
+<span class="nc" id="L154">    buttonPanel.add(editEventButton);</span>
+<span class="nc" id="L155">    buttonPanel.add(editEventsBySearchButton);</span>
+<span class="nc" id="L156">    buttonPanel.add(refreshBtn);</span>
+
+<span class="nc" id="L158">    eventPanel.add(buttonPanel, BorderLayout.SOUTH);</span>
+
+<span class="nc" id="L160">    centerPanel.add(eventPanel, BorderLayout.EAST);</span>
+
+<span class="nc" id="L162">    add(centerPanel, BorderLayout.CENTER);</span>
+<span class="nc" id="L163">    add(statusLabel, BorderLayout.SOUTH);</span>
+<span class="nc" id="L164">  }</span>
+
+  private void renderCalendar() {
+<span class="nc" id="L167">    calendarGrid.removeAll();</span>
+
+<span class="nc" id="L169">    String monthName = currentMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);</span>
+<span class="nc" id="L170">    monthYearLabel.setText(monthName + &quot; &quot; + currentMonth.getYear());</span>
+
+<span class="nc" id="L172">    String[] days = {&quot;Sun&quot;, &quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;, &quot;Thu&quot;, &quot;Fri&quot;, &quot;Sat&quot;};</span>
+<span class="nc bnc" id="L173" title="All 2 branches missed.">    for (String day : days) {</span>
+<span class="nc" id="L174">      JLabel header = new JLabel(day, SwingConstants.CENTER);</span>
+<span class="nc" id="L175">      header.setFont(new Font(&quot;Arial&quot;, Font.BOLD, 12));</span>
+<span class="nc" id="L176">      header.setOpaque(true);</span>
+<span class="nc" id="L177">      header.setBackground(new Color(200, 200, 200));</span>
+<span class="nc" id="L178">      header.setBorder(new LineBorder(Color.GRAY));</span>
+<span class="nc" id="L179">      calendarGrid.add(header);</span>
+    }
+
+<span class="nc" id="L182">    LocalDate firstDay = currentMonth.atDay(1);</span>
+<span class="nc" id="L183">    int firstDayOfWeek = firstDay.getDayOfWeek().getValue() % 7;</span>
+
+<span class="nc bnc" id="L185" title="All 2 branches missed.">    for (int i = 0; i &lt; firstDayOfWeek; i++) {</span>
+<span class="nc" id="L186">      JPanel empty = new JPanel();</span>
+<span class="nc" id="L187">      empty.setBackground(Color.LIGHT_GRAY);</span>
+<span class="nc" id="L188">      calendarGrid.add(empty);</span>
+    }
+
+<span class="nc" id="L191">    int daysInMonth = currentMonth.lengthOfMonth();</span>
+<span class="nc bnc" id="L192" title="All 2 branches missed.">    for (int day = 1; day &lt;= daysInMonth; day++) {</span>
+<span class="nc" id="L193">      LocalDate date = currentMonth.atDay(day);</span>
+<span class="nc" id="L194">      JPanel dayPanel = createDayPanel(date);</span>
+<span class="nc" id="L195">      calendarGrid.add(dayPanel);</span>
+    }
+
+<span class="nc" id="L198">    int totalCells = firstDayOfWeek + daysInMonth;</span>
+<span class="nc" id="L199">    int remaining = 42 - totalCells;</span>
+<span class="nc bnc" id="L200" title="All 2 branches missed.">    for (int i = 0; i &lt; remaining; i++) {</span>
+<span class="nc" id="L201">      JPanel empty = new JPanel();</span>
+<span class="nc" id="L202">      empty.setBackground(Color.LIGHT_GRAY);</span>
+<span class="nc" id="L203">      calendarGrid.add(empty);</span>
+    }
+
+<span class="nc" id="L206">    calendarGrid.revalidate();</span>
+<span class="nc" id="L207">    calendarGrid.repaint();</span>
+<span class="nc" id="L208">  }</span>
+
+  private JPanel createDayPanel(LocalDate date) {
+<span class="nc" id="L211">    JPanel panel = new JPanel(new BorderLayout());</span>
+<span class="nc" id="L212">    panel.setBorder(new LineBorder(Color.GRAY));</span>
+<span class="nc" id="L213">    panel.setPreferredSize(new Dimension(80, 60));</span>
+
+<span class="nc" id="L215">    JLabel dayLabel = new JLabel(String.valueOf(date.getDayOfMonth()), SwingConstants.CENTER);</span>
+<span class="nc" id="L216">    dayLabel.setFont(new Font(&quot;Arial&quot;, Font.BOLD, 14));</span>
+<span class="nc" id="L217">    panel.add(dayLabel, BorderLayout.NORTH);</span>
+
+<span class="nc" id="L219">    Color bgColor = Color.WHITE;</span>
+
+<span class="nc bnc" id="L221" title="All 2 branches missed.">    if (date.equals(selectedDate)) {</span>
+<span class="nc" id="L222">      bgColor = new Color(173, 216, 230);</span>
+<span class="nc bnc" id="L223" title="All 2 branches missed.">    } else if (date.equals(LocalDate.now())) {</span>
+<span class="nc" id="L224">      bgColor = new Color(255, 255, 200);</span>
+<span class="nc bnc" id="L225" title="All 2 branches missed.">    } else if (date.getDayOfWeek().getValue() &gt;= 6) {</span>
+<span class="nc" id="L226">      bgColor = new Color(245, 245, 245);</span>
+    }
+
+<span class="nc" id="L229">    panel.setBackground(bgColor);</span>
+
+<span class="nc" id="L231">    panel.addMouseListener(new java.awt.event.MouseAdapter() {</span>
+      public void mouseClicked(java.awt.event.MouseEvent e) {
+<span class="nc bnc" id="L233" title="All 2 branches missed.">        if (dateSelectionListener != null) {</span>
+<span class="nc" id="L234">          dateSelectionListener.accept(date);</span>
+        }
+<span class="nc" id="L236">      }</span>
+
+      public void mouseEntered(java.awt.event.MouseEvent e) {
+<span class="nc bnc" id="L239" title="All 2 branches missed.">        if (!date.equals(selectedDate)) {</span>
+<span class="nc" id="L240">          panel.setBorder(new LineBorder(Color.BLUE, 2));</span>
+        }
+<span class="nc" id="L242">      }</span>
+
+      public void mouseExited(java.awt.event.MouseEvent e) {
+<span class="nc bnc" id="L245" title="All 2 branches missed.">        if (!date.equals(selectedDate)) {</span>
+<span class="nc" id="L246">          panel.setBorder(new LineBorder(Color.GRAY, 1));</span>
+        } else {
+<span class="nc" id="L248">          panel.setBorder(new LineBorder(Color.BLUE, 3));</span>
+        }
+<span class="nc" id="L250">      }</span>
+    });
+
+<span class="nc bnc" id="L253" title="All 2 branches missed.">    if (date.equals(selectedDate)) {</span>
+<span class="nc" id="L254">      panel.setBorder(new LineBorder(Color.BLUE, 3));</span>
+    }
+
+<span class="nc" id="L257">    return panel;</span>
+  }
+
+  /**
+   * Updates the calendar dropdown list.
+   * Called by controller when calendars change.
+   */
+  public void updateCalendarList(List&lt;String&gt; calendarNames, String activeCalendar) {
+<span class="nc" id="L265">    calendarDropdown.removeAllItems();</span>
+
+<span class="nc bnc" id="L267" title="All 4 branches missed.">    if (calendarNames == null || calendarNames.isEmpty()) {</span>
+<span class="nc" id="L268">      calendarDropdown.addItem(&quot;(No calendars)&quot;);</span>
+<span class="nc" id="L269">      calendarDropdown.setEnabled(false);</span>
+    } else {
+<span class="nc" id="L271">      calendarDropdown.setEnabled(true);</span>
+<span class="nc bnc" id="L272" title="All 2 branches missed.">      for (String name : calendarNames) {</span>
+<span class="nc" id="L273">        calendarDropdown.addItem(name);</span>
+<span class="nc" id="L274">      }</span>
+<span class="nc bnc" id="L275" title="All 2 branches missed.">      if (activeCalendar != null) {</span>
+<span class="nc" id="L276">        calendarDropdown.setSelectedItem(activeCalendar);</span>
+      }
+    }
+
+<span class="nc" id="L280">    statusLabel.setText(&quot;Active Calendar: &quot; + activeCalendar);</span>
+<span class="nc" id="L281">  }</span>
+
+  /**
+   * Updates the status message at the bottom.
+   */
+  public void setStatus(String message) {
+<span class="nc" id="L287">    statusLabel.setText(message);</span>
+<span class="nc" id="L288">  }</span>
+
+  /**
+   * Shows an error dialog.
+   */
+  public void showError(String message) {
+<span class="nc" id="L294">    JOptionPane.showMessageDialog(this, message, &quot;Error&quot;, JOptionPane.ERROR_MESSAGE);</span>
+<span class="nc" id="L295">  }</span>
+
+  /**
+   * Shows a success message.
+   */
+  public void showSuccess(String message) {
+<span class="nc" id="L301">    JOptionPane.showMessageDialog(this, message, &quot;Success&quot;, JOptionPane.INFORMATION_MESSAGE);</span>
+<span class="nc" id="L302">  }</span>
+
+  /**
+   * Shows a message.
+   */
+  public void showMessage(String message) {
+<span class="nc" id="L308">    JOptionPane.showMessageDialog(this, message, &quot;Info&quot;, JOptionPane.INFORMATION_MESSAGE);</span>
+<span class="nc" id="L309">  }</span>
+
+  /**
+   * Gets the calendar dropdown component.
+   * Controller uses this to wire up selection listener.
+   */
+  public JComboBox&lt;String&gt; getCalendarDropdown() {
+<span class="nc" id="L316">    return calendarDropdown;</span>
+  }
+
+  /**
+   * Gets the create calendar button.
+   * Controller uses this to wire up click listener.
+   */
+  public JButton getCreateCalendarButton() {
+<span class="nc" id="L324">    return createCalendarButton;</span>
+  }
+
+  /**
+   * Gets the currently selected date.
+   */
+  public LocalDate getSelectedDate() {
+<span class="nc" id="L331">    return selectedDate;</span>
+  }
+
+  /**
+   * Gets the edit calendar button.
+   * Controller uses this to wire up click listener.
+   */
+  public JButton getEditCalendarButton() {
+<span class="nc" id="L339">    return editCalendarButton;</span>
+  }
+
+  public JButton getCreateEventButton() {
+<span class="nc" id="L343">    return createEventButton;</span>
+  }
+
+  public JButton getEditEventButton() {
+<span class="nc" id="L347">    return editEventButton;</span>
+  }
+
+  public JButton getEditEventsBySearchButton() {
+<span class="nc" id="L351">    return editEventsBySearchButton;</span>
+  }
+
+  /**
+   * Called by Controller to update the calendar grid.
+   */
+  public void updateCalendarView(YearMonth month, LocalDate date) {
+<span class="nc" id="L358">    this.currentMonth = month;</span>
+<span class="nc" id="L359">    this.selectedDate = date;</span>
+<span class="nc" id="L360">    renderCalendar();</span>
+<span class="nc" id="L361">  }</span>
+
+  /**
+   * ok.
+   *
+   * @param prev ok.
+   * @param next ok.
+   * @param today ok.
+   */
+  public void addNavigationListeners(java.awt.event.ActionListener prev,
+                                     java.awt.event.ActionListener next,
+                                     java.awt.event.ActionListener today) {
+<span class="nc" id="L373">    this.prevBtn.addActionListener(prev);</span>
+<span class="nc" id="L374">    this.nextBtn.addActionListener(next);</span>
+<span class="nc" id="L375">    this.todayBtn.addActionListener(today);</span>
+<span class="nc" id="L376">  }</span>
+
+  /**
+   * Allows the Controller to subscribe to date click events.
+   */
+  public void setDateSelectionListener(Consumer&lt;LocalDate&gt; listener) {
+<span class="nc" id="L382">    this.dateSelectionListener = listener;</span>
+<span class="nc" id="L383">  }</span>
+
+  /**
+   * Displays events using the existing ResultFormatter.
+   * Reuses console formatting logic for consistency.
+   */
+  public void displayEventsForQueryResult(LocalDate date, QueryResultDto result) {
+<span class="nc" id="L390">    StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L391">    sb.append(&quot;Events on &quot;).append(date).append(&quot;:\n&quot;);</span>
+<span class="nc" id="L392">    sb.append(&quot;═&quot;.repeat(40)).append(&quot;\n\n&quot;);</span>
+<span class="nc bnc" id="L393" title="All 2 branches missed.">    if (result == null) {</span>
+<span class="nc" id="L394">      sb.append(&quot;Error: Result is null&quot;);</span>
+<span class="nc bnc" id="L395" title="All 4 branches missed.">    } else if (result.getEvents() == null || result.getEvents().isEmpty()) {</span>
+<span class="nc" id="L396">      sb.append(&quot;No events scheduled for this day.&quot;);</span>
+    } else {
+<span class="nc" id="L398">      String formattedEvents = formatter.format(result);</span>
+<span class="nc" id="L399">      sb.append(formattedEvents);</span>
+    }
+<span class="nc" id="L401">    eventArea.setText(sb.toString());</span>
+<span class="nc" id="L402">    eventArea.setCaretPosition(0);</span>
+<span class="nc" id="L403">  }</span>
+
+  @Override
+  public JFrame getFrame() {
+<span class="nc" id="L407">    return this;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="model.query.PrintRangeTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-01-05T23:19:34" hostname="Vaishnavis-MacBook-Pro.local" time="0.003">
+  <properties/>
+  <testcase name="testPrintInRangeMultipleEvents" classname="model.query.PrintRangeTest" time="0.001"/>
+  <testcase name="testPrintOnDateNullDateMessage" classname="model.query.PrintRangeTest" time="0.0"/>
+  <testcase name="testPrintInRangeNoEvents" classname="model.query.PrintRangeTest" time="0.001"/>
+  <testcase name="testPrintInRangeMultipleDays" classname="model.query.PrintRangeTest" time="0.0"/>
+  <testcase name="testPrintInRangeNullStart" classname="model.query.PrintRangeTest" time="0.0"/>
+  <testcase name="testPrintInRangeNullEnd" classname="model.query.PrintRangeTest" time="0.0"/>
+  <testcase name="testPrintInRangeStartAfterEnd" classname="model.query.PrintRangeTest" time="0.0"/>
+  <testcase name="testPrintInRangeNullEnd2" classname="model.query.PrintRangeTest" time="0.0"/>
+  <testcase name="testPrintInRangeNullStart3" classname="model.query.PrintRangeTest" time="0.001"/>
+  <system-out><![CDATA[✓ TEST PASSED: Found 2 events in range
+✓ TEST PASSED: Found no events in empty range
+✓ TEST PASSED: Found 3 events across multiple days
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

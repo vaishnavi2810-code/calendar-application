@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Calendar.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.model</a> &gt; <span class="el_source">Calendar.java</span></div><h1>Calendar.java</h1><pre class="source lang-java linenums">package calendar.model;
+
+import java.time.ZoneId;
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Represents an immutable calendar containing events within a specific timezone.
+ *
+ * &lt;p&gt;A Calendar is a named collection of {@link Event} objects, all operating within
+ * a single timezone context. This class serves as the core domain model for organizing
+ * and grouping events in the MVCalendar application.&lt;/p&gt;
+ *
+ * &lt;h2&gt;Immutability&lt;/h2&gt;
+ *
+ * &lt;p&gt;This class is designed to be immutable after construction. The events set
+ * is defensively copied both on construction and retrieval to prevent external
+ * modification. Any changes to calendar properties require creating a new instance,
+ * typically via {@link CalendarModelBuilder}.&lt;/p&gt;
+ *
+ * &lt;h2&gt;Timezone Handling&lt;/h2&gt;
+ *
+ * &lt;p&gt;All events within a calendar share the same timezone context. When events are
+ * queried or displayed, their times are interpreted relative to this calendar's
+ * timezone. Timezone conversions are handled by the CalendarModel when copying
+ * events between calendars with different timezones.&lt;/p&gt;
+ *
+ * &lt;h2&gt;Usage Example&lt;/h2&gt;
+ *
+ * &lt;pre&gt;{@code
+ * // Creating a calendar using the builder
+ * Calendar workCalendar = new CalendarModelBuilder()
+ *     .setName(&quot;Work&quot;)
+ *     .setTimeZone(ZoneId.of(&quot;America/New_York&quot;))
+ *     .setEvents(new HashSet&lt;&gt;())
+ *     .build();
+ *
+ * // Accessing calendar properties
+ * String name = workCalendar.getName();           // &quot;Work&quot;
+ * ZoneId zone = workCalendar.getTimezone();       // America/New_York
+ * Set&lt;Event&gt; events = workCalendar.getEvents();   // Defensive copy
+ * }&lt;/pre&gt;
+ *
+ * &lt;h2&gt;Thread Safety&lt;/h2&gt;
+ *
+ * &lt;p&gt;Due to its immutable design, this class is inherently thread-safe. Multiple
+ * threads can safely read from a Calendar instance without synchronization.&lt;/p&gt;
+ *
+ * @see Event
+ * @see CalendarModelBuilder
+ * @see calendar.model.CalendarCollection
+ */
+public class Calendar {
+
+  /**
+   * The collection of events belonging to this calendar.
+   * Stored as a Set to ensure no duplicate events exist.
+   */
+  private final Set&lt;Event&gt; events;
+
+  /**
+   * The timezone in which all events in this calendar are interpreted.
+   * Used for display purposes and timezone conversion operations.
+   */
+  private final ZoneId timezone;
+
+  /**
+   * The unique identifier name for this calendar.
+   * Used as the key for storage and retrieval in the repository.
+   */
+  private final String name;
+
+  /**
+   * Constructs a new Calendar with the specified name, timezone, and events.
+   *
+   * &lt;p&gt;The provided events set is stored directly without defensive copying
+   * at construction time. For safe construction with defensive copying,
+   * use {@link CalendarModelBuilder} which handles this automatically.&lt;/p&gt;
+   *
+   * @param name     the unique identifier for this calendar; must not be null
+   *                 or empty when used with the repository layer
+   * @param timezone the timezone for interpreting event times; must not be null
+   * @param events   the initial set of events for this calendar; must not be null
+   * @see CalendarModelBuilder
+   */
+<span class="fc" id="L86">  public Calendar(String name, ZoneId timezone, Set&lt;Event&gt; events) {</span>
+<span class="fc" id="L87">    this.events = events;</span>
+<span class="fc" id="L88">    this.timezone = timezone;</span>
+<span class="fc" id="L89">    this.name = name;</span>
+<span class="fc" id="L90">  }</span>
+
+  /**
+   * Returns the total number of events in this calendar.
+   *
+   * &lt;p&gt;This count includes all events regardless of their date, time,
+   * or recurrence status. Each occurrence of a recurring event series
+   * is counted as a separate event.&lt;/p&gt;
+   *
+   * @return the number of events in this calendar; never negative
+   */
+  public int getEventCount() {
+<span class="fc" id="L102">    return events.size();</span>
+  }
+
+  /**
+   * Returns a defensive copy of all events in this calendar.
+   *
+   * &lt;p&gt;The returned set is a new {@link HashSet} containing references to
+   * the same {@link Event} objects. Since Event objects are immutable,
+   * this provides full protection against external modification of the
+   * calendar's event collection.&lt;/p&gt;
+   *
+   * &lt;p&gt;Modifications to the returned set will not affect this calendar's
+   * internal state. To add or remove events, create a new Calendar instance
+   * with the modified event set.&lt;/p&gt;
+   *
+   * @return a new Set containing all events in this calendar; never null
+   */
+  public Set&lt;Event&gt; getEvents() {
+<span class="fc" id="L120">    return new HashSet&lt;&gt;(events);</span>
+  }
+
+  /**
+   * Returns the timezone associated with this calendar.
+   *
+   * &lt;p&gt;All events in this calendar have their times interpreted relative
+   * to this timezone. When displaying events or performing time-based
+   * queries, this timezone provides the context for interpretation.&lt;/p&gt;
+   *
+   * &lt;p&gt;Common timezone examples include:&lt;/p&gt;
+   * &lt;ul&gt;
+   *   &lt;li&gt;{@code ZoneId.of(&quot;America/New_York&quot;)} - Eastern Time&lt;/li&gt;
+   *   &lt;li&gt;{@code ZoneId.of(&quot;Europe/London&quot;)} - British Time&lt;/li&gt;
+   *   &lt;li&gt;{@code ZoneId.of(&quot;Asia/Tokyo&quot;)} - Japan Standard Time&lt;/li&gt;
+   *   &lt;li&gt;{@code ZoneId.systemDefault()} - System's default timezone&lt;/li&gt;
+   * &lt;/ul&gt;
+   *
+   * @return the timezone for this calendar; never null
+   */
+  public ZoneId getTimezone() {
+<span class="fc" id="L141">    return timezone;</span>
+  }
+
+  /**
+   * Returns the unique name identifier for this calendar.
+   *
+   * &lt;p&gt;The name serves as the primary identifier for the calendar within
+   * the repository layer. It is used for:&lt;/p&gt;
+   * &lt;ul&gt;
+   *   &lt;li&gt;Storage and retrieval from {@link  calendar.model.CalendarCollection}&lt;/li&gt;
+   *   &lt;li&gt;Display in the user interface dropdown&lt;/li&gt;
+   *   &lt;li&gt;Reference in copy operations between calendars&lt;/li&gt;
+   *   &lt;li&gt;Setting the active calendar in {@link calendar.model.CalendarCollection}&lt;/li&gt;
+   * &lt;/ul&gt;
+   *
+   * @return the name of this calendar; may be empty if not properly initialized
+   */
+  public String getName() {
+<span class="fc" id="L159">    return name;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>QueryEventDto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.dto</a> &gt; <span class="el_source">QueryEventDto.java</span></div><h1>QueryEventDto.java</h1><pre class="source lang-java linenums">package calendar.dto;
+
+import java.time.LocalDate;
+import java.util.regex.Matcher;
+
+/**
+ * Data Transfer Object for querying calendar events.
+ */
+public class QueryEventDto {
+
+  /**
+   * Enumeration of different query types supported by the calendar system.
+   */
+<span class="fc" id="L14">  public enum QueryType {</span>
+<span class="fc" id="L15">    PRINT_ON_DATE,</span>
+<span class="fc" id="L16">    PRINT_IN_RANGE,</span>
+<span class="fc" id="L17">    SHOW_STATUS_AT</span>
+  }
+
+  private final QueryType type;
+  private final String onDate;
+  private final String rangeStart;
+  private final String rangeEnd;
+  private final String atInstant;
+
+  /**
+   * Creates a QueryEventDto by extracting and parsing relevant fields from the provided
+   * matcher based on the query type.
+   *
+   * @param type the type of query operation
+   * @param matcher the regex matcher containing the parsed query data with named groups
+   */
+<span class="fc" id="L33">  public QueryEventDto(QueryType type, Matcher matcher) {</span>
+<span class="fc" id="L34">    this.type = type;</span>
+<span class="fc" id="L35">    this.onDate = getGroup(matcher, &quot;date&quot;);</span>
+<span class="fc" id="L36">    this.rangeStart = getGroup(matcher, &quot;start&quot;);</span>
+<span class="fc" id="L37">    this.rangeEnd = getGroup(matcher, &quot;end&quot;);</span>
+<span class="fc" id="L38">    this.atInstant = getGroup(matcher, &quot;datetime&quot;);</span>
+<span class="fc" id="L39">  }</span>
+
+  /**
+   * Creates a QueryEventDto directly from parameters without using a Matcher.
+   * Used for GUI mode where data comes from form fields rather than text parsing.
+   *
+   * @param type the type of query operation
+   * @param onDate date string in YYYY-MM-DD format
+   * @param rangeStart start datetime string in YYYY-MM-DDTHH:mm format
+   * @param rangeEnd end datetime string in YYYY-MM-DDTHH:mm format
+   * @param atInstant instant datetime string in YYYY-MM-DDTHH:mm format
+   */
+  private QueryEventDto(QueryType type, String onDate, String rangeStart,
+<span class="fc" id="L52">                        String rangeEnd, String atInstant) {</span>
+<span class="fc" id="L53">    this.type = type;</span>
+<span class="fc" id="L54">    this.onDate = onDate;</span>
+<span class="fc" id="L55">    this.rangeStart = rangeStart;</span>
+<span class="fc" id="L56">    this.rangeEnd = rangeEnd;</span>
+<span class="fc" id="L57">    this.atInstant = atInstant;</span>
+<span class="fc" id="L58">  }</span>
+
+  private String getGroup(Matcher matcher, String groupName) {
+    try {
+<span class="fc" id="L62">      return matcher.group(groupName);</span>
+<span class="fc" id="L63">    } catch (IllegalArgumentException | IllegalStateException e) {</span>
+<span class="fc" id="L64">      return null;</span>
+    }
+  }
+
+  private LocalDate parseLocalDate(Matcher matcher, String groupName) {
+<span class="nc" id="L69">    String dateStr = getGroup(matcher, groupName);</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">    return (dateStr != null) ? LocalDate.parse(dateStr) : null;</span>
+  }
+
+  /**
+   * Creates a query DTO for events on a specific date.
+   *
+   * @param date date string in YYYY-MM-DD format
+   * @return configured QueryEventDto
+   */
+  public static QueryEventDto forDate(String date) {
+<span class="fc" id="L80">    return new QueryEventDto(QueryType.PRINT_ON_DATE, date, null, null, null);</span>
+  }
+
+  /**
+   * Creates a query DTO for events in a datetime range.
+   *
+   * @param startDateTime start in YYYY-MM-DDTHH:mm format
+   * @param endDateTime end in YYYY-MM-DDTHH:mm format
+   * @return configured QueryEventDto
+   */
+  public static QueryEventDto forRange(String startDateTime, String endDateTime) {
+<span class="fc" id="L91">    return new QueryEventDto(QueryType.PRINT_IN_RANGE, null, startDateTime, endDateTime, null);</span>
+  }
+
+  /**
+   * Creates a query DTO for status at a specific instant.
+   *
+   * @param instant instant in YYYY-MM-DDTHH:mm format
+   * @return configured QueryEventDto
+   */
+  public static QueryEventDto forStatus(String instant) {
+<span class="fc" id="L101">    return new QueryEventDto(QueryType.SHOW_STATUS_AT, null, null, null, instant);</span>
+  }
+
+  public QueryType getType() {
+<span class="fc" id="L105">    return type;</span>
+  }
+
+  public String getOnDate() {
+<span class="fc" id="L109">    return onDate;</span>
+  }
+
+  public String getRangeStart() {
+<span class="fc" id="L113">    return rangeStart;</span>
+  }
+
+  public String getRangeEnd() {
+<span class="fc" id="L117">    return rangeEnd;</span>
+  }
+
+  public String getAtInstant() {
+<span class="fc" id="L121">    return atInstant;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

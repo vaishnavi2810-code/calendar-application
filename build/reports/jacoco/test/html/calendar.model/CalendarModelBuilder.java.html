@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CalendarModelBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.model</a> &gt; <span class="el_source">CalendarModelBuilder.java</span></div><h1>CalendarModelBuilder.java</h1><pre class="source lang-java linenums">package calendar.model;
+
+import java.time.ZoneId;
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Builder class for creating CalendarModel objects using the Builder pattern.
+ * Provides a fluent interface for constructing calendars with various properties.
+ */
+public class CalendarModelBuilder {
+  private String name;
+  private ZoneId timeZone;
+  private Set&lt;Event&gt; events;
+
+  /**
+  * Constructs a new CalendarModelBuilder with default values.
+  * Default timezone is system default, empty event set, and empty name.
+  */
+<span class="fc" id="L20">  public CalendarModelBuilder() {</span>
+<span class="fc" id="L21">    this.name = &quot;&quot;;</span>
+<span class="fc" id="L22">    this.timeZone = ZoneId.systemDefault();</span>
+<span class="fc" id="L23">    this.events = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L24">  }</span>
+
+  /**
+  * Sets the name of the calendar.
+  *
+  * @param name the calendar name (e.g., &quot;work&quot;, &quot;personal&quot;)
+  * @return this CalendarModelBuilder instance for method chaining
+  */
+  public CalendarModelBuilder setName(String name) {
+<span class="fc" id="L33">    this.name = name;</span>
+<span class="fc" id="L34">    return this;</span>
+  }
+
+  /**
+  * Sets the timezone for the calendar.
+  *
+  * @param timeZone the timezone for this calendar
+  * @return this CalendarModelBuilder instance for method chaining
+  */
+  public CalendarModelBuilder setTimeZone(ZoneId timeZone) {
+<span class="fc" id="L44">    this.timeZone = timeZone;</span>
+<span class="fc" id="L45">    return this;</span>
+  }
+
+  /**
+  * Sets the initial events for the calendar.
+  * Note: This replaces any previously set events in the builder.
+  *
+  * @param events the set of events to initialize the calendar with
+  * @return this CalendarModelBuilder instance for method chaining
+  */
+  public CalendarModelBuilder setEvents(Set&lt;Event&gt; events) {
+<span class="fc" id="L56">    this.events = new HashSet&lt;&gt;(events);</span>
+<span class="fc" id="L57">    return this;</span>
+  }
+
+  /**
+  * Constructs and returns the CalendarModel with all configured properties.
+  *
+  * @return a new CalendarModel with the specified properties
+  */
+  public Calendar build() {
+<span class="fc" id="L66">    return new Calendar(this.name, this.timeZone, this.events);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EditCalendarDialog.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">calendar</a> &gt; <a href="index.source.html" class="el_package">calendar.view</a> &gt; <span class="el_source">EditCalendarDialog.java</span></div><h1>EditCalendarDialog.java</h1><pre class="source lang-java linenums">package calendar.view;
+
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.time.ZoneId;
+import java.util.Objects;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+/**
+ * Dialog for editing an existing calendar.
+ * &quot;Dumb&quot; View: It simply exposes fields for Name and Timezone.
+ * It does not enforce which one must be edited.
+ */
+public class EditCalendarDialog extends JDialog {
+
+  private JTextField nameField;
+  private JComboBox&lt;String&gt; timezoneBox;
+<span class="nc" id="L29">  private boolean confirmed = false;</span>
+
+  /**
+   * Creates a dialog for editing a calendar.
+   *
+   * @param parent The parent frame
+   * @param currentCalendarName The name of the calendar being edited
+   * @param currentTimezone The current timezone of the calendar
+   */
+  public EditCalendarDialog(JFrame parent, String currentCalendarName, String currentTimezone) {
+<span class="nc" id="L39">    super(parent, &quot;Edit Calendar&quot;, true);</span>
+<span class="nc" id="L40">    initComponents(currentCalendarName, currentTimezone);</span>
+<span class="nc" id="L41">    layoutComponents(currentCalendarName);</span>
+<span class="nc" id="L42">    pack();</span>
+<span class="nc" id="L43">    setLocationRelativeTo(parent);</span>
+<span class="nc" id="L44">  }</span>
+
+  private void initComponents(String currentName, String currentTimezone) {
+<span class="nc" id="L47">    nameField = new JTextField(currentName, 15);</span>
+<span class="nc" id="L48">    String[] timezones = ZoneId.getAvailableZoneIds().toArray(new String[0]);</span>
+<span class="nc" id="L49">    timezoneBox = new JComboBox&lt;&gt;(timezones);</span>
+<span class="nc" id="L50">    timezoneBox.setSelectedItem(Objects</span>
+<span class="nc" id="L51">            .requireNonNullElseGet(currentTimezone,</span>
+<span class="nc" id="L52">                    () -&gt; ZoneId.systemDefault().getId()));</span>
+<span class="nc" id="L53">  }</span>
+
+  private void layoutComponents(String currentCalendarName) {
+<span class="nc" id="L56">    JPanel mainPanel = new JPanel();</span>
+<span class="nc" id="L57">    mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));</span>
+<span class="nc" id="L58">    mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));</span>
+<span class="nc" id="L59">    JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));</span>
+<span class="nc" id="L60">    infoPanel.add(new JLabel(&quot;Editing Calendar: &quot;));</span>
+<span class="nc" id="L61">    JLabel calendarLabel = new JLabel(currentCalendarName);</span>
+<span class="nc" id="L62">    calendarLabel.setFont(calendarLabel.getFont().deriveFont(Font.BOLD));</span>
+<span class="nc" id="L63">    infoPanel.add(calendarLabel);</span>
+<span class="nc" id="L64">    mainPanel.add(infoPanel);</span>
+<span class="nc" id="L65">    mainPanel.add(Box.createVerticalStrut(10));</span>
+<span class="nc" id="L66">    JPanel fieldPanel = new JPanel(new GridLayout(2, 2, 10, 10));</span>
+<span class="nc" id="L67">    fieldPanel.add(new JLabel(&quot;Name:&quot;));</span>
+<span class="nc" id="L68">    fieldPanel.add(nameField);</span>
+<span class="nc" id="L69">    fieldPanel.add(new JLabel(&quot;Timezone:&quot;));</span>
+<span class="nc" id="L70">    fieldPanel.add(timezoneBox);</span>
+<span class="nc" id="L71">    mainPanel.add(fieldPanel);</span>
+<span class="nc" id="L72">    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));</span>
+<span class="nc" id="L73">    JButton okButton = new JButton(&quot;Save&quot;); // Changed &quot;OK&quot; to &quot;Save&quot; to imply action</span>
+<span class="nc" id="L74">    JButton cancelButton = new JButton(&quot;Cancel&quot;);</span>
+
+<span class="nc" id="L76">    okButton.addActionListener(e -&gt; {</span>
+<span class="nc" id="L77">      confirmed = true;</span>
+<span class="nc" id="L78">      dispose();</span>
+<span class="nc" id="L79">    });</span>
+
+<span class="nc" id="L81">    cancelButton.addActionListener(e -&gt; {</span>
+<span class="nc" id="L82">      confirmed = false;</span>
+<span class="nc" id="L83">      dispose();</span>
+<span class="nc" id="L84">    });</span>
+
+<span class="nc" id="L86">    buttonPanel.add(okButton);</span>
+<span class="nc" id="L87">    buttonPanel.add(cancelButton);</span>
+<span class="nc" id="L88">    setLayout(new BorderLayout());</span>
+<span class="nc" id="L89">    add(mainPanel, BorderLayout.CENTER);</span>
+<span class="nc" id="L90">    add(buttonPanel, BorderLayout.SOUTH);</span>
+<span class="nc" id="L91">  }</span>
+
+  /**
+   * Returns the name currently in the text field.
+   * The View does NOT check if this is different from the original.
+   * That is the Controller's job.
+   */
+  public String getNewName() {
+<span class="nc" id="L99">    return nameField.getText().trim();</span>
+  }
+
+  /**
+   * Returns the timezone currently selected.
+   */
+  public String getNewTimezone() {
+<span class="nc" id="L106">    return (String) timezoneBox.getSelectedItem();</span>
+  }
+
+  /**
+   * Returns true if user clicked Save, false if cancelled.
+   */
+  public boolean isConfirmed() {
+<span class="nc" id="L113">    return confirmed;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
