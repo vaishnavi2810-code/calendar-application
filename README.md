@@ -1,4 +1,4 @@
-# 🗓️ Calendar Application
+# Calendar Application
 
 > **Event management system with MVC architecture, design patterns, and dual CLI/GUI interfaces**
 
@@ -8,7 +8,7 @@
 
 **Key Features:** MVC Architecture | Strategy Pattern | SOLID Principles | CLI + GUI Interfaces
 
-## 📖 Overview
+## Overview
 
 A calendar management system supporting multiple calendars with independent timezones, recurring events, and both command-line and graphical user interfaces. Demonstrates clean software architecture with proper separation of concerns.
 
@@ -19,7 +19,7 @@ A calendar management system supporting multiple calendars with independent time
 - ✅ Design patterns: Strategy, Command, Factory, Builder
 - ✅ SOLID principles throughout codebase
 
-## 🏗️ Architecture
+## Architecture
 
 ### MVC with Service Layer
 ```
@@ -48,7 +48,7 @@ Model Layer:
 - Interface Segregation: Specific interfaces for each operation
 - Dependency Inversion: Controllers depend on abstractions, not implementations
 
-## ✨ Key Features
+## Key Features
 
 ### Calendar Management
 - Create multiple calendars with custom timezones
@@ -70,7 +70,7 @@ Model Layer:
 - Availability checking at specific times
 - Duplicate prevention
 
-## 🖥️ Application Interfaces
+## Application Interfaces
 
 ### GUI Mode
 <p align="center">
@@ -103,7 +103,7 @@ events created now is 10
 1. Event{subject='Team Meeting', startDateTime=2025-12-01T10:00...}
 ```
 
-## 🚀 How to Use
+## How to Use
 
 ### Build the Application
 ```bash
@@ -173,7 +173,7 @@ create event "Class" from 2025-12-01T10:00 to 2025-12-01T11:30 repeats MWF for 1
 export cal school_calendar.ical
 ```
 
-## 🎯 Technical Implementation
+## Technical Implementation
 
 ### Core Design
 
@@ -197,7 +197,7 @@ export cal school_calendar.ical
 - Current implementation: in-memory HashMap
 - Easily replaceable with database or file storage
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 **Language:** Java 11+  
 **UI:** Java Swing (GUI), Console I/O (CLI)  
